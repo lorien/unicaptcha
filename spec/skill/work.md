@@ -1,13 +1,16 @@
 ## Workflow
 
 Study documents inside `spec/ref/` directory.
+Read `spec/ref/research.md` document.
 Read `spec/skill/task_tracking.md`.
 Select ONLY ONE task and work on it.
-After task is done, perform final checks (see below).
-After task is done, make a new github commit, in commit message describe what you have done.
-After task is done, create new report file, see the section "Report" below.
+After task is done do these aciton (in this very order):
+- perform final checks (see below)
+- create new report file, see the section "Report" below
+- make a new github commit, in commit message describe what you have done
+
 Do not do github commit and do not create report file if you have not worked on any task
-from implementation plan (like when all tasks are in "done" state).
+    from implementation plan (like when all tasks are in "done" state).
 
 ## Task Done Check List
 
