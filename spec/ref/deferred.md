@@ -7,7 +7,7 @@ never discussed.
 | # | Item | Notes |
 |---|---|---|
 | 1 | PyPI publishing / release automation flow | Whether a `v*` tag triggers automated publish, TestPyPI dry-run, trusted publishing vs token. Deliberately postponed ("other day"). |
-| 2 | Exact per-provider challenge field lists | Which fields each provider's challenge classes carry beyond the universal kind-base fields (2Captcha's `lang`, `hint`, `phrase`, `numeric`, `math`, `min_len`, `max_len`, `case_sensitive`; CapMonster capability flags; etc.). Worked out during implementation against each provider's API reference. |
+| 2 | Exact per-provider challenge field lists | Which fields each provider's challenge classes carry beyond the universal kind-base fields (2Captcha's `lang`, `hint`, `phrase`, `numeric`, `math`, `min_len`, `max_len`, `case_sensitive`; CapMonster capability flags; etc.). Worked out during implementation against each provider's API reference. Includes the worker-context surface (`user_agent`/`cookies` per provider, ADR-0069). |
 | 3 | `examples/` directory | Use-case examples; nature undecided (runnable scripts vs illustrative snippets). Directory name must be `examples/`. |
 | 4 | Automatic provider selection / failover routing | Kind-level random selection now exists (ADR-0064: `provider=None` picks uniformly among supporting adapters). Still deferred: *policy* routing — cheapest-first, failover, load balancing, stickiness/weighting. A strategy wrapper could be added as a purely additive layer. |
 | 5 | Client-side rate limiting / concurrency caps | v1: no `max_parallel_solves`, no request spacing. Callers manage concurrency; `RateLimitError` retry with backoff exists as a safety net. Documented guidance only. |

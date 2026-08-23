@@ -31,7 +31,7 @@ supersede.
 | [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057 |
 | [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics; scoped to solve() by 0067 |
 | [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter; 0059 |
-| [0012](ADR/0012-proxy-handling.md) | Proxy handling | optional challenge field + client default |
+| [0012](ADR/0012-proxy-handling.md) | Proxy handling | optional challenge field + client default; amended: 0069 |
 | [0013](ADR/0013-auxiliary-operations.md) | Auxiliary operations | amended: TaskRef routing, four-state status; 0057, 0068 |
 | [0014](ADR/0014-api-key-hygiene.md) | API key hygiene | own SecretStr, no env helpers; amended: 0063 |
 | [0015](ADR/0015-poll-only-no-webhooks.md) | Poll-only, no webhooks | |
@@ -88,6 +88,7 @@ supersede.
 | [0066](ADR/0066-challenge-call-style.md) | Challenge call-style | amends 0006: keyword-only fields, positional payload |
 | [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10 |
 | [0068](ADR/0068-report-good-result.md) | report_good_result | amends 0013/0053: bool return, adapter report pairs |
+| [0069](ADR/0069-worker-context.md) | Worker context parameters | amends 0012: `user_agent`/`cookies` challenge fields |
 
 ## Conventions
 

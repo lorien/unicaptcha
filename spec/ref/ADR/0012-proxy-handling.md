@@ -1,6 +1,6 @@
 # ADR-0012: Proxy handling
 
-**Status:** Accepted
+**Status:** Accepted (worker-context fields `user_agent`/`cookies` follow the same challenge placement per ADR-0069)
 **Date:** 2026-08-22
 
 ## Context
