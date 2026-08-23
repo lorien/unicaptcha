@@ -77,6 +77,14 @@ unicaptcha ships a public adapter SDK: third parties can implement their own
 provider adapters and register them in the universal client. See
 `spec/ref/architecture.md` ("Adapter SDK") for the contract.
 
+## Funding
+
+The built-in adapters embed unicaptcha's referral ID in every request by
+default; the provider pays the project a small commission per solve at no
+change to your pricing. Pass `referral=False` to disable it, or
+`referral="your-own-id"` to credit your own software registration
+(ADR-0072). Third-party adapters embed nothing by default.
+
 ## License
 
 MIT. Repository: https://github.com/lorien/unicaptcha

@@ -72,7 +72,7 @@ supersede.
 | [0050](ADR/0050-status-queries-answer.md) | Status queries answer, operations raise | |
 | [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | extended to submit/wait/wait_ref by 0067 |
 | [0052](ADR/0052-adapter-naming.md) | Adapter naming | amends 0005/0036/0041/0042: `adapters=` kwarg, `<Provider>Adapter` |
-| [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063, 0068 |
+| [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063, 0068, 0072 |
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | superseded by 0062 |
 | [0055](ADR/0055-adapter-provider-attribute.md) | Adapter `provider` attribute | amends 0037/0041/0052/0053: `kind` renamed `provider` |
 | [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatus surface + BaseSolution root | amends 0032/0035: no `Result` embedding, `TaskState` enum |
@@ -80,7 +80,7 @@ supersede.
 | [0058](ADR/0058-unknown-state-and-solve-poll.md) | UNKNOWN state in adapter contract | 4-state parse_task_result; solve-poll fail-fast |
 | [0059](ADR/0059-rate-limit-retry.md) | Rate-limit retry | amends 0011: 429 + provider payloads retryable |
 | [0060](ADR/0060-registry-advisory-and-recovery.md) | Registry advisory + recovery | amends 0033/0038: per-client semantics, workflow |
-| [0061](ADR/0061-facade-constructor-parity.md) | Facade constructor parity | amends 0051: api_key/base_url + all client kwargs; amended: 0063 |
+| [0061](ADR/0061-facade-constructor-parity.md) | Facade constructor parity | amends 0051: api_key/base_url + all client kwargs; amended: 0063, 0072 |
 | [0062](ADR/0062-captchasolver-naming.md) | CaptchaSolver naming | supersedes 0054 class names; amends 0036 |
 | [0063](ADR/0063-str-api-key.md) | Plain str api_key | amends 0014/0053/0061: union, boundary wrapping |
 | [0064](ADR/0064-kind-solve-and-provider-selection.md) | Kind-level solve + provider selection | amends 0005/0045/0048; random among supporting adapters |
@@ -91,6 +91,7 @@ supersede.
 | [0069](ADR/0069-worker-context.md) | Worker context parameters | amends 0012: `user_agent`/`cookies` challenge fields |
 | [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags |
 | [0071](ADR/0071-capsolver-provider.md) | Capsolver provider | amends 0001: 4th provider; RuCaptcha v2 verified |
+| [0072](ADR/0072-referral-embedding.md) | Referral embedding | amends 0053/0061: trinary `referral` kwarg, on by default |
 
 ## Conventions
 

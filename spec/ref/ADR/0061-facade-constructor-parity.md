@@ -1,6 +1,6 @@
 # ADR-0061: Facade constructor parity
 
-**Status:** Accepted (amends ADR-0051's parity principle; complements ADR-0007; `api_key` union per ADR-0063)
+**Status:** Accepted (amends ADR-0051's parity principle; complements ADR-0007; `api_key` union per ADR-0063; `referral` kwarg per ADR-0072)
 **Date:** 2026-08-23
 
 ## Context
@@ -22,6 +22,7 @@ kwarg** of `CaptchaSolver` / `AsyncCaptchaSolver` except `adapters`:
 TwoCaptchaClient(
     api_key: SecretStr | str,        # adapter credentials (positional-first); str wrapped (ADR-0063)
     base_url: str | None = None,    # overrides default_base_url (RuCaptcha mirrors)
+    referral: bool | str = True,    # affiliate id: True=project's, False=off, str=own (ADR-0072)
     # client kwargs, identical names/defaults/validation as CaptchaSolver:
     name=..., solve=..., retry=..., http=..., http_client=...,
     on_event=..., abandoned_registry_limit=...,
