@@ -20,7 +20,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- NetworkError
 +-- AuthenticationError
 +-- InsufficientBalanceError
-+-- UnsupportedCaptchaError        server-side task-type rejection only
++-- UnsupportedCaptchaError        provider lacks the operation/kind (both sides, ADR-0057)
 +-- InvalidChallengeError          client-side challenge validation
 +-- SolveTimeoutError
 +-- RateLimitError
