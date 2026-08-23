@@ -1,6 +1,6 @@
 # ADR-0041: Public/internal boundary and the adapter SDK
 
-**Status:** Accepted (amended: pydantic dropped — frozen dataclasses; adapter SDK public from day one)
+**Status:** Accepted (amended: pydantic dropped — frozen dataclasses; adapter SDK public from day one; registration via `adapters=` per ADR-0052)
 **Date:** 2026-08-23
 
 ## Context
@@ -23,7 +23,7 @@ from day one.
 - **The adapter SDK contract**: adapter base machinery is public API.
   Custom adapters implement the contract (kind, challenges frozenset,
   pure translation methods, error mapping, optional per-kind defaults)
-  and register via `UnicaptchaClient(providers=[...])`.
+  and register via `UnicaptchaClient(adapters=[...])`.
 - The injectable HTTP layer is exposed as a public **Protocol**
   (what may be injected); its implementation stays `_internal`.
 

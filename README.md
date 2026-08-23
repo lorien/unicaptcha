@@ -35,13 +35,13 @@ Requires Python 3.11+. Single runtime dependency: `httpx`.
 The exact API is being finalized; the intended shape:
 
 ```python
-from unicaptcha import UnicaptchaClient
+from unicaptcha import SecretStr, UnicaptchaClient
 from unicaptcha.providers.twocaptcha import (
-    TwoCaptchaProvider,
+    TwoCaptchaAdapter,
     TwoCaptchaImageChallenge,
 )
 
-client = UnicaptchaClient(providers=[TwoCaptchaProvider(api_key="...")])
+client = UnicaptchaClient(adapters=[TwoCaptchaAdapter(api_key=SecretStr("..."))])
 result = client.solve(TwoCaptchaImageChallenge(body=image_bytes))
 print(result.solution.text)
 ```

@@ -1,12 +1,12 @@
 # ADR-0042: Config validation — InvalidConfigError, fail-fast at construction
 
-**Status:** Accepted
+**Status:** Accepted (amended by ADR-0052: the argument is the adapters list)
 **Date:** 2026-08-23
 
 ## Context
 
 Config values can be nonsense (`total_timeout=0`, `poll_interval=-5`,
-`max_attempts=-1`, `providers=[]`). When are they checked and as what
+`max_attempts=-1`, `adapters=[]`). When are they checked and as what
 error? Challenges already fail fast with `InvalidChallengeError`; config
 mistakes are the same class of caller bug.
 
@@ -20,7 +20,7 @@ mistakes are the same class of caller bug.
 - Constructed config objects are trustable: per-call overrides can never
   smuggle garbage past construction.
 - Client construction additionally validates composite invariants:
-  empty/None providers list, duplicate kinds (ADR-0037, `ValueError`),
+  empty/None adapters list, duplicate kinds (ADR-0037, `ValueError`),
   `http` config + injected httpx client together (ADR-0049).
 
 ## Rationale

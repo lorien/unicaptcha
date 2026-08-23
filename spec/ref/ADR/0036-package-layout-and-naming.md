@@ -1,6 +1,6 @@
 # ADR-0036: Package layout and naming
 
-**Status:** Accepted (amended: `unicaptcha.types` module added; class names carry the Client suffix)
+**Status:** Accepted (amended: `unicaptcha.types` module added; class names carry the Client suffix; adapter classes named `<Provider>Adapter` per ADR-0052)
 **Date:** 2026-08-22, amendments 2026-08-23
 
 ## Context

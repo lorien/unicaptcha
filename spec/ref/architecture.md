@@ -414,7 +414,7 @@ class MyServiceAdapter:
     def map_provider_error(self, raw: bytes) -> ErrorKind and message: ...
 ```
 
-- Registration: `UnicaptchaClient(providers=[MyServiceAdapter(...)])`.
+- Registration: `UnicaptchaClient(adapters=[MyServiceAdapter(...)])`.
 - Third-party facades: author-written composition of a universal client,
   following the documented pattern; no generation machinery (rejected:
   kills static typing).

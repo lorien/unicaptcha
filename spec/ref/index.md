@@ -24,7 +24,7 @@ supersede.
 | [0002](ADR/0002-captcha-types-scope.md) | CAPTCHA types scope | image, text, reCAPTCHA v2/v3, hCaptcha |
 | [0003](ADR/0003-sync-async-architecture.md) | Blocking sync + async-native architecture | no wrapper magic |
 | [0004](ADR/0004-python-version-and-typing-policy.md) | Python 3.11+ and strict typing | mypy + pyright strict, py.typed |
-| [0005](ADR/0005-universal-multi-provider-client.md) | Universal multi-provider client | registry, dispatch by challenge class |
+| [0005](ADR/0005-universal-multi-provider-client.md) | Universal multi-provider client | registry, dispatch by challenge class; amended: 0052 |
 | [0006](ADR/0006-provider-specific-challenge-classes.md) | Provider-specific challenge classes | frozen dataclasses |
 | [0007](ADR/0007-provider-facades-via-composition.md) | Provider facades | amended: peers over SolveEngine |
 | [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | Result[T], Decimal cost |
@@ -55,13 +55,13 @@ supersede.
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |
 | [0034](ADR/0034-result-surface-and-metadata.md) | Result surface and metadata | raw bytes, provider/created_at/elapsed |
 | [0035](ADR/0035-solution-bases-non-instantiable.md) | Solution bases non-instantiable | |
-| [0036](ADR/0036-package-layout-and-naming.md) | Package layout and naming | *Client suffix everywhere |
+| [0036](ADR/0036-package-layout-and-naming.md) | Package layout and naming | *Client suffix everywhere; amended: 0052 |
 | [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | |
 | [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close |
 | [0039](ADR/0039-logging-taxonomy.md) | Logging taxonomy | |
 | [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | |
-| [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | |
-| [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError |
+| [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052 |
+| [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052 |
 | [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge |
 | [0044](ADR/0044-event-attachment-and-parity.md) | Event handler attachment | constructor + per-call |
 | [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | |
@@ -71,6 +71,7 @@ supersede.
 | [0049](ADR/0049-http-config-mutual-exclusion.md) | HTTP config mutual exclusion | |
 | [0050](ADR/0050-status-queries-answer.md) | Status queries answer, operations raise | |
 | [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | |
+| [0052](ADR/0052-adapter-naming.md) | Adapter naming | amends 0005/0036/0041/0042: `adapters=` kwarg, `<Provider>Adapter` |
 
 ## Conventions
 

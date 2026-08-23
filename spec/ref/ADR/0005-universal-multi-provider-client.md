@@ -1,6 +1,6 @@
 # ADR-0005: Universal multi-provider client
 
-**Status:** Accepted
+**Status:** Accepted (amended by ADR-0052: the registration argument is `adapters=`, accepting adapter instances)
 **Date:** 2026-08-22
 
 ## Context
@@ -14,10 +14,10 @@ exist precisely to give per-provider ergonomics.
 ## Decision
 
 The universal client (`UnicaptchaClient` / `AsyncUnicaptchaClient`) accepts a
-**list of providers**, each with its own credentials:
+**list of adapters**, each with its own credentials:
 
 ```python
-client = UnicaptchaClient(providers=[two_captcha, anti_captcha])
+client = UnicaptchaClient(adapters=[two_captcha, anti_captcha])
 client.solve(TwoCaptchaImageChallenge(body=b"..."))   # routes to 2Captcha
 client.solve(AntiCaptchaRecaptchaV2Challenge(...))    # routes to Anti-Captcha
 ```

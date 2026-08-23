@@ -12,12 +12,12 @@ exception messages, or the event stream. pydantic was initially to provide
 ## Decision
 
 - **Key delivery**: constructor argument only
-  (`TwoCaptchaProvider(api_key=...)`). No `from_env()` helpers (owner
+  (`TwoCaptchaAdapter(api_key=...)`). No `from_env()` helpers (owner
   decision); environment handling belongs to the caller.
 - **Storage**: hand-rolled `SecretStr` wrapper (~30 lines, public type)
   masking in `repr`/`str`.
 - **No-leak guarantees**, documented as contracts:
-  - `repr`/`str` of clients, providers, challenges render keys as `***`
+  - `repr`/`str` of clients, adapters, challenges render keys as `***`
     (full mask, no partial characters — keys are short enough that
     fragments aid guessing);
   - log messages never contain key values at any level; scrubbing is
@@ -25,7 +25,7 @@ exception messages, or the event stream. pydantic was initially to provide
   - `raw_response` on exceptions is scrubbed defensively before attach;
   - `SolveEvent` contains no credentials by construction.
 - **Multiple keys / rotation**: out of scope for v1 (deferred.md item 6);
-  one key per provider instance; multi-account = multiple clients sharing
+  one key per adapter instance; multi-account = multiple clients sharing
   an HTTP layer.
 
 ## Rationale
