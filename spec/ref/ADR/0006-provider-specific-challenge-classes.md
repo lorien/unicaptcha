@@ -1,6 +1,6 @@
 # ADR-0006: Provider-specific challenge classes
 
-**Status:** Accepted (amended 2026-08-23: frozen dataclasses instead of pydantic; amended by ADR-0048 adding kind bases)
+**Status:** Accepted (amended 2026-08-23: frozen dataclasses instead of pydantic; amended by ADR-0048 adding kind bases; call-style policy per ADR-0066)
 **Date:** 2026-08-22
 
 ## Context

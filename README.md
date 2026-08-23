@@ -43,7 +43,7 @@ from unicaptcha import CaptchaSolver, ImageChallenge
 from unicaptcha.providers.twocaptcha import TwoCaptchaAdapter
 
 client = CaptchaSolver(adapters=[TwoCaptchaAdapter("...")])
-result = client.solve(ImageChallenge(body=Path("test.png")))
+result = client.solve(ImageChallenge(Path("test.png")))
 print(result.solution.text)
 ```
 

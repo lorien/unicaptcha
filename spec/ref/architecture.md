@@ -103,6 +103,13 @@ BaseChallenge (public abstract root; open for custom kinds)
   construction (`InvalidChallengeError` chained from the OSError on
   read failure); the library base64-encodes internally (ADR-0025 as
   amended by ADR-0065). Text challenges take `str`.
+- **Call style** (ADR-0066): kind-base fields are keyword-only except
+  a kind's single payload field (`ImageChallenge(Path("..."))`,
+  `TextChallenge("2+2?")`); multi-field kinds require keywords
+  (`RecaptchaV2Challenge(sitekey=..., pageurl=...)`); provider extras
+  and optional fields (`invisible=False`, `proxy=...`,
+  `numeric=True`) are keyword-only. Kills the same-typed-string swap
+  hazard and the non-default-after-default inheritance wart.
 
 ## 3. Solution taxonomy
 
