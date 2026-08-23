@@ -18,11 +18,14 @@ Universal Python interface to multiple anti-captcha services.
 
 ## Supported CAPTCHA kinds (v1)
 
-- Image CAPTCHA (raw `bytes`)
+- Image CAPTCHA (`bytes` or `Path`)
 - Text CAPTCHA (plain-text question)
-- reCAPTCHA v2 (checkbox and invisible)
-- reCAPTCHA v3
-- hCaptcha
+- reCAPTCHA v2 (checkbox and invisible; Enterprise via flags)
+- reCAPTCHA v3 (Enterprise via flags)
+- hCaptcha (invisible via flag)
+- FunCaptcha / Arkose
+- GeeTest v3
+- GeeTest v4
 
 ## Install
 
