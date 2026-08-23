@@ -79,6 +79,7 @@ supersede.
 | [0057](ADR/0057-unsupported-captcha-error-scope.md) | UnsupportedCaptchaError scope | amends 0009/0013/0053: client-side gaps included |
 | [0058](ADR/0058-unknown-state-and-solve-poll.md) | UNKNOWN state in adapter contract | 4-state parse_task_result; solve-poll fail-fast |
 | [0059](ADR/0059-rate-limit-retry.md) | Rate-limit retry | amends 0011: 429 + provider payloads retryable |
+| [0060](ADR/0060-registry-advisory-and-recovery.md) | Registry advisory + recovery | amends 0033/0038: per-client semantics, workflow |
 
 ## Conventions
 

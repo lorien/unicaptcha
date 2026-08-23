@@ -1,6 +1,6 @@
 # ADR-0038: Abandoned-task registry
 
-**Status:** Accepted (amended: bounded with eviction warning and configurable cap; survives close)
+**Status:** Accepted (amended: bounded with eviction warning and configurable cap; survives close; per-client advisory semantics and the recovery workflow per ADR-0060)
 **Date:** 2026-08-23
 
 ## Context
@@ -24,7 +24,9 @@ workers.
 - **Entry lifecycle**: entries are added at submission time and removed
   when the solve delivers successfully; after abandonment they are removed
   only when a later `get_task_result` on that id reaches a terminal state
-  (READY / UNSOLVABLE / UNKNOWN).
+  (READY / UNSOLVABLE / UNKNOWN) **on the same client** — the registry is
+  per-client, best-effort, advisory (ADR-0060); cross-client reclaim
+  cannot clean a closed client's registry.
 - **Registry survives close** (supersedes an earlier "cleared on close" --
   clearing would erase exactly the tasks close-orphaning creates).
   `abandoned_tasks()` remains readable on a closed client.

@@ -343,9 +343,14 @@ provider lacks coverage (ADR-0057). Balance is pinned to USD `Decimal`
   storage; `abandoned_tasks()` returns a snapshot tuple, never a live list.
 - Bounded: default cap 1000, one WARNING log per eviction, cap configurable
   client-side (`abandoned_registry_limit`), `None` = unbounded.
-- Entries removed when a later `get_task_result` reaches a terminal state;
-  cleared never (survives close).
-- No automatic reclaim loop; the caller drives reclamation.
+- Per-client, best-effort, **advisory** (ADR-0060): entries removed when a
+  same-client `get_task_result` reaches a terminal state; cleared never
+  (survives close); cross-client reclaim leaves stale entries (harmless,
+  bounded).
+- No automatic reclaim loop; the caller drives reclamation:
+  snapshot `abandoned_tasks()` -> new client with the same adapters ->
+  `get_task_result(ref)` per entry -> terminal states are answers
+  (ADR-0050, ADR-0056); persist TaskRefs to survive restarts.
 
 ## 8. Logging and events
 
