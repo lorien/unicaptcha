@@ -30,7 +30,7 @@ supersede.
 | [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | Result[T], Decimal cost |
 | [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057 |
 | [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics |
-| [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter |
+| [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter; 0059 |
 | [0012](ADR/0012-proxy-handling.md) | Proxy handling | optional challenge field + client default |
 | [0013](ADR/0013-auxiliary-operations.md) | Auxiliary operations | amended: TaskRef routing, four-state status |
 | [0014](ADR/0014-api-key-hygiene.md) | API key hygiene | own SecretStr, no env helpers |
@@ -78,6 +78,7 @@ supersede.
 | [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatus surface + BaseSolution root | amends 0032/0035: no `Result` embedding, `TaskState` enum |
 | [0057](ADR/0057-unsupported-captcha-error-scope.md) | UnsupportedCaptchaError scope | amends 0009/0013/0053: client-side gaps included |
 | [0058](ADR/0058-unknown-state-and-solve-poll.md) | UNKNOWN state in adapter contract | 4-state parse_task_result; solve-poll fail-fast |
+| [0059](ADR/0059-rate-limit-retry.md) | Rate-limit retry | amends 0011: 429 + provider payloads retryable |
 
 ## Conventions
 

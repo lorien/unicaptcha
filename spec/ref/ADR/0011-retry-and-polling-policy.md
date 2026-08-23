@@ -1,6 +1,6 @@
 # ADR-0011: Retry and polling policy
 
-**Status:** Accepted (amended 2026-08-23: refined retry scope by failure knowledge; full jitter added; aux-op parity settled)
+**Status:** Accepted (amended 2026-08-23: refined retry scope by failure knowledge; full jitter added; aux-op parity settled; rate-limit retryability added per ADR-0059)
 **Date:** 2026-08-22
 
 ## Context
@@ -17,7 +17,9 @@ initially candidates for a reduced policy.
 **Submission phase** — retry only provably-safe failures:
 
 - **Retry**: pre-send failures (DNS, connection refused, TLS handshake,
-  connect-timeout) and received **500 / 503**.
+  connect-timeout), received **500 / 503**, and **rate-limit signals**
+  (HTTP 429, provider rate-limit payloads; `RateLimitError` on
+  exhaustion, ADR-0059).
 - **Fail fast** (`NetworkError`, no resubmit): read timeouts,
   connection reset after send, **502 / 504** (gateway errors may mask a
   committed origin request).

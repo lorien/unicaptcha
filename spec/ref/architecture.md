@@ -275,7 +275,8 @@ solve(challenge, solve=None, retry=None, on_event=None) -> Result[T]
         build payload (adapter, pure)
         POST createTask
           - pre-send failure (DNS, refused, TLS, connect-timeout): retry
-          - received 500/503: retry
+           - received 500/503: retry
+           - rate limit (429 / provider payload): retry, RateLimitError on exhaustion (ADR-0059)
           - read timeout, reset-after-send, 502/504: fail fast NetworkError
           - backoff: full jitter, base 1s, cap 30s, max 3 attempts
      poll phase:
