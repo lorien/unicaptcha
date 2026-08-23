@@ -233,6 +233,11 @@ SolveConfig(total_timeout, poll_interval)
 RetryConfig(max_attempts, backoff_base, backoff_cap)
 ```
 
+- `HttpClientConfig.timeout` is per-request: the float maps to
+  `httpx.Timeout(timeout)`, limiting each stage (connect, read, write,
+  pool) independently — distinct from `SolveConfig.total_timeout`, the
+  whole-solve budget (ADR-0024).
+
 - `None` means "unspecified", never a value. Explicit bad values
   (`total_timeout=0`, `poll_interval=-5`) raise `InvalidConfigError` at config
   construction; `None` is always valid (ADR-0042).

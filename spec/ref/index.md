@@ -43,7 +43,7 @@ supersede.
 | [0021](ADR/0021-static-semver-versioning.md) | Static SemVer versioning | 0.1.0 start |
 | [0022](ADR/0022-manual-changelog-with-ci-guards.md) | Manual changelog with CI guards | |
 | [0023](ADR/0023-readme-only-docs.md) | README-only docs for v1 | |
-| [0024](ADR/0024-network-knobs.md) | Network knobs | amended: mutual exclusion, per-request UA |
+| [0024](ADR/0024-network-knobs.md) | Network knobs | amended: mutual exclusion, per-request UA, per-stage timeout semantics |
 | [0025](ADR/0025-image-input-bytes-only.md) | Image input as bytes only | amended: 0065 |
 | [0026](ADR/0026-user-agent-and-repo-url.md) | User-Agent and repo URL | |
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |

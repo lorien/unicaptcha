@@ -1,6 +1,6 @@
 # ADR-0024: Network knobs
 
-**Status:** Accepted (amended 2026-08-23: TLS omitted → injection-only; HTTP/2 rejected; per-request User-Agent refined in ADR-0049's amendment note)
+**Status:** Accepted (amended 2026-08-23: TLS omitted → injection-only; HTTP/2 rejected; per-request User-Agent refined in ADR-0049's amendment note; per-stage timeout semantics pinned, name kept)
 **Date:** 2026-08-22
 
 ## Context
@@ -15,7 +15,12 @@ httpx clients. Each knob costs config surface and documentation.
 Exposed on the library (via `HttpClientConfig` or constructor):
 
 1. **Per-request HTTP timeout** (`timeout`, default 20 s) — independent of
-   the solve budget.
+   the solve budget. Semantics: the float is passed as
+   `httpx.Timeout(timeout)` — **each stage** (connect, read, write,
+   pool) **independently** limited to it; not a shared budget across
+   stages. The name matches httpx deliberately (the value maps
+   directly); distinction from `SolveConfig.total_timeout` is carried
+   by the configs being separate objects and "total" in that name.
 2. **Connection pool limits** (`max_connections`,
    `max_keepalive_connections`) — passthrough to httpx pool defaults when
    None.
@@ -52,3 +57,7 @@ Overridable via constructor flat kwarg.
   insecure mode officially offered, config noise for a corporate-only
   case the injection hatch already serves.
 - **HTTP/2 extra**: rejected; negligible gain for poll-based traffic.
+- **Rename `timeout` -> `request_timeout` / `per_request_timeout`**:
+  rejected; "request timeout" collides with stage-specific jargon
+  (connect/read timeout, HTTP 408) and reads as single-stage;
+  "per_request" is verbose. httpx's own word kept.
