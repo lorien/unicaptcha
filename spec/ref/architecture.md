@@ -240,7 +240,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- NetworkError
 +-- AuthenticationError
 +-- InsufficientBalanceError
-+-- UnsupportedCaptchaError        server-side task-type rejection only
++-- UnsupportedCaptchaError        provider lacks the operation/kind (both sides, ADR-0057)
 +-- InvalidChallengeError          client-side challenge validation
 +-- SolveTimeoutError
 +-- RateLimitError
@@ -306,8 +306,9 @@ solve(challenge, solve=None, retry=None, on_event=None) -> Result[T]
 | `abandoned_tasks()` | snapshot `tuple[TaskRef, ...]` | same |
 
 Report-bad coverage differs per provider and captcha kind; adapters enforce
-the support matrix and raise `UnsupportedCaptchaError` where the provider
-lacks coverage. Balance is pinned to USD `Decimal` (ADR-0040).
+the support matrix pre-flight and raise `UnsupportedCaptchaError` where the
+provider lacks coverage (ADR-0057). Balance is pinned to USD `Decimal`
+(ADR-0040).
 
 ### Cancellation (ADR-0016)
 

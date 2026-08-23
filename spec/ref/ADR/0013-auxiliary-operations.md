@@ -23,8 +23,10 @@ All three operations exist on both tiers:
 
 - `get_balance()` returns `Decimal`, pinned to USD (ADR-0040).
 - `report_bad_result` is a uniform method everywhere; adapters enforce the
-  per-provider/per-kind support matrix, raising `UnsupportedCaptchaError`
-  where coverage is missing (probe-by-exception; introspection deferred).
+  per-provider/per-kind support matrix pre-flight, raising
+  `UnsupportedCaptchaError` where coverage is missing — client-side,
+  no network traffic (ADR-0057; probe-by-exception; introspection
+  deferred).
 - `get_task_result` returns `TaskStatus` with four states
   (PENDING/READY/UNSOLVABLE/UNKNOWN) — provider outcomes are returned
   values, never exceptions (ADR-0050).

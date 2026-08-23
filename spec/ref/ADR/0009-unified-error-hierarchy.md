@@ -1,6 +1,6 @@
 # ADR-0009: Unified error hierarchy
 
-**Status:** Accepted (amended three times: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added)
+**Status:** Accepted (amended three times: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added; UnsupportedCaptchaError scope widened by ADR-0057)
 **Date:** 2026-08-22, amendments 2026-08-23
 
 ## Context
@@ -39,10 +39,10 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 - Message travels via standard `Exception` machinery.
 - Every wrapped cause uses `raise ... from cause`; event-handler exceptions
   propagate raw (ADR-0018).
-- `UnsupportedCaptchaError` exists **only** for server-side rejections
-  (task type unavailable on plan/account, provider dropped support);
-  client-side "this provider never had that kind" is impossible by design
-  (no class exists) and wrong-provider arguments are `TypeError`
+- `UnsupportedCaptchaError` covers server-side task-type rejections
+  (task type unavailable on plan/account, provider dropped support)
+  **and** client-side pre-flight coverage gaps such as the report-bad
+  support matrix (ADR-0057); wrong-provider arguments are `TypeError`
   (ADR-0045).
 - Malformed provider responses (HTTP 200, unparseable/wrong-shape body)
   map to `ProviderError` with the parse failure as `__cause__`
