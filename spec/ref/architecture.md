@@ -220,7 +220,7 @@ carry no proxy field.
 
 ### Worker context (ADR-0069)
 
-`user_agent: str | None` and `cookies: Mapping[str, str] None` — optional
+`user_agent: str | None` and `cookies: Mapping[str, str] | None` — optional
 keyword-only challenge fields the provider's solver uses when loading the
 target page (token validity: tokens can be UA-bound). Distinct from the
 transport User-Agent (constructor kwarg, ADR-0024); no client-level default,
