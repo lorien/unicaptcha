@@ -44,7 +44,7 @@ supersede.
 | [0022](ADR/0022-manual-changelog-with-ci-guards.md) | Manual changelog with CI guards | |
 | [0023](ADR/0023-readme-only-docs.md) | README-only docs for v1 | |
 | [0024](ADR/0024-network-knobs.md) | Network knobs | amended: mutual exclusion, per-request UA |
-| [0025](ADR/0025-image-input-bytes-only.md) | Image input as bytes only | |
+| [0025](ADR/0025-image-input-bytes-only.md) | Image input as bytes only | amended: 0065 |
 | [0026](ADR/0026-user-agent-and-repo-url.md) | User-Agent and repo URL | |
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |
 | [0028](ADR/0028-no-proxy-validation.md) | No proxy validation | |
@@ -84,6 +84,7 @@ supersede.
 | [0062](ADR/0062-captchasolver-naming.md) | CaptchaSolver naming | supersedes 0054 class names; amends 0036 |
 | [0063](ADR/0063-str-api-key.md) | Plain str api_key | amends 0014/0053/0061: union, boundary wrapping |
 | [0064](ADR/0064-kind-solve-and-provider-selection.md) | Kind-level solve + provider selection | amends 0005/0045/0048; random among supporting adapters |
+| [0065](ADR/0065-path-body.md) | Path accepted for image bodies | amends 0025: `bytes \| Path`, normalized to bytes |
 
 ## Conventions
 

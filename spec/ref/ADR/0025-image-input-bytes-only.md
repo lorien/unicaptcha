@@ -1,6 +1,6 @@
 # ADR-0025: Image input as bytes only
 
-**Status:** Accepted
+**Status:** Accepted (amended by ADR-0065: `Path` also accepted, normalized to bytes at construction; bytes/base64/URL stance unchanged)
 **Date:** 2026-08-23
 
 ## Context
@@ -11,9 +11,12 @@ themselves). The choice defines the most-used call surface.
 
 ## Decision
 
-Image challenge `body` accepts **`bytes` only**. The library base64-encodes
-internally (all three APIs expect base64). No file reading, no URL
-fetching, no pre-encoded string acceptance.
+Image challenge `body` accepts **`bytes` only** — amended by
+ADR-0065 to `bytes | Path`, the Path read and normalized to bytes in
+`__post_init__` (snapshot semantics; stored value is always bytes).
+The library base64-encodes
+internally (all three APIs expect base64). No file-like objects, no
+URL fetching, no pre-encoded string acceptance.
 
 Text challenges take `str` (the question text) plus provider-specific
 fields; no input-type ambiguity exists there.

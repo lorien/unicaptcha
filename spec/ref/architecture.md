@@ -74,7 +74,7 @@ Two-level hierarchy, symmetric with solutions (ADR-0048, ADR-0006).
 
 ```
 BaseChallenge (public abstract root; open for custom kinds)
-+-- ImageChallenge          body: bytes
++-- ImageChallenge          body: bytes | Path (normalized to bytes; ADR-0065)
 +-- TextChallenge           text: str
 +-- RecaptchaV2Challenge    sitekey: str; pageurl: str; invisible: bool
 +-- RecaptchaV3Challenge    sitekey: str; pageurl: str; action: str|None; min_score: ...
@@ -99,8 +99,10 @@ BaseChallenge (public abstract root; open for custom kinds)
 - Custom adapters may subclass `BaseChallenge` directly to introduce novel
   kinds; per-kind timing defaults then come from the adapter's declaration
   with generic fallback (ADR-0041).
-- Image input is raw `bytes` only; the library base64-encodes internally
-  (ADR-0025). Text challenges take `str`.
+- Image input is `bytes | Path`, Path normalized to bytes at
+  construction (`InvalidChallengeError` chained from the OSError on
+  read failure); the library base64-encodes internally (ADR-0025 as
+  amended by ADR-0065). Text challenges take `str`.
 
 ## 3. Solution taxonomy
 
