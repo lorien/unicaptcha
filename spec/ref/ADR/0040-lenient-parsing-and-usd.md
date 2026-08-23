@@ -1,6 +1,6 @@
 # ADR-0040: Lenient parsing and USD-pinned balance
 
-**Status:** Accepted
+**Status:** Accepted (currency verification note added 2026-08-23)
 **Date:** 2026-08-23
 
 ## Context
@@ -21,6 +21,13 @@ all three services bill in USD.
   preserved and the parse failure as `__cause__` (ADR-0009).
 - **Balance is USD-pinned**: `get_balance() -> Decimal`, documented as
   always USD. No currency field, no conversion.
+- **Verification note (implementation-time)**: confirm each provider's
+  balance-field currency, including 2Captcha — accounts may be
+  currency-scoped by registration (anycaptcha reports 2Captcha
+  balances as RUB). If any provider returns non-USD: convert nothing,
+  document that provider's actual currency, and revisit the pin
+  (candidate shapes: per-provider documented currency, or
+  `tuple[Decimal, str]`).
 
 ## Rationale
 
