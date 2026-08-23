@@ -20,7 +20,7 @@ supersede.
 
 | ADR | Topic | Notes |
 |---|---|---|
-| [0001](ADR/0001-supported-providers.md) | Supported providers | 2Captcha, Anti-Captcha, CapMonster Cloud |
+| [0001](ADR/0001-supported-providers.md) | Supported providers | 2Captcha, Anti-Captcha, CapMonster, Capsolver; amended: 0071 |
 | [0002](ADR/0002-captcha-types-scope.md) | CAPTCHA types scope | 8 kinds, enterprise flags; amended: 0070 |
 | [0003](ADR/0003-sync-async-architecture.md) | Blocking sync + async-native architecture | no wrapper magic |
 | [0004](ADR/0004-python-version-and-typing-policy.md) | Python 3.11+ and strict typing | mypy + pyright strict, py.typed |
@@ -90,6 +90,7 @@ supersede.
 | [0068](ADR/0068-report-good-result.md) | report_good_result | amends 0013/0053: bool return, adapter report pairs |
 | [0069](ADR/0069-worker-context.md) | Worker context parameters | amends 0012: `user_agent`/`cookies` challenge fields |
 | [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags |
+| [0071](ADR/0071-capsolver-provider.md) | Capsolver provider | amends 0001: 4th provider; RuCaptcha v2 verified |
 
 ## Conventions
 

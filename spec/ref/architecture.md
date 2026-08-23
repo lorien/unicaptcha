@@ -472,6 +472,7 @@ unicaptcha/
         twocaptcha/    # challenges, solutions, adapter, facades
         anticaptcha/
         capmonster/
+        capsolver/     # ADR-0071
     _internal/         # engine, http layer implementation, clock, scrubbing
 ```
 

@@ -1,6 +1,6 @@
 # ADR-0001: Supported providers
 
-**Status:** Accepted
+**Status:** Accepted (amended by ADR-0071: Capsolver added as the fourth provider; RuCaptcha's API v2 verified complete)
 **Date:** 2026-08-22
 
 ## Context
@@ -12,19 +12,22 @@ NextCaptcha, and others. Supporting everything at once dilutes v1 quality.
 
 ## Decision
 
-Support exactly three providers in v1:
+Support four providers in v1:
 
 | Provider | kind | Default base URL |
 |---|---|---|
 | 2Captcha | `twocaptcha` | `https://api.2captcha.com` |
 | Anti-Captcha | `anti-captcha` | `https://api.anti-captcha.com` |
 | CapMonster Cloud | `capmonster` | `https://api.capmonster.cloud` |
+| Capsolver (ADR-0071) | `capsolver` | `https://api.capsolver.com` |
 
 For 2Captcha, target the **modern JSON API** (`createTask`/`getTaskResult`),
 not the legacy `in.php`/`res.php` text protocol. RuCaptcha and other
 2Captcha-protocol mirrors work by overriding the 2Captcha adapter's
-`base_url`. Self-hosted CapMonster (the legacy desktop product) is out of
-scope; only CapMonster Cloud's API is supported.
+`base_url`; RuCaptcha's API v2 (JSON) is verified complete and current
+(ADR-0071) — smaller mirrors need per-service verification. Self-hosted
+CapMonster (the legacy desktop product) is out of scope; only CapMonster
+Cloud's API is supported.
 
 ## Rationale
 

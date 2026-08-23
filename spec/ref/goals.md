@@ -51,7 +51,8 @@ See [deferred.md](deferred.md) for the canonical list with rationale.
 
 ## v1 scope
 
-- Providers: 2Captcha (modern JSON API), Anti-Captcha, CapMonster Cloud.
+- Providers: 2Captcha (modern JSON API), Anti-Captcha, CapMonster Cloud,
+  Capsolver (ADR-0071).
 - CAPTCHA kinds: image, text, reCAPTCHA v2 (checkbox + invisible),
   reCAPTCHA v3, hCaptcha, FunCaptcha, GeeTest v3, GeeTest v4
   (ADR-0070; reCAPTCHA Enterprise via flags on v2/v3).
