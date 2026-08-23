@@ -12,7 +12,9 @@ Universal Python interface to multiple anti-captcha services.
 | Anti-Captcha | `anti-captcha` | `https://api.anti-captcha.com` |
 | CapMonster Cloud | `capmonster` | `https://api.capmonster.cloud` |
 
-2Captcha-protocol mirrors such as RuCaptcha work by overriding the 2Captcha adapter's base URL.
+2Captcha-protocol mirrors such as RuCaptcha work by overriding the base URL:
+`TwoCaptchaClient(api_key=..., base_url="https://api.rucaptcha.com")`
+(ADR-0061).
 
 ## Supported CAPTCHA kinds (v1)
 

@@ -33,7 +33,9 @@ it states *what is* per the settled decisions; ADRs state *why*.
 - Facades (`TwoCaptchaClient` and async counterpart) know their provider
   statically; convenience methods construct challenges and delegate to the
   engine. Facade methods have full parameter parity with `solve()`
-  (ADR-0051).
+  (ADR-0051); facade constructors have full parity with `MultiClient`
+  except `adapters` — `api_key`, `base_url` (provider mirror override),
+  and every client kwarg (ADR-0061).
 - Adapters are pure translation units: challenge -> JSON payload, response
   bytes -> typed objects, provider error -> ErrorKind. No I/O, no state
   (ADR-0041).

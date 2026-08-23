@@ -1,6 +1,6 @@
 # ADR-0051: Facade parameter parity
 
-**Status:** Accepted
+**Status:** Accepted (constructor parity per ADR-0061)
 **Date:** 2026-08-23
 
 ## Context
