@@ -278,10 +278,11 @@ solve(challenge, solve=None, retry=None, on_event=None) -> Result[T]
           - received 500/503: retry
           - read timeout, reset-after-send, 502/504: fail fast NetworkError
           - backoff: full jitter, base 1s, cap 30s, max 3 attempts
-    poll phase:
-        POST getTaskResult every poll_interval
-          - transient failures tolerated, bounded by total_timeout
-          - UNSOLVABLE response -> UnsolvableCaptchaError (no auto-resubmit)
+     poll phase:
+         POST getTaskResult every poll_interval
+           - transient failures tolerated, bounded by total_timeout
+           - UNSOLVABLE response -> UnsolvableCaptchaError (no auto-resubmit)
+           - UNKNOWN (task not found) -> ProviderError, fail fast (ADR-0058)
     terminal:
         READY -> Result[T] (emit "solved")
         budget exhausted -> SolveTimeoutError (emit "failed")
@@ -413,7 +414,7 @@ class MyServiceAdapter(BaseAdapter):
     def __init__(self, api_key: SecretStr, base_url: str | None = None): ...
     def build_payload(self, challenge) -> dict[str, Any]: ...
     def parse_submit_response(self, raw: bytes) -> int: ...
-    def parse_task_result(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable
+    def parse_task_result(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable|unknown (ADR-0058)
     def parse_balance(self, raw: bytes) -> Decimal: ...
     def report_bad_supported(self, challenge_type) -> bool: ...
     def build_report_bad(self, task: TaskRef) -> dict[str, Any]: ...
