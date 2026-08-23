@@ -1,6 +1,6 @@
 # ADR-0032: TaskStatus split from Result
 
-**Status:** Accepted (amended by ADR-0050: four states, UNKNOWN as returned status)
+**Status:** Accepted (amended by ADR-0050: four states, UNKNOWN as returned status; amended by ADR-0056: `result` field replaced by `solution`/`cost`/`raw`, no submission metadata)
 **Date:** 2026-08-23
 
 ## Context
@@ -14,10 +14,11 @@ method.
 ## Decision
 
 - `solve()` returns `Result[T]` with **non-optional `solution`**.
-- The single-shot query returns a separate lightweight **`TaskStatus`**:
-  `task_id`, `provider`, `status`, `result: Result[T] | None` (populated
-  only when READY). Optionality here is honest: it is the point of the
-  call.
+- The single-shot query returns a separate lightweight **`TaskStatus`**
+  (non-generic, per ADR-0056): `task_id`, `provider`, `status`
+  (four states), `solution: BaseSolution | None` populated only when
+  READY, plus `cost` and `raw`. Optionality here is honest: it is the
+  point of the call.
 - Per ADR-0050, `status` has four values: PENDING, READY, UNSOLVABLE,
   UNKNOWN — provider-side outcomes are returned, not raised.
 

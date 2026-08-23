@@ -1,6 +1,6 @@
 # ADR-0035: Solution bases non-instantiable
 
-**Status:** Accepted
+**Status:** Accepted (amended by ADR-0056: `BaseSolution` abstract root added over the kind bases)
 **Date:** 2026-08-23
 
 ## Context
@@ -14,7 +14,7 @@ bare base — always the provider subclass. Should users be able to?
 
 - Bases **reject direct instantiation**: `__post_init__` raises `TypeError`
   when `type(self) is Base`. They are abstract types by contract and by
-  runtime enforcement.
+  runtime enforcement. Includes the `BaseSolution` root (ADR-0056).
 - Adapters always construct provider subclasses (e.g.,
   `AntiCaptchaRecaptchaV2Solution`).
 - Facade methods return the narrower static type

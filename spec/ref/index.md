@@ -51,10 +51,10 @@ supersede.
 | [0029](ADR/0029-unsolvable-captcha-error.md) | UnsolvableCaptchaError | dedicated exception, no auto-resubmit |
 | [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
-| [0032](ADR/0032-taskstatus-split.md) | TaskStatus split from Result | amended: four states |
+| [0032](ADR/0032-taskstatus-split.md) | TaskStatus split from Result | amended: 0050, 0056 |
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |
 | [0034](ADR/0034-result-surface-and-metadata.md) | Result surface and metadata | raw bytes, provider/created_at/elapsed |
-| [0035](ADR/0035-solution-bases-non-instantiable.md) | Solution bases non-instantiable | |
+| [0035](ADR/0035-solution-bases-non-instantiable.md) | Solution bases non-instantiable | amended: 0056 |
 | [0036](ADR/0036-package-layout-and-naming.md) | Package layout and naming | *Client suffix everywhere; amended: 0052, 0054 |
 | [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | amended: 0055 |
 | [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close |
@@ -75,6 +75,7 @@ supersede.
 | [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question |
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | amends 0036: `MultiClient`/`AsyncMultiClient` |
 | [0055](ADR/0055-adapter-provider-attribute.md) | Adapter `provider` attribute | amends 0037/0041/0052/0053: `kind` renamed `provider` |
+| [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatus surface + BaseSolution root | amends 0032/0035: no `Result` embedding, `TaskState` enum |
 
 ## Conventions
 

@@ -95,11 +95,12 @@ BaseChallenge (public abstract root; open for custom kinds)
 ## 3. Solution taxonomy
 
 ```
-ImageSolution          text: str                  (abstract)
-TextSolution           text: str                  (abstract)
-RecaptchaV2Solution    token: str                 (abstract)
-RecaptchaV3Solution    token: str; score; action  (abstract)
-HCaptchaSolution       token: str                 (abstract)
+BaseSolution (public abstract root; open for custom kinds; ADR-0056)
++-- ImageSolution          text: str                  (abstract)
++-- TextSolution           text: str                  (abstract)
++-- RecaptchaV2Solution    token: str                 (abstract)
++-- RecaptchaV3Solution    token: str; score; action  (abstract)
++-- HCaptchaSolution       token: str                 (abstract)
 ```
 
 - Bases contain only fields all three providers return for that kind
@@ -138,14 +139,19 @@ API). Routing vehicle for all task-addressing operations (ADR-0045).
 
 ### TaskStatus
 
-Returned by single-shot status queries (ADR-0032, ADR-0050):
+Returned by single-shot status queries (ADR-0032, ADR-0050; surface per
+ADR-0056 — non-generic, no submission metadata):
 
 | Field | Type |
 |---|---|
 | `task_id` | `int` |
 | `provider` | `str` |
-| `status` | `PENDING \| READY \| UNSOLVABLE \| UNKNOWN` |
-| `result` | `Result[T] \| None` | populated only when READY |
+| `status` | `TaskState` — enum: `PENDING \| READY \| UNSOLVABLE \| UNKNOWN` |
+| `solution` | `BaseSolution \| None` | populated only when READY; narrow via isinstance |
+| `cost` | `Decimal \| None` |
+| `raw` | `bytes` | untouched response body |
+
+`Result[T]` is the solve()-only return; TaskStatus never embeds it.
 
 Provider-side outcomes are always returned values; exceptions on this method
 are reserved for caller-side faults (wrong provider -> TypeError, client

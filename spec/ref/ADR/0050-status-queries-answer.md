@@ -1,6 +1,6 @@
 # ADR-0050: Status queries answer, operations raise
 
-**Status:** Accepted (supersedes the UnknownTaskError decision)
+**Status:** Accepted (supersedes the UnknownTaskError decision; TaskStatus surface per ADR-0056)
 **Date:** 2026-08-23
 
 ## Context
