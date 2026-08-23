@@ -8,7 +8,7 @@ it states *what is* per the settled decisions; ADRs state *why*.
 
 ```
 +---------------------------------------------------------------+
-| MultiClient / AsyncMultiClient               provider facades  |
+| CaptchaSolver / AsyncCaptchaSolver             provider facades  |
 | (registry + dispatch)                       (convenience)    |
 +------------------------------+------------------------------+
                                |  both delegate to
@@ -33,7 +33,7 @@ it states *what is* per the settled decisions; ADRs state *why*.
 - Facades (`TwoCaptchaClient` and async counterpart) know their provider
   statically; convenience methods construct challenges and delegate to the
   engine. Facade methods have full parameter parity with `solve()`
-  (ADR-0051); facade constructors have full parity with `MultiClient`
+  (ADR-0051); facade constructors have full parity with `CaptchaSolver`
   except `adapters` — `api_key`, `base_url` (provider mirror override),
   and every client kwarg (ADR-0061).
 - Adapters are pure translation units: challenge -> JSON payload, response
@@ -382,7 +382,7 @@ unicaptcha/
                        # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, challenge/solution kind bases
     _version.py        # single version source (pyproject reads it)
-     client.py          # MultiClient / AsyncMultiClient
+     client.py          # CaptchaSolver / AsyncCaptchaSolver
     errors.py          # hierarchy + ErrorKind
     events.py          # SolveEvent
     types.py           # public model vocabulary (Result, TaskStatus, TaskRef,
@@ -403,7 +403,7 @@ unicaptcha/
   `_internal/` plus module privates are implementation details. The HTTP
   layer is exposed as a public **Protocol** (what may be injected), while its
   implementation stays internal (ADR-0041).
-- Naming: universal `MultiClient` / `AsyncMultiClient`; facades
+- Naming: universal `CaptchaSolver` / `AsyncCaptchaSolver`; facades
   `<Provider>Client` / `Async<Provider>Client`; challenges
   `<Provider><Kind>Challenge`; solutions `<Provider><Kind>Solution`
   (ADR-0036).
@@ -430,7 +430,7 @@ class MyServiceAdapter(BaseAdapter):
     def map_provider_error(self, raw: bytes) -> ErrorKind and message: ...
 ```
 
-- Registration: `MultiClient(adapters=[MyServiceAdapter(...)])`.
+- Registration: `CaptchaSolver(adapters=[MyServiceAdapter(...)])`.
   Non-adapter objects (e.g. facades) raise `TypeError` at construction
   (ADR-0053).
 - `BaseAdapter` is a public ABC (ADR-0053): `provider` (ADR-0055),

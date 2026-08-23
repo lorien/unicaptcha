@@ -1,6 +1,6 @@
 # ADR-0036: Package layout and naming
 
-**Status:** Accepted (amended: `unicaptcha.types` module added; class names carry the Client suffix; adapter classes named `<Provider>Adapter` per ADR-0052; universal client renamed `MultiClient` per ADR-0054)
+**Status:** Accepted (amended: `unicaptcha.types` module added; adapter classes named `<Provider>Adapter` per ADR-0052; universal tier renamed `CaptchaSolver`/`AsyncCaptchaSolver` per ADR-0062, Client suffix scoped to facades)
 **Date:** 2026-08-22, amendments 2026-08-23
 
 ## Context
@@ -17,7 +17,7 @@ unicaptcha/
                        # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, kind bases
     _version.py        # single version source
-     client.py          # MultiClient / AsyncMultiClient (ADR-0054)
+     client.py          # CaptchaSolver / AsyncCaptchaSolver (ADR-0062)
     errors.py          # hierarchy + ErrorKind
     events.py          # SolveEvent
     types.py           # public model vocabulary; re-exported from root
@@ -29,11 +29,11 @@ unicaptcha/
     _internal/         # engine, http layer implementation, clock, scrubbing
 ```
 
-- **Class names**: `MultiClient` / `AsyncMultiClient` (ADR-0054, was
-  `UnicaptchaClient` / `AsyncUnicaptchaClient`);
-  `TwoCaptchaClient` / `AsyncTwoCaptchaClient` etc. — every client class
-  ends in `Client` (owner refinement of the initial `Unicaptcha`
-  proposal).
+- **Class names**: `CaptchaSolver` / `AsyncCaptchaSolver`
+  (ADR-0062, was `UnicaptchaClient` / `MultiClient` earlier);
+  `TwoCaptchaClient` / `AsyncTwoCaptchaClient` etc. — every facade
+  class ends in `Client` (owner refinement of the initial `Unicaptcha`
+  proposal; suffix scoped to facades by ADR-0062).
 - Challenges: `<Provider><Kind>Challenge`; solutions:
   `<Provider><Kind>Solution`.
 - **`unicaptcha.types`**: public home for `Proxy`/`ProxyKind` and the model

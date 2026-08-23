@@ -23,7 +23,7 @@ leaving bare **Adapter** as the term.
 ## Decision
 
 - Constructor kwarg: `adapters=[TwoCaptchaAdapter(...), MyServiceAdapter(...)]`
-  on `MultiClient` / `AsyncMultiClient`.
+  on `CaptchaSolver` / `AsyncCaptchaSolver`.
 - Class naming: shipped adapters are `<Provider>Adapter`
   (`TwoCaptchaAdapter`, `AntiCaptchaAdapter`, `CapMonsterAdapter`);
   third-party convention `<Name>Adapter` — parallel to `<Provider>Client`

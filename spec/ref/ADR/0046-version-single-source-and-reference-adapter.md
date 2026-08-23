@@ -27,7 +27,7 @@ usable by external authors — internal refactors could silently break it.
 - The test suite contains a minimal fake "myservice" provider that
   implements the documented adapter SDK contract **exactly as an
   external author would**: public imports only, no `_internal` access.
-- It registers into a real `MultiClient` and solves scripted
+- It registers into a real `CaptchaSolver` and solves scripted
   challenges through the full engine in tests.
 - CI asserts it never imports `_internal` — if an internal refactor
   breaks external adapter authors, CI fails instead of a user.

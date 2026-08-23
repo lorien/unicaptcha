@@ -11,18 +11,18 @@ README promises that 2Captcha-protocol mirrors (RuCaptcha) work "by
 overriding the 2Captcha adapter's base URL", and ADR-0007 says facades
 create their adapter internally — so `base_url` must be a facade
 constructor parameter for the promise to hold. No ADR said so, nor
-which of `MultiClient`'s many constructor kwargs facades accept.
+which of the universal client's many constructor kwargs facades accept.
 
 ## Decision
 
 A facade constructor accepts the **adapter set** plus **every client
-kwarg** of `MultiClient` / `AsyncMultiClient` except `adapters`:
+kwarg** of `CaptchaSolver` / `AsyncCaptchaSolver` except `adapters`:
 
 ```python
 TwoCaptchaClient(
     api_key: SecretStr,             # adapter credentials (positional-first)
     base_url: str | None = None,    # overrides default_base_url (RuCaptcha mirrors)
-    # client kwargs, identical names/defaults/validation as MultiClient:
+    # client kwargs, identical names/defaults/validation as CaptchaSolver:
     name=..., solve=..., retry=..., http=..., http_client=...,
     on_event=..., abandoned_registry_limit=...,
 )
@@ -43,7 +43,7 @@ TwoCaptchaClient(
   calls now holds for construction.
 - The README's mirror-provider story becomes a documented signature,
   not folklore.
-- Everything `MultiClient` accepts describes the engine/HTTP layer the
+- Everything `CaptchaSolver` accepts describes the engine/HTTP layer the
   facade also owns (peers) — refusing any of them would force the
   facade user into a universal client for no architectural reason.
 

@@ -25,7 +25,7 @@ from day one.
   Custom adapters implement the contract (`provider` identity,
   challenges frozenset,
   pure translation methods, error mapping, optional per-kind defaults)
-  and register via `MultiClient(adapters=[...])`.
+  and register via `CaptchaSolver(adapters=[...])`.
 - The injectable HTTP layer is exposed as a public **Protocol**
   (what may be injected); its implementation stays `_internal`.
 
