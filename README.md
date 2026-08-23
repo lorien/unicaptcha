@@ -53,6 +53,15 @@ one, uniform random choice when omitted); provider-specific options
 use the concrete class, e.g. `TwoCaptchaImageChallenge(body=..., numeric=True)`
 (ADR-0064). Image `body` accepts `bytes` or `Path` (ADR-0065).
 
+Two-phase batch workflows split submit from collection (ADR-0067):
+
+```python
+ticket = client.submit(ImageChallenge(Path("a.png")))   # collect later
+...
+result = client.wait(ticket)                            # -> Result, typed
+status = client.wait_ref(TaskRef("twocaptcha", 12345), timeout=120)  # from persisted ids
+```
+
 An async-native `AsyncCaptchaSolver` and per-provider facade clients
 (`TwoCaptchaClient` and async counterpart) are part of the same design.
 See `spec/ref/architecture.md` for the complete specification.

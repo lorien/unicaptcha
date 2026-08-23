@@ -29,7 +29,7 @@ supersede.
 | [0007](ADR/0007-provider-facades-via-composition.md) | Provider facades | amended: peers over SolveEngine |
 | [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | Result[T], Decimal cost |
 | [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057 |
-| [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics |
+| [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics; scoped to solve() by 0067 |
 | [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter; 0059 |
 | [0012](ADR/0012-proxy-handling.md) | Proxy handling | optional challenge field + client default |
 | [0013](ADR/0013-auxiliary-operations.md) | Auxiliary operations | amended: TaskRef routing, four-state status |
@@ -37,7 +37,7 @@ supersede.
 | [0015](ADR/0015-poll-only-no-webhooks.md) | Poll-only, no webhooks | |
 | [0016](ADR/0016-cancellation-semantics.md) | Cancellation semantics | amended: pure propagation |
 | [0017](ADR/0017-no-client-rate-limiting.md) | No client-side rate limiting | |
-| [0018](ADR/0018-logging-and-events.md) | Logging and events | amended: flat logger, failed phase |
+| [0018](ADR/0018-logging-and-events.md) | Logging and events | amended: flat logger, failed phase; 0067 |
 | [0019](ADR/0019-toolchain.md) | Toolchain | uv, ruff, pytest, respx, slotscheck |
 | [0020](ADR/0020-mit-license.md) | MIT license | |
 | [0021](ADR/0021-static-semver-versioning.md) | Static SemVer versioning | 0.1.0 start |
@@ -57,20 +57,20 @@ supersede.
 | [0035](ADR/0035-solution-bases-non-instantiable.md) | Solution bases non-instantiable | amended: 0056 |
 | [0036](ADR/0036-package-layout-and-naming.md) | Package layout and naming | *Client suffix everywhere; amended: 0052, 0054 |
 | [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | amended: 0055 |
-| [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close |
+| [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close; deferral ≠ abandonment per 0067 |
 | [0039](ADR/0039-logging-taxonomy.md) | Logging taxonomy | |
 | [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | |
 | [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052, 0053 |
 | [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
 | [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge |
 | [0044](ADR/0044-event-attachment-and-parity.md) | Event handler attachment | constructor + per-call |
-| [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | amended: 0064 |
+| [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | amended: 0064; TaskTicket per 0067 |
 | [0046](ADR/0046-version-single-source-and-reference-adapter.md) | Version single source + reference adapter | |
 | [0047](ADR/0047-ci-matrix-and-free-threaded.md) | CI matrix and free-threaded Python | |
 | [0048](ADR/0048-challenge-kind-bases.md) | Challenge kind bases | symmetric with solutions; amended: 0064 |
 | [0049](ADR/0049-http-config-mutual-exclusion.md) | HTTP config mutual exclusion | |
 | [0050](ADR/0050-status-queries-answer.md) | Status queries answer, operations raise | |
-| [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | |
+| [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | extended to submit/wait/wait_ref by 0067 |
 | [0052](ADR/0052-adapter-naming.md) | Adapter naming | amends 0005/0036/0041/0042: `adapters=` kwarg, `<Provider>Adapter` |
 | [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063 |
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | superseded by 0062 |
@@ -86,6 +86,7 @@ supersede.
 | [0064](ADR/0064-kind-solve-and-provider-selection.md) | Kind-level solve + provider selection | amends 0005/0045/0048; random among supporting adapters |
 | [0065](ADR/0065-path-body.md) | Path accepted for image bodies | amends 0025: `bytes \| Path`, normalized to bytes |
 | [0066](ADR/0066-challenge-call-style.md) | Challenge call-style | amends 0006: keyword-only fields, positional payload |
+| [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10 |
 
 ## Conventions
 

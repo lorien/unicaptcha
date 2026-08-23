@@ -1,6 +1,6 @@
 # ADR-0051: Facade parameter parity
 
-**Status:** Accepted (constructor parity per ADR-0061)
+**Status:** Accepted (constructor parity per ADR-0061; parity extends to `submit`/`wait`/`wait_ref` per ADR-0067)
 **Date:** 2026-08-23
 
 ## Context

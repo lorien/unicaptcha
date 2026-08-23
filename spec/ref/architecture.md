@@ -156,6 +156,13 @@ Public, constructible: `TaskRef(provider: str, task_id: int)`. Registry
 entries are TaskRefs (with abandoned-at metadata available from the registry
 API). Routing vehicle for all task-addressing operations (ADR-0045).
 
+### TaskTicket[T]
+
+Issued by `submit()` (ADR-0067): frozen dataclass, generic over the
+solution type (bound via the challenge->solution link); `task_ref:
+TaskRef`, `submitted_at: datetime` (UTC). Not user-constructible —
+provenance is its value. Bridges to persistence via `.task_ref`.
+
 ### TaskStatus
 
 Returned by single-shot status queries (ADR-0032, ADR-0050; surface per
@@ -326,6 +333,32 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result
 - Aux operations (`get_balance`, `report_bad_result`, `get_task_result`)
   use the **same** retry policy as submission (ADR-0011).
 - Polling only; no webhooks (ADR-0015).
+
+### Two-phase operations (ADR-0067)
+
+`solve() = submit() + wait()`, exposed as separate calls on both tiers:
+
+```python
+ticket = solver.submit(challenge, provider=None, retry=None)   # -> TaskTicket[T]
+result = solver.wait(ticket, timeout=None)                     # -> Result[T], raises on failure
+status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatus, answers (PENDING on budget out)
+```
+
+- `submit` routes exactly like `solve()` (ADR-0064); bounded by the
+  retry policy only.
+- `wait`: operation semantics — `Result[T]` typed, raises
+  (`UnsolvableCaptchaError`, UNKNOWN -> `ProviderError` per ADR-0058,
+  `SolveTimeoutError`); clock starts at the call, default = per-kind
+  `total_timeout` (ADR-0030) via the merge chain.
+- `wait_ref`: query semantics — polls until terminal or budget out
+  (returns PENDING `TaskStatus` on exhaustion).
+- `get_task_result` unchanged: single-shot (ADR-0050).
+- Events: `submitted` at submit; `solved`/`failed` at wait's terminal
+  state; never-waited tickets eventless (ADR-0018 as amended).
+  Deferral is not abandonment (ADR-0038 as amended): the registry
+  records only cancelled/orphaned waits. Billing caveat: solved but
+  uncollected tasks are billed by the provider.
+
 
 ### Auxiliary operations
 

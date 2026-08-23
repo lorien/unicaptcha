@@ -1,6 +1,6 @@
 # ADR-0018: Logging and events
 
-**Status:** Accepted (amended: flat logger only; `failed` phase added; sync handler guard added)
+**Status:** Accepted (amended: flat logger only; `failed` phase added; sync handler guard added; two-phase event semantics per ADR-0067 — invariant reworded to "every *waited* solve")
 **Date:** 2026-08-22, amendments 2026-08-23
 
 ## Context
@@ -19,6 +19,10 @@ only). Invariants:
 - Every solve ends in exactly one of `solved` or `failed`; the `failed`
   event fires immediately before the terminal raise, for every
   library-raised exception (timeout, unsolvable, network, provider, ...).
+  (Amended by ADR-0067 for two-phase: `submitted` fires at submit,
+  `solved`/`failed` at wait's terminal state; never-waited tickets are
+  eventless — "every *waited* solve ends in exactly one of `solved` or
+  `failed`.")
 - **Cancellation is eventless**: firing events while unwinding
   `CancelledError` repeats the ADR-0016 mistake; the abandoned-task
   registry is cancellation's observability story.

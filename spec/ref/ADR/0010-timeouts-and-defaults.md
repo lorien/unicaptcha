@@ -1,6 +1,6 @@
 # ADR-0010: Timeouts — total_timeout semantics
 
-**Status:** Accepted (amended 2026-08-23: budget semantics settled as total, name `total_timeout`; per-request timeout confirmed as separate knob)
+**Status:** Accepted (amended 2026-08-23: budget semantics settled as total, name `total_timeout`; per-request timeout confirmed as separate knob; scoped to `solve()` by ADR-0067 — `wait()` carries its own call-start budget, closing the granular split as deferred item 10)
 **Date:** 2026-08-22
 
 ## Context

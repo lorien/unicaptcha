@@ -1,6 +1,6 @@
 # ADR-0045: TaskRef and pre-flight provider validation
 
-**Status:** Accepted
+**Status:** Accepted (TaskTicket joins the task-addressing family per ADR-0067: submit-issued, kind-typed, not user-constructible; TaskRef itself unchanged)
 **Date:** 2026-08-23
 
 ## Context

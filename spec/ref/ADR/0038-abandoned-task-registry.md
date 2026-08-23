@@ -1,6 +1,6 @@
 # ADR-0038: Abandoned-task registry
 
-**Status:** Accepted (amended: bounded with eviction warning and configurable cap; survives close; per-client advisory semantics and the recovery workflow per ADR-0060)
+**Status:** Accepted (amended: bounded with eviction warning and configurable cap; survives close; per-client advisory semantics and the recovery workflow per ADR-0060; deferral ≠ abandonment per ADR-0067)
 **Date:** 2026-08-23
 
 ## Context
