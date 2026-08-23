@@ -60,8 +60,8 @@ supersede.
 | [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close |
 | [0039](ADR/0039-logging-taxonomy.md) | Logging taxonomy | |
 | [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | |
-| [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052 |
-| [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052 |
+| [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052, 0053 |
+| [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
 | [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge |
 | [0044](ADR/0044-event-attachment-and-parity.md) | Event handler attachment | constructor + per-call |
 | [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | |
@@ -72,6 +72,7 @@ supersede.
 | [0050](ADR/0050-status-queries-answer.md) | Status queries answer, operations raise | |
 | [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | |
 | [0052](ADR/0052-adapter-naming.md) | Adapter naming | amends 0005/0036/0041/0042: `adapters=` kwarg, `<Provider>Adapter` |
+| [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question |
 
 ## Conventions
 

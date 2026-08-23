@@ -383,7 +383,7 @@ unicaptcha/
   root exposes core vocabulary; provider classes require explicit subpackage
   imports (`from unicaptcha.providers.twocaptcha import ...`).
 - Public surface: root + provider packages + the adapter SDK contract
-  (`BaseChallenge`, adapter protocol, registration). Everything under
+  (`BaseChallenge`, `BaseAdapter` ABC, registration). Everything under
   `_internal/` plus module privates are implementation details. The HTTP
   layer is exposed as a public **Protocol** (what may be injected), while its
   implementation stays internal (ADR-0041).
@@ -398,7 +398,7 @@ unicaptcha/
 ### Adapter SDK (ADR-0041)
 
 ```python
-class MyServiceAdapter:
+class MyServiceAdapter(BaseAdapter):
     kind: ClassVar[str] = "myservice"
     challenges: ClassVar[frozenset[type[BaseChallenge]]]
     default_solve_config: ClassVar[...]        # per-kind timing defaults; optional
@@ -415,6 +415,12 @@ class MyServiceAdapter:
 ```
 
 - Registration: `UnicaptchaClient(adapters=[MyServiceAdapter(...)])`.
+  Non-adapter objects (e.g. facades) raise `TypeError` at construction
+  (ADR-0053).
+- `BaseAdapter` is a public ABC (ADR-0053): `kind`, `challenges`, and
+  the translation methods are abstract; `__init__` (api_key storage,
+  `base_url` defaulting), key-masking `repr` (ADR-0014), and the
+  report-bad default-unsupported trio are concrete.
 - Third-party facades: author-written composition of a universal client,
   following the documented pattern; no generation machinery (rejected:
   kills static typing).

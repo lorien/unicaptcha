@@ -33,8 +33,8 @@ leaving bare **Adapter** as the term.
   service and its `kind` string. **Adapter** is the object implementing
   the translation contract. The extension feature is the **adapter SDK**.
   Facades remain peers, never registerable.
-- This ADR does not settle the adapter contract's enforcement mechanism
-  (structural Protocol vs ABC); that decision is pending separately.
+- The adapter contract's enforcement mechanism is settled in ADR-0053:
+  `BaseAdapter` is an ABC.
 
 ## Rationale
 

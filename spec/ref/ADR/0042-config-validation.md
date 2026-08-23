@@ -21,6 +21,7 @@ mistakes are the same class of caller bug.
   smuggle garbage past construction.
 - Client construction additionally validates composite invariants:
   empty/None adapters list, duplicate kinds (ADR-0037, `ValueError`),
+  non-adapter objects in `adapters` (`TypeError`, ADR-0053),
   `http` config + injected httpx client together (ADR-0049).
 
 ## Rationale

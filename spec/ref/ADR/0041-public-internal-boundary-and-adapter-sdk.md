@@ -1,6 +1,6 @@
 # ADR-0041: Public/internal boundary and the adapter SDK
 
-**Status:** Accepted (amended: pydantic dropped — frozen dataclasses; adapter SDK public from day one; registration via `adapters=` per ADR-0052)
+**Status:** Accepted (amended: pydantic dropped — frozen dataclasses; adapter SDK public from day one; registration via `adapters=` per ADR-0052; contract is the `BaseAdapter` ABC per ADR-0053)
 **Date:** 2026-08-23
 
 ## Context
@@ -20,7 +20,8 @@ from day one.
   solution kind bases.
 - `unicaptcha.providers.<name>`: that provider's challenges, solutions,
   adapter class, facades.
-- **The adapter SDK contract**: adapter base machinery is public API.
+- **The adapter SDK contract**: `BaseAdapter` (an ABC, ADR-0053) and the
+  adapter base machinery are public API.
   Custom adapters implement the contract (kind, challenges frozenset,
   pure translation methods, error mapping, optional per-kind defaults)
   and register via `UnicaptchaClient(adapters=[...])`.
