@@ -77,8 +77,14 @@ BaseChallenge (public abstract root; open for custom kinds)
 +-- ImageChallenge          body: bytes | Path (normalized to bytes; ADR-0065)
 +-- TextChallenge           text: str
 +-- RecaptchaV2Challenge    sitekey: str; pageurl: str; invisible: bool
+|                           enterprise flags: is_enterprise, data_s, api_domain (ADR-0070)
 +-- RecaptchaV3Challenge    sitekey: str; pageurl: str; action: str|None; min_score: ...
+|                           enterprise flags: is_enterprise, data_s, api_domain (ADR-0070)
 +-- HCaptchaChallenge       sitekey: str; pageurl: str
+|                           flags: is_invisible, rqdata (ADR-0070)
++-- FunCaptchaChallenge     public_key: str; pageurl: str (ADR-0070)
++-- GeeTestChallenge        gt_key: str; challenge: str; pageurl: str (ADR-0070)
++-- GeeTestV4Challenge      captcha_id: str; pageurl: str (ADR-0070)
 ```
 
 - Kind bases are public, **instantiable** (ADR-0064), carry the
@@ -120,6 +126,10 @@ BaseSolution (public abstract root; open for custom kinds; ADR-0056)
 +-- RecaptchaV2Solution    token: str                 (abstract)
 +-- RecaptchaV3Solution    token: str; score; action  (abstract)
 +-- HCaptchaSolution       token: str                 (abstract)
++-- FunCaptchaSolution     token: str                 (abstract; ADR-0070)
++-- GeeTestSolution        challenge; validate; seccode        (abstract; ADR-0070)
++-- GeeTestV4Solution      captcha_id; lot_number; pass_token; gen_time; captcha_output
+                                                          (abstract; ADR-0070)
 ```
 
 - Bases contain only fields all three providers return for that kind

@@ -1,6 +1,6 @@
 # ADR-0030: Numeric defaults
 
-**Status:** Accepted
+**Status:** Accepted (table gains FunCaptcha / GeeTest v3 / GeeTest v4 rows per ADR-0070 — values at implementation, GeeTest/FunCaptcha class near reCAPTCHA cadence)
 **Date:** 2026-08-23
 
 ## Context

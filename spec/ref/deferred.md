@@ -18,3 +18,4 @@ never discussed.
 | 10 | ~~Granular `submit_timeout` / `solve_timeout` split~~ | **Closed by ADR-0067**: the two-phase `submit()`/`wait()` API realizes the split as two calls with separate budgets; no config knobs needed. |
 | 11 | Capability introspection API | `client.supports(...)` / `providers_supporting(...)` and challenge-kind tags. v1: probe by calling, catch exceptions. |
 | 12 | Client usage statistics | Cumulative solved/failed counters, Decimal cost totals, per-provider breakdown. v1: events + logging are the observability story. If added, prefer an `on_event`-fed collector over client state. |
+| 13 | Deferred CAPTCHA kinds: KeyCaptcha, Capy Puzzle, TikTok | Named candidates excluded from v1 (ADR-0070): KeyCaptcha/Capy are single-provider, low demand; TikTok has a cookies-typed solution (no payload field, secrets-adjacent repr questions). Third-party adapters may cover them via the SDK meanwhile. |

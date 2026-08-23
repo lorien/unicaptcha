@@ -21,7 +21,7 @@ supersede.
 | ADR | Topic | Notes |
 |---|---|---|
 | [0001](ADR/0001-supported-providers.md) | Supported providers | 2Captcha, Anti-Captcha, CapMonster Cloud |
-| [0002](ADR/0002-captcha-types-scope.md) | CAPTCHA types scope | image, text, reCAPTCHA v2/v3, hCaptcha |
+| [0002](ADR/0002-captcha-types-scope.md) | CAPTCHA types scope | 8 kinds, enterprise flags; amended: 0070 |
 | [0003](ADR/0003-sync-async-architecture.md) | Blocking sync + async-native architecture | no wrapper magic |
 | [0004](ADR/0004-python-version-and-typing-policy.md) | Python 3.11+ and strict typing | mypy + pyright strict, py.typed |
 | [0005](ADR/0005-universal-multi-provider-client.md) | Universal multi-provider client | registry, dispatch by challenge class; amended: 0052, 0064 |
@@ -49,7 +49,7 @@ supersede.
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |
 | [0028](ADR/0028-no-proxy-validation.md) | No proxy validation | |
 | [0029](ADR/0029-unsolvable-captcha-error.md) | UnsolvableCaptchaError | dedicated exception, no auto-resubmit |
-| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | |
+| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
 | [0032](ADR/0032-taskstatus-split.md) | TaskStatus split from Result | amended: 0050, 0056 |
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |
@@ -89,6 +89,7 @@ supersede.
 | [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10 |
 | [0068](ADR/0068-report-good-result.md) | report_good_result | amends 0013/0053: bool return, adapter report pairs |
 | [0069](ADR/0069-worker-context.md) | Worker context parameters | amends 0012: `user_agent`/`cookies` challenge fields |
+| [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags |
 
 ## Conventions
 
