@@ -13,7 +13,7 @@ vs bytes — errors had settled on bytes) and the exact metadata field set.
 - **`raw: bytes`** — the untouched HTTP response body. One convention
   everywhere: "raw means the verbatim wire payload". Ergonomic access is
   what the typed fields are for.
-- Metadata set: `provider: str` (adapter kind; also the aux-op routing
+- Metadata set: `provider: str` (adapter provider string; also the aux-op routing
   key), `created_at: datetime` (task submission time, UTC, timezone-aware),
   `elapsed: timedelta` (submission -> ready). No poll-count (internal
   noise; already in events), no captcha-type field (derivable from the
