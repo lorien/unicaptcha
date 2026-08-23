@@ -367,6 +367,7 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatus, 
 | `get_balance(provider)` | provider discriminator: instance / class / provider string; returns `Decimal` USD | implicit provider |
 | `get_task_result(task)` | `TaskRef` | `int \| TaskRef` |
 | `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` |
+| `report_good_result(task)` | `TaskRef` | `TaskRef \| int` (ADR-0068; returns bool, feeds worker quality routing where supported) |
 | `abandoned_tasks()` | snapshot `tuple[TaskRef, ...]` | same |
 
 Report-bad coverage differs per provider and captcha kind; adapters enforce
@@ -487,6 +488,9 @@ class MyServiceAdapter(BaseAdapter):
     def report_bad_supported(self, challenge_type) -> bool: ...
     def build_report_bad(self, task: TaskRef) -> dict[str, Any]: ...
     def parse_report_bad(self, raw: bytes) -> bool: ...
+    def report_good_supported(self, challenge_type) -> bool: ...   # ADR-0068
+    def build_report_good(self, task: TaskRef) -> dict[str, Any]: ...
+    def parse_report_good(self, raw: bytes) -> bool: ...
     def map_provider_error(self, raw: bytes) -> ErrorKind and message: ...
 ```
 
@@ -497,7 +501,8 @@ class MyServiceAdapter(BaseAdapter):
   `challenges`, and
   the translation methods are abstract; `__init__` (api_key storage,
   `base_url` defaulting), key-masking `repr` (ADR-0014), and the
-  report-bad default-unsupported trio are concrete.
+  report default-unsupported pairs (bad + good, ADR-0068) are
+  concrete.
 - Third-party facades: author-written composition of a universal client,
   following the documented pattern; no generation machinery (rejected:
   kills static typing).

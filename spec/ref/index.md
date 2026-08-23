@@ -32,7 +32,7 @@ supersede.
 | [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics; scoped to solve() by 0067 |
 | [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter; 0059 |
 | [0012](ADR/0012-proxy-handling.md) | Proxy handling | optional challenge field + client default |
-| [0013](ADR/0013-auxiliary-operations.md) | Auxiliary operations | amended: TaskRef routing, four-state status |
+| [0013](ADR/0013-auxiliary-operations.md) | Auxiliary operations | amended: TaskRef routing, four-state status; 0057, 0068 |
 | [0014](ADR/0014-api-key-hygiene.md) | API key hygiene | own SecretStr, no env helpers; amended: 0063 |
 | [0015](ADR/0015-poll-only-no-webhooks.md) | Poll-only, no webhooks | |
 | [0016](ADR/0016-cancellation-semantics.md) | Cancellation semantics | amended: pure propagation |
@@ -72,7 +72,7 @@ supersede.
 | [0050](ADR/0050-status-queries-answer.md) | Status queries answer, operations raise | |
 | [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | extended to submit/wait/wait_ref by 0067 |
 | [0052](ADR/0052-adapter-naming.md) | Adapter naming | amends 0005/0036/0041/0042: `adapters=` kwarg, `<Provider>Adapter` |
-| [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063 |
+| [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063, 0068 |
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | superseded by 0062 |
 | [0055](ADR/0055-adapter-provider-attribute.md) | Adapter `provider` attribute | amends 0037/0041/0052/0053: `kind` renamed `provider` |
 | [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatus surface + BaseSolution root | amends 0032/0035: no `Result` embedding, `TaskState` enum |
@@ -87,6 +87,7 @@ supersede.
 | [0065](ADR/0065-path-body.md) | Path accepted for image bodies | amends 0025: `bytes \| Path`, normalized to bytes |
 | [0066](ADR/0066-challenge-call-style.md) | Challenge call-style | amends 0006: keyword-only fields, positional payload |
 | [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10 |
+| [0068](ADR/0068-report-good-result.md) | report_good_result | amends 0013/0053: bool return, adapter report pairs |
 
 ## Conventions
 

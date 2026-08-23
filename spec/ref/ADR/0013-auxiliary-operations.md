@@ -1,6 +1,6 @@
 # ADR-0013: Auxiliary operations
 
-**Status:** Accepted (amended twice: routing via TaskRef instead of bare ids/Result; four-state status semantics per ADR-0050)
+**Status:** Accepted (amended twice: routing via TaskRef instead of bare ids/Result; four-state status semantics per ADR-0050; `report_good_result` added per ADR-0068)
 **Date:** 2026-08-22
 
 ## Context
@@ -20,13 +20,16 @@ All three operations exist on both tiers:
 | `get_balance(...)` | discriminator: provider instance / class / provider string (all three accepted, normalized internally) | implicit provider |
 | `get_task_result(task)` | `TaskRef` | `int \| TaskRef` |
 | `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` |
+| `report_good_result(task)` | `TaskRef` | `TaskRef \| int` (ADR-0068) |
 
 - `get_balance()` returns `Decimal`, pinned to USD (ADR-0040).
-- `report_bad_result` is a uniform method everywhere; adapters enforce the
-  per-provider/per-kind support matrix pre-flight, raising
+- `report_bad_result` and `report_good_result` are uniform methods
+  everywhere; adapters enforce the per-provider/per-kind support
+  matrix pre-flight for both, raising
   `UnsupportedCaptchaError` where coverage is missing — client-side,
-  no network traffic (ADR-0057; probe-by-exception; introspection
-  deferred).
+  no network traffic (ADR-0057, ADR-0068; probe-by-exception;
+  introspection deferred). Good reports feed worker quality routing
+  on providers that accept them.
 - `get_task_result` returns `TaskStatus` with four states
   (PENDING/READY/UNSOLVABLE/UNKNOWN) — provider outcomes are returned
   values, never exceptions (ADR-0050).
