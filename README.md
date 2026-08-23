@@ -37,10 +37,10 @@ Requires Python 3.11+. Single runtime dependency: `httpx`.
 The exact API is being finalized; the intended shape:
 
 ```python
-from unicaptcha import CaptchaSolver, ImageChallenge, SecretStr
+from unicaptcha import CaptchaSolver, ImageChallenge
 from unicaptcha.providers.twocaptcha import TwoCaptchaAdapter
 
-client = CaptchaSolver(adapters=[TwoCaptchaAdapter(api_key=SecretStr("..."))])
+client = CaptchaSolver(adapters=[TwoCaptchaAdapter("...")])
 result = client.solve(ImageChallenge(body=image_bytes))
 print(result.solution.text)
 ```

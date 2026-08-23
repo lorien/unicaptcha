@@ -1,6 +1,6 @@
 # ADR-0014: API key hygiene
 
-**Status:** Accepted (amended: no env-var helpers; own SecretStr after pydantic was dropped)
+**Status:** Accepted (amended: no env-var helpers; own SecretStr after pydantic was dropped; `SecretStr | str` accepted and normalized at construction per ADR-0063)
 **Date:** 2026-08-22
 
 ## Context
@@ -12,7 +12,9 @@ exception messages, or the event stream. pydantic was initially to provide
 ## Decision
 
 - **Key delivery**: constructor argument only
-  (`TwoCaptchaAdapter(api_key=...)`). No `from_env()` helpers (owner
+  (`TwoCaptchaAdapter(api_key=...)`), typed `SecretStr | str` — a
+  plain string is wrapped into `SecretStr` at construction
+  (ADR-0063). No `from_env()` helpers (owner
   decision); environment handling belongs to the caller.
 - **Storage**: hand-rolled `SecretStr` wrapper (~30 lines, public type)
   masking in `repr`/`str`.

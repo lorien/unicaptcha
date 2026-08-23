@@ -1,6 +1,6 @@
 # ADR-0053: Adapter contract enforcement — ABC
 
-**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042)
+**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042; `api_key` union per ADR-0063)
 **Date:** 2026-08-23
 
 ## Context
@@ -45,7 +45,7 @@ Four facts decide it:
 | Member | Kind |
 |---|---|
 | `provider`, `challenges` | abstract declarations (`provider` per ADR-0055) |
-| `__init__(api_key: SecretStr, base_url: str \| None = None)` | concrete: store key; resolve `base_url or default_base_url` |
+| `__init__(api_key: SecretStr \| str, base_url: str \| None = None)` | concrete: wrap plain str into SecretStr (ADR-0063), store key; resolve `base_url or default_base_url` |
 | `default_base_url: ClassVar[str]` | declared per provider (README table) |
 | `__repr__` / `__str__` | concrete, key masked (ADR-0014) |
 | `build_payload`, `parse_submit_response`, `parse_task_result`, `parse_balance`, `map_provider_error` | abstract — the translation core |
