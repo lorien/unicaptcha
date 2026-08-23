@@ -34,7 +34,7 @@ Four facts decide it:
     extensions.** The HTTP layer stays a Protocol (we accept existing
   httpx clients that will never subclass our base); adapters are
   extensions written against our contract.
-- Registration check: the `UnicaptchaClient` / `AsyncUnicaptchaClient`
+- Registration check: the `MultiClient` / `AsyncMultiClient`
   constructor validates each element of `adapters=` with
   `isinstance(adapter, BaseAdapter)`; non-adapters (e.g. facades) raise
   `TypeError` — consistent with the wrong-object precedent of ADR-0045.

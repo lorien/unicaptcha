@@ -1,6 +1,6 @@
 # ADR-0036: Package layout and naming
 
-**Status:** Accepted (amended: `unicaptcha.types` module added; class names carry the Client suffix; adapter classes named `<Provider>Adapter` per ADR-0052)
+**Status:** Accepted (amended: `unicaptcha.types` module added; class names carry the Client suffix; adapter classes named `<Provider>Adapter` per ADR-0052; universal client renamed `MultiClient` per ADR-0054)
 **Date:** 2026-08-22, amendments 2026-08-23
 
 ## Context
@@ -17,7 +17,7 @@ unicaptcha/
                        # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, kind bases
     _version.py        # single version source
-    client.py          # UnicaptchaClient / AsyncUnicaptchaClient
+     client.py          # MultiClient / AsyncMultiClient (ADR-0054)
     errors.py          # hierarchy + ErrorKind
     events.py          # SolveEvent
     types.py           # public model vocabulary; re-exported from root
@@ -29,7 +29,8 @@ unicaptcha/
     _internal/         # engine, http layer implementation, clock, scrubbing
 ```
 
-- **Class names**: `UnicaptchaClient` / `AsyncUnicaptchaClient`;
+- **Class names**: `MultiClient` / `AsyncMultiClient` (ADR-0054, was
+  `UnicaptchaClient` / `AsyncUnicaptchaClient`);
   `TwoCaptchaClient` / `AsyncTwoCaptchaClient` etc. — every client class
   ends in `Client` (owner refinement of the initial `Unicaptcha`
   proposal).

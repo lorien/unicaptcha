@@ -7,7 +7,7 @@
 
 Provider facades (`TwoCaptchaClient`, ...) add convenience methods mirroring
 exactly what each provider supports. The original composition decision had
-each facade construct/wrap its own `UnicaptchaClient` instance. LSP analysis
+each facade construct/wrap its own universal client instance. LSP analysis
 and owner review exposed this as over-engineered: a facade knows its
 provider statically and needs no dispatch machinery; wrapping a universal
 client inside facades creates nesting questions (shared pools, ownership,
@@ -18,7 +18,7 @@ validation of "facade over a client lacking its provider").
 Facades and the universal client are **peers**, not nested:
 
 ```
-UnicaptchaClient (registry + dispatch)      TwoCaptchaClient (facade)
+MultiClient (registry + dispatch)             TwoCaptchaClient (facade)
                 +--------------------------------------+
                 |            SolveEngine                |
                 |  adapters (pure)                      |
@@ -31,7 +31,7 @@ UnicaptchaClient (registry + dispatch)      TwoCaptchaClient (facade)
 - The facade creates its adapter and the engine directly; no universal
   client appears in its object graph.
 - Resource sharing happens at the **HTTP layer**: `TwoCaptchaClient(...,
-  http_client=my_http)` and `UnicaptchaClient(..., http_client=my_http)`
+  http_client=my_http)` and `MultiClient(..., http_client=my_http)`
   inject the same object at the layer where the resource actually lives.
 - Facade method surface: `solve_image`, `solve_text`, `solve_recaptcha_v2`,
   `solve_recaptcha_v3`, `solve_hcaptcha`, plus aux ops with identical names

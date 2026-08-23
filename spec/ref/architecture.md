@@ -8,7 +8,7 @@ it states *what is* per the settled decisions; ADRs state *why*.
 
 ```
 +---------------------------------------------------------------+
-| UnicaptchaClient / AsyncUnicaptchaClient    provider facades  |
+| MultiClient / AsyncMultiClient               provider facades  |
 | (registry + dispatch)                       (convenience)    |
 +------------------------------+------------------------------+
                                |  both delegate to
@@ -366,7 +366,7 @@ unicaptcha/
                        # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, challenge/solution kind bases
     _version.py        # single version source (pyproject reads it)
-    client.py          # UnicaptchaClient / AsyncUnicaptchaClient
+     client.py          # MultiClient / AsyncMultiClient
     errors.py          # hierarchy + ErrorKind
     events.py          # SolveEvent
     types.py           # public model vocabulary (Result, TaskStatus, TaskRef,
@@ -387,7 +387,7 @@ unicaptcha/
   `_internal/` plus module privates are implementation details. The HTTP
   layer is exposed as a public **Protocol** (what may be injected), while its
   implementation stays internal (ADR-0041).
-- Naming: universal `UnicaptchaClient` / `AsyncUnicaptchaClient`; facades
+- Naming: universal `MultiClient` / `AsyncMultiClient`; facades
   `<Provider>Client` / `Async<Provider>Client`; challenges
   `<Provider><Kind>Challenge`; solutions `<Provider><Kind>Solution`
   (ADR-0036).
@@ -414,7 +414,7 @@ class MyServiceAdapter(BaseAdapter):
     def map_provider_error(self, raw: bytes) -> ErrorKind and message: ...
 ```
 
-- Registration: `UnicaptchaClient(adapters=[MyServiceAdapter(...)])`.
+- Registration: `MultiClient(adapters=[MyServiceAdapter(...)])`.
   Non-adapter objects (e.g. facades) raise `TypeError` at construction
   (ADR-0053).
 - `BaseAdapter` is a public ABC (ADR-0053): `kind`, `challenges`, and

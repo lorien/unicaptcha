@@ -24,7 +24,7 @@ from day one.
   adapter base machinery are public API.
   Custom adapters implement the contract (kind, challenges frozenset,
   pure translation methods, error mapping, optional per-kind defaults)
-  and register via `UnicaptchaClient(adapters=[...])`.
+  and register via `MultiClient(adapters=[...])`.
 - The injectable HTTP layer is exposed as a public **Protocol**
   (what may be injected); its implementation stays `_internal`.
 
