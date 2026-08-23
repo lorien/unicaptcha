@@ -32,7 +32,7 @@ differ, instead of a lossy lowest-common-denominator abstraction.
 
 - Automatic provider selection, failover, load balancing, or routing policies.
 - Client-side rate limiting or concurrency caps.
-- API-key rotation or multi-account management per provider kind.
+- API-key rotation or multi-account management per provider.
 - Webhook/pingback solve mode; solving is strictly poll-based.
 - Browser automation, CAPTCHA detection, or page scraping.
 - A fake/test double module for downstream users (unicaptcha.testing).

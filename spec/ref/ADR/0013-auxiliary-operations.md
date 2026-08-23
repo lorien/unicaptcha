@@ -17,7 +17,7 @@ All three operations exist on both tiers:
 
 | Operation | Universal client | Facade |
 |---|---|---|
-| `get_balance(...)` | discriminator: provider instance / class / kind string (all three accepted, normalized internally) | implicit provider |
+| `get_balance(...)` | discriminator: provider instance / class / provider string (all three accepted, normalized internally) | implicit provider |
 | `get_task_result(task)` | `TaskRef` | `int \| TaskRef` |
 | `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` |
 

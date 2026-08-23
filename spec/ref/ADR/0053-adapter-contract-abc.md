@@ -44,7 +44,7 @@ Four facts decide it:
 
 | Member | Kind |
 |---|---|
-| `kind`, `challenges` | abstract declarations |
+| `provider`, `challenges` | abstract declarations (`provider` per ADR-0055) |
 | `__init__(api_key: SecretStr, base_url: str \| None = None)` | concrete: store key; resolve `base_url or default_base_url` |
 | `default_base_url: ClassVar[str]` | declared per provider (README table) |
 | `__repr__` / `__str__` | concrete, key masked (ADR-0014) |

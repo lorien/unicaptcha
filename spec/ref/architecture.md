@@ -28,7 +28,7 @@ it states *what is* per the settled decisions; ADRs state *why*.
 - Universal clients and facades are **peers**: neither contains the other.
   Both delegate to the same internal SolveEngine (ADR-0007).
 - The universal client holds a registry of provider adapters keyed by adapter
-  `kind`. `solve(challenge)` dispatches on the concrete challenge class:
+  `provider` (ADR-0055). `solve(challenge)` dispatches on the concrete challenge class:
   constructing the challenge is the provider choice (ADR-0005).
 - Facades (`TwoCaptchaClient` and async counterpart) know their provider
   statically; convenience methods construct challenges and delegate to the
@@ -52,11 +52,11 @@ it states *what is* per the settled decisions; ADRs state *why*.
 
 ### Provider identification
 
-Each adapter declares `kind: ClassVar[str]` (e.g. `"twocaptcha"`). This string
-is the single source of truth: registry key, `Result.provider`,
-`TaskRef.provider`, `SolveEvent.provider`. Kind strings are public API.
-Duplicate kinds in one client are rejected at construction with `ValueError`
-(ADR-0037).
+Each adapter declares `provider: ClassVar[str]` (e.g. `"twocaptcha"`). This
+string is the single source of truth: registry key, `Result.provider`,
+`TaskRef.provider`, `SolveEvent.provider`. Provider strings are public API.
+Duplicate providers in one client are rejected at construction with
+`ValueError` (ADR-0037).
 
 ### 2Captcha API flavor
 
@@ -125,7 +125,7 @@ living in `unicaptcha.types` and re-exported from the root (ADR-0036).
 | `task_id` | `int` | provider task id |
 | `cost` | `Decimal \| None` | provider-reported cost, `Decimal(str(raw))`; None when unreported |
 | `raw` | `bytes` | untouched HTTP response body; uniform with `error.raw_response` |
-| `provider` | `str` | adapter kind |
+| `provider` | `str` | adapter provider string |
 | `created_at` | `datetime` | task submission time, UTC-aware |
 | `elapsed` | `timedelta` | submission -> ready |
 | `task_ref` | `TaskRef` | convenience property built from provider + task_id |
@@ -294,7 +294,7 @@ solve(challenge, solve=None, retry=None, on_event=None) -> Result[T]
 
 | Operation | Universal client | Facade |
 |---|---|---|
-| `get_balance(provider)` | provider discriminator: instance / class / kind string; returns `Decimal` USD | implicit provider |
+| `get_balance(provider)` | provider discriminator: instance / class / provider string; returns `Decimal` USD | implicit provider |
 | `get_task_result(task)` | `TaskRef` | `int \| TaskRef` |
 | `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` |
 | `abandoned_tasks()` | snapshot `tuple[TaskRef, ...]` | same |
@@ -399,7 +399,7 @@ unicaptcha/
 
 ```python
 class MyServiceAdapter(BaseAdapter):
-    kind: ClassVar[str] = "myservice"
+    provider: ClassVar[str] = "myservice"
     challenges: ClassVar[frozenset[type[BaseChallenge]]]
     default_solve_config: ClassVar[...]        # per-kind timing defaults; optional
 
@@ -417,7 +417,8 @@ class MyServiceAdapter(BaseAdapter):
 - Registration: `MultiClient(adapters=[MyServiceAdapter(...)])`.
   Non-adapter objects (e.g. facades) raise `TypeError` at construction
   (ADR-0053).
-- `BaseAdapter` is a public ABC (ADR-0053): `kind`, `challenges`, and
+- `BaseAdapter` is a public ABC (ADR-0053): `provider` (ADR-0055),
+  `challenges`, and
   the translation methods are abstract; `__init__` (api_key storage,
   `base_url` defaulting), key-masking `repr` (ADR-0014), and the
   report-bad default-unsupported trio are concrete.

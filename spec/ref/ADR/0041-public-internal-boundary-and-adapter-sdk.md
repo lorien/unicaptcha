@@ -22,7 +22,8 @@ from day one.
   adapter class, facades.
 - **The adapter SDK contract**: `BaseAdapter` (an ABC, ADR-0053) and the
   adapter base machinery are public API.
-  Custom adapters implement the contract (kind, challenges frozenset,
+  Custom adapters implement the contract (`provider` identity,
+  challenges frozenset,
   pure translation methods, error mapping, optional per-kind defaults)
   and register via `MultiClient(adapters=[...])`.
 - The injectable HTTP layer is exposed as a public **Protocol**

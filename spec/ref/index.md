@@ -56,7 +56,7 @@ supersede.
 | [0034](ADR/0034-result-surface-and-metadata.md) | Result surface and metadata | raw bytes, provider/created_at/elapsed |
 | [0035](ADR/0035-solution-bases-non-instantiable.md) | Solution bases non-instantiable | |
 | [0036](ADR/0036-package-layout-and-naming.md) | Package layout and naming | *Client suffix everywhere; amended: 0052, 0054 |
-| [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | |
+| [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | amended: 0055 |
 | [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close |
 | [0039](ADR/0039-logging-taxonomy.md) | Logging taxonomy | |
 | [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | |
@@ -74,6 +74,7 @@ supersede.
 | [0052](ADR/0052-adapter-naming.md) | Adapter naming | amends 0005/0036/0041/0042: `adapters=` kwarg, `<Provider>Adapter` |
 | [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question |
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | amends 0036: `MultiClient`/`AsyncMultiClient` |
+| [0055](ADR/0055-adapter-provider-attribute.md) | Adapter `provider` attribute | amends 0037/0041/0052/0053: `kind` renamed `provider` |
 
 ## Conventions
 

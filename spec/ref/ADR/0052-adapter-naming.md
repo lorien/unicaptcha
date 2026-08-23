@@ -9,7 +9,7 @@ The universal client's constructor argument was specified as
 `providers=[...]`, but the objects it accepts are adapter instances — not
 providers (the services) and not facades (peers, never registerable).
 "Provider" already has a precise meaning in the taxonomy: the external
-service, identified by its `kind` string (`Result.provider`,
+service, identified by its provider string (`Result.provider`,
 `TaskRef.provider`, `SolveEvent.provider`, `get_balance(provider)`
 discriminator). Overloading it with a second, object-shaped meaning made
 the tier boundary fuzzy: the README example even showed a
@@ -30,7 +30,8 @@ leaving bare **Adapter** as the term.
   (ADR-0036) and `<Provider><Kind>Challenge`. The base contract class is
   `BaseAdapter`, symmetric with `BaseChallenge`.
 - Terminology rule: **provider** is the identity concept only — the
-  service and its `kind` string. **Adapter** is the object implementing
+  service and its provider string (ADR-0055: the adapter attribute is
+  `provider`). **Adapter** is the object implementing
   the translation contract. The extension feature is the **adapter SDK**.
   Facades remain peers, never registerable.
 - The adapter contract's enforcement mechanism is settled in ADR-0053:
@@ -68,5 +69,5 @@ leaving bare **Adapter** as the term.
 - **`ServiceAdapter` family** (`TwoCaptchaServiceAdapter`): rejected;
   "service" is used descriptively (goals, README prose) but is not the
   formal identity word — adopting it here forks terminology unless the
-  whole identity vocabulary (`kind`, `Result.provider`, ...) renames
+  whole identity vocabulary (`provider`, `Result.provider`, ...) renames
   too, for no clarity gain.
