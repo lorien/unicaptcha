@@ -37,16 +37,19 @@ Requires Python 3.11+. Single runtime dependency: `httpx`.
 The exact API is being finalized; the intended shape:
 
 ```python
-from unicaptcha import CaptchaSolver, SecretStr
-from unicaptcha.providers.twocaptcha import (
-    TwoCaptchaAdapter,
-    TwoCaptchaImageChallenge,
-)
+from unicaptcha import CaptchaSolver, ImageChallenge, SecretStr
+from unicaptcha.providers.twocaptcha import TwoCaptchaAdapter
 
 client = CaptchaSolver(adapters=[TwoCaptchaAdapter(api_key=SecretStr("..."))])
-result = client.solve(TwoCaptchaImageChallenge(body=image_bytes))
+result = client.solve(ImageChallenge(body=image_bytes))
 print(result.solution.text)
 ```
+
+Kind-base challenges carry universal fields only and route to any
+registered adapter supporting the kind (`provider="capmonster"` to pin
+one, uniform random choice when omitted); provider-specific options
+use the concrete class, e.g. `TwoCaptchaImageChallenge(body=..., numeric=True)`
+(ADR-0064).
 
 An async-native `AsyncCaptchaSolver` and per-provider facade clients
 (`TwoCaptchaClient` and async counterpart) are part of the same design.

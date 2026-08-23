@@ -29,7 +29,9 @@ it states *what is* per the settled decisions; ADRs state *why*.
   Both delegate to the same internal SolveEngine (ADR-0007).
 - The universal client holds a registry of provider adapters keyed by adapter
   `provider` (ADR-0055). `solve(challenge)` dispatches on the concrete challenge class:
-  constructing the challenge is the provider choice (ADR-0005).
+  constructing the challenge is the provider choice (ADR-0005); kind-base
+  challenges are routed by the optional `provider=` discriminator or uniform
+  random choice among supporting adapters (ADR-0064).
 - Facades (`TwoCaptchaClient` and async counterpart) know their provider
   statically; convenience methods construct challenges and delegate to the
   engine. Facade methods have full parameter parity with `solve()`
@@ -79,15 +81,21 @@ BaseChallenge (public abstract root; open for custom kinds)
 +-- HCaptchaChallenge       sitekey: str; pageurl: str
 ```
 
-- Kind bases are public, abstract, carry the **universal fields** (defined
-  once), and link each kind to its solution type for precise static typing.
+- Kind bases are public, **instantiable** (ADR-0064), carry the
+  **universal fields** (defined once), and link each kind to its
+  solution type for precise static typing. A kind-base instance plus
+  routing is a complete universal-fields-only solve request;
+  solutions keep their non-instantiable rule (ADR-0035, ADR-0056).
 - Provider subclasses (`TwoCaptchaRecaptchaV2Challenge`, ...) inherit the
   universal fields and add only provider-specific extras (ADR-0031).
 - All challenges are **frozen dataclasses** with `__post_init__` validation
   raising `InvalidChallengeError` (ADR-0006, as amended by ADR-0041's dropping
   of pydantic).
 - Dispatch in the universal client keys on the **concrete class**; the adapter
-  contract lists concrete classes (ADR-0048).
+  contract lists concrete classes (ADR-0048). Kind-base instances are routed
+  by `solve(provider=...)` or uniform random choice among supporting
+  adapters, then upcast to the concrete class before `build_payload`
+  (ADR-0064).
 - Custom adapters may subclass `BaseChallenge` directly to introduce novel
   kinds; per-kind timing defaults then come from the adapter's declaration
   with generic fallback (ADR-0041).
@@ -270,18 +278,23 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 ## 7. Solve flow and behavior
 
 ```
-solve(challenge, solve=None, retry=None, on_event=None) -> Result[T]
+solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result[T]
     validate client open
-    dispatch challenge -> adapter (universal) or direct (facade)
+    dispatch challenge -> adapter (universal) or direct (facade):
+        concrete class -> its adapter (provider= must match if given, else TypeError)
+        kind base + provider="name" -> that adapter (TypeError if unknown,
+            UnsupportedCaptchaError if kind unsupported)
+        kind base + provider=None -> uniform random choice among supporting
+            adapters (ADR-0064); upcast to concrete class before build_payload
     submit phase:
         build payload (adapter, pure)
         POST createTask
           - pre-send failure (DNS, refused, TLS, connect-timeout): retry
-           - received 500/503: retry
-           - rate limit (429 / provider payload): retry, RateLimitError on exhaustion (ADR-0059)
+          - received 500/503: retry
+          - rate limit (429 / provider payload): retry, RateLimitError on exhaustion (ADR-0059)
           - read timeout, reset-after-send, 502/504: fail fast NetworkError
           - backoff: full jitter, base 1s, cap 30s, max 3 attempts
-     poll phase:
+    poll phase:
          POST getTaskResult every poll_interval
            - transient failures tolerated, bounded by total_timeout
            - UNSOLVABLE response -> UnsolvableCaptchaError (no auto-resubmit)

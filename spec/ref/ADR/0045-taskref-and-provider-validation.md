@@ -28,7 +28,11 @@ Bare ints are ambiguous on multi-provider clients.
   registry — raises **`TypeError`** naming both parties
   ("TaskRef belongs to provider 'anti-captcha' but this facade is
   'twocaptcha'"). Same for challenge dispatch. Unknown discriminator
-  strings in `get_balance` get the same treatment.
+  strings in `get_balance` get the same treatment. The
+  `solve(..., provider=...)` discriminator of kind-level solve
+  (ADR-0064) is validated the same way: unknown string ->
+  `TypeError`; contradicting a concrete challenge's provider ->
+  `TypeError` naming both parties.
 
 ## Rationale
 

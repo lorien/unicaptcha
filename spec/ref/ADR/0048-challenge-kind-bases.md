@@ -1,6 +1,6 @@
 # ADR-0048: Challenge kind bases
 
-**Status:** Accepted
+**Status:** Accepted (amended by ADR-0064: kind bases are instantiable, carrying universal fields, for kind-level solve; the abstract rule survives for solutions and custom-kind roots)
 **Date:** 2026-08-23
 
 ## Context
@@ -28,7 +28,10 @@ BaseChallenge (public abstract root, open for custom kinds)
   (`TwoCaptchaRecaptchaV2Challenge`, ...) add only provider-specific
   extras. Kills 15-fold duplication of `sitekey`/`pageurl` validation
   and documents the universal field set structurally.
-- Bases are abstract (same non-instantiable enforcement as solutions).
+- Bases are instantiable (amended by ADR-0064): a kind-base instance
+  plus routing (`provider=` or random selection) is a complete
+  universal-fields-only request. Solutions keep the
+  non-instantiable rule (ADR-0035, ADR-0056).
 - The challenge->solution type link is declared on kind bases (overridable
   per provider subclass where solution types narrow).
 - **Dispatch stays concrete-class-keyed**: the adapter `challenges`

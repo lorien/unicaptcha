@@ -23,11 +23,16 @@ client.solve(TwoCaptchaImageChallenge(body=b"..."))   # routes to 2Captcha
 client.solve(AntiCaptchaRecaptchaV2Challenge(...))    # routes to Anti-Captcha
 ```
 
-- Dispatch is **type-based**: constructing the challenge is the provider
-  choice. There is deliberately no provider-agnostic `solve_image(...)`
-  method on the universal client, because no honest universal parameter
-  surface exists (providers differ in supported fields) and provider
-  selection would become library magic.
+- Dispatch is **type-based**: for concrete challenge classes,
+  constructing the challenge is the provider
+  choice. There is deliberately no provider-agnostic
+  `solve_image(...)` method on the universal client, because no
+  honest universal parameter surface exists (providers differ in
+  supported fields) and provider selection would become library
+  magic. (Amended by ADR-0064: kind-base challenges are now
+  instantiable and solvable via `solve(ImageChallenge(...),
+  provider=None | "name")` — universal fields only, explicit or
+  random provider choice; the method-name objection is unaffected.)
 - A challenge whose provider is not registered raises `TypeError`
   pre-flight.
 - No automatic provider selection, failover, or load balancing (deferred,

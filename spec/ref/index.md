@@ -24,7 +24,7 @@ supersede.
 | [0002](ADR/0002-captcha-types-scope.md) | CAPTCHA types scope | image, text, reCAPTCHA v2/v3, hCaptcha |
 | [0003](ADR/0003-sync-async-architecture.md) | Blocking sync + async-native architecture | no wrapper magic |
 | [0004](ADR/0004-python-version-and-typing-policy.md) | Python 3.11+ and strict typing | mypy + pyright strict, py.typed |
-| [0005](ADR/0005-universal-multi-provider-client.md) | Universal multi-provider client | registry, dispatch by challenge class; amended: 0052 |
+| [0005](ADR/0005-universal-multi-provider-client.md) | Universal multi-provider client | registry, dispatch by challenge class; amended: 0052, 0064 |
 | [0006](ADR/0006-provider-specific-challenge-classes.md) | Provider-specific challenge classes | frozen dataclasses |
 | [0007](ADR/0007-provider-facades-via-composition.md) | Provider facades | amended: peers over SolveEngine |
 | [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | Result[T], Decimal cost |
@@ -64,10 +64,10 @@ supersede.
 | [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
 | [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge |
 | [0044](ADR/0044-event-attachment-and-parity.md) | Event handler attachment | constructor + per-call |
-| [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | |
+| [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | amended: 0064 |
 | [0046](ADR/0046-version-single-source-and-reference-adapter.md) | Version single source + reference adapter | |
 | [0047](ADR/0047-ci-matrix-and-free-threaded.md) | CI matrix and free-threaded Python | |
-| [0048](ADR/0048-challenge-kind-bases.md) | Challenge kind bases | symmetric with solutions |
+| [0048](ADR/0048-challenge-kind-bases.md) | Challenge kind bases | symmetric with solutions; amended: 0064 |
 | [0049](ADR/0049-http-config-mutual-exclusion.md) | HTTP config mutual exclusion | |
 | [0050](ADR/0050-status-queries-answer.md) | Status queries answer, operations raise | |
 | [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | |
@@ -82,6 +82,7 @@ supersede.
 | [0060](ADR/0060-registry-advisory-and-recovery.md) | Registry advisory + recovery | amends 0033/0038: per-client semantics, workflow |
 | [0061](ADR/0061-facade-constructor-parity.md) | Facade constructor parity | amends 0051: api_key/base_url + all client kwargs |
 | [0062](ADR/0062-captchasolver-naming.md) | CaptchaSolver naming | supersedes 0054 class names; amends 0036 |
+| [0064](ADR/0064-kind-solve-and-provider-selection.md) | Kind-level solve + provider selection | amends 0005/0045/0048; random among supporting adapters |
 
 ## Conventions
 
