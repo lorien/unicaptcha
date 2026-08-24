@@ -30,7 +30,7 @@ ways:
 
 - **Capsolver ships in v1** as the fourth provider:
   `CapsolverAdapter`, facades `CapsolverClient` /
-  `AsyncCapsolverClient`, package `unicaptcha.providers.capsolver`.
+  `AsyncCapsolverClient`, package `unicaptcha.provider.capsolver`.
 
 | Provider | kind | Default base URL |
 |---|---|---|

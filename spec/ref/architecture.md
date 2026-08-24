@@ -480,14 +480,33 @@ unicaptcha/
                        # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, challenge/solution kind bases
     _version.py        # single version source (pyproject reads it)
-     client.py          # CaptchaSolver / AsyncCaptchaSolver
+    client.py          # CaptchaSolver / AsyncCaptchaSolver
     errors.py          # hierarchy + ErrorKind
     events.py          # SolveEvent
     types.py           # public model vocabulary (Result, TaskStatus, TaskRef,
                        # Proxy, SecretStr, configs, kind bases re-exported)
-    solutions/         # abstract solution kind bases
-    providers/
-        twocaptcha/    # challenges, solutions, adapter, facades
+    challenge/         # abstract challenge kind bases (ADR-0048)
+        base.py        # BaseChallenge
+        image.py       # ImageChallenge
+        text.py        # TextChallenge
+        recaptcha_v2.py  # RecaptchaV2Challenge
+        recaptcha_v3.py  # RecaptchaV3Challenge
+        hcaptcha.py    # HCaptchaChallenge
+        funcaptcha.py  # FunCaptchaChallenge
+        geetest.py     # GeeTestChallenge, GeeTestV4Challenge
+        turnstile.py   # TurnstileChallenge
+    solution/          # abstract solution kind bases (ADR-0035)
+        base.py        # BaseSolution
+        image.py       # ImageSolution
+        text.py        # TextSolution
+        recaptcha_v2.py  # RecaptchaV2Solution
+        recaptcha_v3.py  # RecaptchaV3Solution
+        hcaptcha.py    # HCaptchaSolution
+        funcaptcha.py  # FunCaptchaSolution
+        geetest.py     # GeeTestSolution, GeeTestV4Solution
+        turnstile.py   # TurnstileSolution
+    provider/          # one package per provider; singular one-per-concern files
+        twocaptcha/    # challenge.py, solution.py, adapter.py, client.py
         anticaptcha/
         capmonster/
         capsolver/     # ADR-0071
@@ -496,7 +515,12 @@ unicaptcha/
 
 - Import model: **eager**. `import unicaptcha` pre-loads provider packages;
   root exposes core vocabulary; provider classes require explicit subpackage
-  imports (`from unicaptcha.providers.twocaptcha import ...`).
+  imports (`from unicaptcha.provider.twocaptcha import ...`).
+- Naming rule (ADR-0036 amendment): root package **files** are plural
+  (`types.py`, `errors.py`, `events.py`); root package **directories** are
+  singular (`challenge/`, `solution/`, `provider/`, `_internal/`); everything
+  inside a provider package is singular, one file per concern
+  (`challenge.py`, `solution.py`, `adapter.py`, `client.py`).
 - Public surface: root + provider packages + the adapter SDK contract
   (`BaseChallenge`, `BaseAdapter` ABC, registration). Everything under
   `_internal/` plus module privates are implementation details. The HTTP

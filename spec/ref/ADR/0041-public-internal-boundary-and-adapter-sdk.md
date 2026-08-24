@@ -18,7 +18,7 @@ from day one.
 - Root `unicaptcha`: clients, errors + ErrorKind, Result/TaskStatus/
   SolveEvent/TaskRef, SecretStr, configs, Proxy/ProxyKind, challenge and
   solution kind bases.
-- `unicaptcha.providers.<name>`: that provider's challenges, solutions,
+- `unicaptcha.provider.<name>`: that provider's challenges, solutions,
   adapter class, facades.
 - **The adapter SDK contract**: `BaseAdapter` (an ABC, ADR-0053) and the
   adapter base machinery are public API.

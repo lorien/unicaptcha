@@ -1,7 +1,7 @@
 # ADR-0036: Package layout and naming
 
-**Status:** Accepted (amended: `unicaptcha.types` module added; adapter classes named `<Provider>Adapter` per ADR-0052; universal tier renamed `CaptchaSolver`/`AsyncCaptchaSolver` per ADR-0062, Client suffix scoped to facades)
-**Date:** 2026-08-22, amendments 2026-08-23
+**Status:** Accepted (amended: `unicaptcha.types` module added; adapter classes named `<Provider>Adapter` per ADR-0052; universal tier renamed `CaptchaSolver`/`AsyncCaptchaSolver` per ADR-0062, Client suffix scoped to facades; amended 2026-08-24: singular/plural naming rule — root files plural, root directories singular, provider internals singular one-per-concern; `challenge/` kind-base package added per ADR-0048)
+**Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
 
@@ -17,17 +17,31 @@ unicaptcha/
                        # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, kind bases
     _version.py        # single version source
-     client.py          # CaptchaSolver / AsyncCaptchaSolver (ADR-0062)
+    client.py          # CaptchaSolver / AsyncCaptchaSolver (ADR-0062)
     errors.py          # hierarchy + ErrorKind
     events.py          # SolveEvent
     types.py           # public model vocabulary; re-exported from root
-    solutions/         # abstract solution kind bases
-    providers/
-        twocaptcha/    # challenges, solutions, adapter, facade
+    challenge/         # abstract challenge kind bases (ADR-0048)
+    solution/          # abstract solution kind bases (ADR-0035)
+    provider/          # one package per provider
+        twocaptcha/    # challenge.py, solution.py, adapter.py, client.py
         anticaptcha/
         capmonster/
+        capsolver/     # ADR-0071
     _internal/         # engine, http layer implementation, clock, scrubbing
 ```
+
+- **Naming rule** (2026-08-24 amendment): root package **files** are
+  plural (`types.py`, `errors.py`, `events.py`); root package
+  **directories** are singular (`challenge/`, `solution/`, `provider/`,
+  `_internal/`); everything inside a provider package is singular, one
+  file per concern (`challenge.py`, `solution.py`, `adapter.py`,
+  `client.py`).
+- **`challenge/`** (2026-08-24 amendment): abstract challenge kind bases
+  (ADR-0048) live in a root package symmetric with `solution/`, one file
+  per kind (`base.py`, `image.py`, `text.py`, `recaptcha_v2.py`,
+  `recaptcha_v3.py`, `hcaptcha.py`, `funcaptcha.py`, `geetest.py`,
+  `turnstile.py`).
 
 - **Class names**: `CaptchaSolver` / `AsyncCaptchaSolver`
   (ADR-0062, was `UnicaptchaClient` / `MultiClient` earlier);
@@ -44,7 +58,7 @@ unicaptcha/
 - Facade method names: `solve_image`, `solve_text`, `solve_recaptcha_v2`,
   `solve_recaptcha_v3`, `solve_hcaptcha`; aux ops identical on both tiers.
 - Root `__init__` exports core vocabulary only; provider classes require
-  `from unicaptcha.providers.<name> import ...` (three providers x five
+  `from unicaptcha.provider.<name> import ...` (four providers x nine
   kinds x two clients would drown the root).
 
 ## Rationale

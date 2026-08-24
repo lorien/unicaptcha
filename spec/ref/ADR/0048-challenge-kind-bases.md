@@ -1,7 +1,7 @@
 # ADR-0048: Challenge kind bases
 
-**Status:** Accepted (amended by ADR-0064: kind bases are instantiable, carrying universal fields, for kind-level solve; the abstract rule survives for solutions and custom-kind roots)
-**Date:** 2026-08-23
+**Status:** Accepted (amended by ADR-0064: kind bases are instantiable, carrying universal fields, for kind-level solve; the abstract rule survives for solutions and custom-kind roots; amended 2026-08-24: kind bases live in the root `challenge/` package per the ADR-0036 naming rule)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -42,6 +42,11 @@ BaseChallenge (public abstract root, open for custom kinds)
   `BaseChallenge` directly for kinds we never modeled (e.g. GeeTest);
   per-kind timing defaults come from the adapter's declaration with
   generic fallback (ADR-0041, ADR-0030).
+- **Location** (2026-08-24 amendment): the kind bases live in the root
+  `unicaptcha/challenge/` package, symmetric with `solution/`, one file
+  per kind (`base.py`, `image.py`, `text.py`, `recaptcha_v2.py`,
+  `recaptcha_v3.py`, `hcaptcha.py`, `funcaptcha.py`, `geetest.py`,
+  `turnstile.py`); the root re-exports them (ADR-0036).
 
 ## Rationale
 

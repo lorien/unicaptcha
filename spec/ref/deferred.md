@@ -13,7 +13,7 @@ never discussed.
 | 5 | Client-side rate limiting / concurrency caps | v1: no `max_parallel_solves`, no request spacing. Callers manage concurrency; `RateLimitError` retry with backoff exists as a safety net. Documented guidance only. |
 | 6 | API-key rotation | One key per provider instance in v1. Rotation can be added later as a provider-level wrapper. |
 | 7 | Webhook/pingback solve mode | v1 is strictly poll-based. The submit/await separation now also has a public face (ADR-0067), keeping a webhook mode additive if ever added. |
-| 8 | Hierarchical logger names | v1 uses one flat `unicaptcha` logger. Component-hierarchy names (`unicaptcha.http`, `unicaptcha.providers.twocaptcha`, ...) rejected for now to avoid scope creep; revisit if per-component filtering is requested. |
+| 8 | Hierarchical logger names | v1 uses one flat `unicaptcha` logger. Component-hierarchy names (`unicaptcha.http`, `unicaptcha.provider.twocaptcha`, ...) rejected for now to avoid scope creep; revisit if per-component filtering is requested. |
 | 9 | `unicaptcha.testing` module | Fake clients / canned results / failure injection for downstream test suites. Defer until core API survives real usage. |
 | 10 | ~~Granular `submit_timeout` / `solve_timeout` split~~ | **Closed by ADR-0067**: the two-phase `submit()`/`wait()` API realizes the split as two calls with separate budgets; no config knobs needed. |
 | 11 | Capability introspection API | `client.supports(...)` / `providers_supporting(...)` and challenge-kind tags. v1: probe by calling, catch exceptions. |
