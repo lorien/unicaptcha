@@ -1,6 +1,6 @@
 # ADR-0009: Unified error hierarchy
 
-**Status:** Accepted (amended three times: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added; UnsupportedCaptchaError scope widened by ADR-0057)
+**Status:** Accepted (amended: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added; UnsupportedCaptchaError scope widened by ADR-0057; ServiceBusyError added by ADR-0059 amendment)
 **Date:** 2026-08-22, amendments 2026-08-23
 
 ## Context
@@ -24,6 +24,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- InvalidChallengeError          client-side challenge validation
 +-- SolveTimeoutError
 +-- RateLimitError
++-- ServiceBusyError               provider capacity: no workers free (ADR-0059 amendment)
 +-- UnsolvableCaptchaError
 +-- InvalidConfigError
 +-- ClientClosedError
@@ -33,9 +34,9 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 - Base carries `kind: ErrorKind` and `raw_response: bytes` (verbatim body).
   No `provider_code` attribute: adapters normalize semantics into the
   hierarchy; the original bytes are attached for debugging.
-- `ErrorKind` (11 values): NETWORK, AUTH, BALANCE, UNSUPPORTED,
-  INVALID_CHALLENGE, TIMEOUT, RATE_LIMIT, UNSOLVABLE, CLOSED,
-  INVALID_CONFIG, PROVIDER.
+- `ErrorKind` (12 values): NETWORK, AUTH, BALANCE, UNSUPPORTED,
+  INVALID_CHALLENGE, TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE,
+  CLOSED, INVALID_CONFIG, PROVIDER.
 - Message travels via standard `Exception` machinery.
 - Every wrapped cause uses `raise ... from cause`; event-handler exceptions
   propagate raw (ADR-0018).

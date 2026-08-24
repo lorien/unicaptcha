@@ -28,7 +28,7 @@ supersede.
 | [0006](ADR/0006-provider-specific-challenge-classes.md) | Provider-specific challenge classes | frozen dataclasses; amended: 0048, 0066 |
 | [0007](ADR/0007-provider-facades-via-composition.md) | Provider facades | amended: peers over SolveEngine |
 | [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | Result[T], Decimal cost |
-| [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057 |
+| [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057; ServiceBusyError per 0059 |
 | [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics; scoped to solve() by 0067 |
 | [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter; 0059 |
 | [0012](ADR/0012-proxy-handling.md) | Proxy handling | optional challenge field + client default; amended: 0069 |
@@ -78,7 +78,7 @@ supersede.
 | [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatus surface + BaseSolution root | amends 0032/0035: no `Result` embedding, `TaskState` enum |
 | [0057](ADR/0057-unsupported-captcha-error-scope.md) | UnsupportedCaptchaError scope | amends 0009/0013/0053: client-side gaps included |
 | [0058](ADR/0058-unknown-state-and-solve-poll.md) | UNKNOWN state in adapter contract | 4-state parse_task_result; solve-poll fail-fast |
-| [0059](ADR/0059-rate-limit-retry.md) | Rate-limit retry | amends 0011: 429 + provider payloads retryable |
+| [0059](ADR/0059-rate-limit-retry.md) | Rate-limit retry | amends 0011: 429 + provider payloads retryable; ServiceBusyError amendment |
 | [0060](ADR/0060-registry-advisory-and-recovery.md) | Registry advisory + recovery | amends 0033/0038: per-client semantics, workflow |
 | [0061](ADR/0061-facade-constructor-parity.md) | Facade constructor parity | amends 0051: api_key/base_url + all client kwargs; amended: 0063, 0072 |
 | [0062](ADR/0062-captchasolver-naming.md) | CaptchaSolver naming | supersedes 0054 class names; amends 0036 |
