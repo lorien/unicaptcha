@@ -59,7 +59,7 @@ supersede.
 | [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | amended: 0055 |
 | [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close; deferral ≠ abandonment per 0067 |
 | [0039](ADR/0039-logging-taxonomy.md) | Logging taxonomy | |
-| [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | amended: currency note; EmptySolutionError |
+| [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | amended: currency note; EmptySolutionError; required fields |
 | [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052, 0053 |
 | [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
 | [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge; amended: poll_delay |

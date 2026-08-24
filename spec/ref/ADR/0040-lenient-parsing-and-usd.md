@@ -1,6 +1,6 @@
 # ADR-0040: Lenient parsing and USD-pinned balance
 
-**Status:** Accepted (currency verification note added 2026-08-23; `EmptySolutionError` amendment added 2026-08-23)
+**Status:** Accepted (currency verification note added 2026-08-23; `EmptySolutionError` amendment added 2026-08-23; required-fields amendment added 2026-08-23)
 **Date:** 2026-08-23
 
 ## Context
@@ -16,6 +16,15 @@ all three services bill in USD.
   fields are ignored **and logged at DEBUG** (one line per unknown field,
   provider named). Missing optional fields become `None`. Provider drift
   becomes visible during debugging without breaking anyone.
+- **Required fields per response type** (amendment): each operation's
+  response has required fields — createTask must yield a task id;
+  getTaskResult must yield a status; getBalance must yield a balance.
+  A missing required field is a **malformed response**: `ProviderError`,
+  `raw_response` preserved, parse failure chained as `__cause__` —
+  identical treatment to unparseable JSON. Optional/unknown fields keep
+  their existing rules (None / ignored + DEBUG). Per-operation
+  required-field lists are finalized with the deferred-#2 field
+  matrices at implementation.
 - **Malformed responses are not drift**: HTTP 200 with an unparseable body
   or wrong-shape JSON raises `ProviderError` with `raw_response` bytes
   preserved and the parse failure as `__cause__` (ADR-0009).
