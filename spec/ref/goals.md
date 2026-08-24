@@ -54,8 +54,9 @@ See [deferred.md](deferred.md) for the canonical list with rationale.
 - Providers: 2Captcha (modern JSON API), Anti-Captcha, CapMonster Cloud,
   Capsolver (ADR-0071).
 - CAPTCHA kinds: image, text, reCAPTCHA v2 (checkbox + invisible),
-  reCAPTCHA v3, hCaptcha, FunCaptcha, GeeTest v3, GeeTest v4
-  (ADR-0070; reCAPTCHA Enterprise via flags on v2/v3).
+  reCAPTCHA v3, hCaptcha, FunCaptcha, GeeTest v3, GeeTest v4,
+  Cloudflare Turnstile (ADR-0070, ADR-0074; reCAPTCHA Enterprise via
+  flags on v2/v3).
 - Python: 3.11+ (all alive versions; see ADR-0004).
 - Runtime dependencies: httpx only.
 - Distribution: PyPI package `unicaptcha`; MIT license.

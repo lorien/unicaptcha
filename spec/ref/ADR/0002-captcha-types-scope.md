@@ -1,6 +1,6 @@
 # ADR-0002: CAPTCHA types scope
 
-**Status:** Accepted (amended by ADR-0070: scope extended to eight kinds — FunCaptcha, GeeTest v3/v4 added; reCAPTCHA Enterprise covered as flags on V2/V3)
+**Status:** Accepted (amended by ADR-0070: scope extended to eight kinds — FunCaptcha, GeeTest v3/v4 added; reCAPTCHA Enterprise covered as flags on V2/V3; amended by ADR-0074: Cloudflare Turnstile added as ninth kind)
 **Date:** 2026-08-22
 
 ## Context
@@ -13,7 +13,7 @@ classes, and adapter parsing per provider.
 
 ## Decision
 
-v1 supports eight CAPTCHA kinds:
+v1 supports nine CAPTCHA kinds:
 
 1. Image CAPTCHA (picture containing distorted text; input is raw `bytes`)
 2. Text CAPTCHA (plain-text question, e.g. "What is two plus three?")
@@ -23,9 +23,12 @@ v1 supports eight CAPTCHA kinds:
 6. FunCaptcha / Arkose (ADR-0070)
 7. GeeTest v3 (ADR-0070)
 8. GeeTest v4 (ADR-0070)
+9. Cloudflare Turnstile (ADR-0074)
 
-Turnstile, KeyCaptcha, Capy Puzzle, TikTok, audio, Amazon WAF, DataDome
-remain out of scope (deferred by name in deferred.md); the taxonomy
+KeyCaptcha, Capy Puzzle, TikTok, audio, Amazon WAF, DataDome
+remain out of scope (deferred by name in deferred.md; Turnstile's earlier
+listing here was a dangling claim — it was never in deferred.md — resolved
+by ADR-0074 adding it to scope); the taxonomy
 (ADR-0048) keeps adding them additive.
 
 ## Rationale

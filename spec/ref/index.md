@@ -21,7 +21,7 @@ supersede.
 | ADR | Topic | Notes |
 |---|---|---|
 | [0001](ADR/0001-supported-providers.md) | Supported providers | 2Captcha, Anti-Captcha, CapMonster, Capsolver; amended: 0071 |
-| [0002](ADR/0002-captcha-types-scope.md) | CAPTCHA types scope | 8 kinds, enterprise flags; amended: 0070 |
+| [0002](ADR/0002-captcha-types-scope.md) | CAPTCHA types scope | 9 kinds, enterprise flags; amended: 0070, 0074 |
 | [0003](ADR/0003-sync-async-architecture.md) | Blocking sync + async-native architecture | no wrapper magic |
 | [0004](ADR/0004-python-version-and-typing-policy.md) | Python 3.11+ and strict typing | mypy + pyright strict, py.typed |
 | [0005](ADR/0005-universal-multi-provider-client.md) | Universal multi-provider client | registry, dispatch by challenge class; amended: 0052, 0064 |
@@ -89,10 +89,11 @@ supersede.
 | [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10; poll-delay skip |
 | [0068](ADR/0068-report-good-result.md) | report_good_result | amends 0013/0053: bool return, adapter report pairs |
 | [0069](ADR/0069-worker-context.md) | Worker context parameters | amends 0012: `user_agent`/`cookies` challenge fields |
-| [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags |
+| [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags; amended: 0074 |
 | [0071](ADR/0071-capsolver-provider.md) | Capsolver provider | amends 0001: 4th provider; RuCaptcha v2 verified |
 | [0072](ADR/0072-referral-embedding.md) | Referral embedding | amends 0053/0061: trinary `referral` kwarg, on by default |
 | [0073](ADR/0073-adapter-endpoints.md) | Adapter Endpoints | amends 0053: operation-keyed paths, all-or-nothing override |
+| [0074](ADR/0074-turnstile-kind.md) | Cloudflare Turnstile kind | amends 0002/0070: ninth v1 kind; resolves dangling deferred claim |
 
 ## Conventions
 

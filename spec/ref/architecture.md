@@ -86,6 +86,8 @@ BaseChallenge (public abstract root; open for custom kinds)
 +-- FunCaptchaChallenge     public_key: str; pageurl: str (ADR-0070)
 +-- GeeTestChallenge        gt_key: str; challenge: str; pageurl: str (ADR-0070)
 +-- GeeTestV4Challenge      captcha_id: str; pageurl: str (ADR-0070)
++-- TurnstileChallenge      sitekey: str; pageurl: str (ADR-0074)
+|                           flags: action, c_data, chl_page_data (ADR-0074)
 ```
 
 - Kind bases are public, **instantiable** (ADR-0064), carry the
@@ -130,7 +132,8 @@ BaseSolution (public abstract root; open for custom kinds; ADR-0056)
 +-- FunCaptchaSolution     token: str                 (abstract; ADR-0070)
 +-- GeeTestSolution        challenge; validate; seccode        (abstract; ADR-0070)
 +-- GeeTestV4Solution      captcha_id; lot_number; pass_token; gen_time; captcha_output
-                                                          (abstract; ADR-0070)
+                                                           (abstract; ADR-0070)
++-- TurnstileSolution      token: str                 (abstract; ADR-0074)
 ```
 
 - Bases contain only fields all three providers return for that kind

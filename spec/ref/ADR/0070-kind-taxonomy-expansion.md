@@ -1,6 +1,6 @@
 # ADR-0070: Kind taxonomy expansion — FunCaptcha, GeeTest v3/v4, enterprise flags
 
-**Status:** Accepted (amends ADR-0002; extends ADR-0030's timing table)
+**Status:** Accepted (amends ADR-0002; extends ADR-0030's timing table; amended by ADR-0074: Turnstile added as ninth kind)
 **Date:** 2026-08-23
 
 ## Context
