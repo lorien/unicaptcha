@@ -299,11 +299,13 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- InvalidConfigError
 +-- ClientClosedError
 +-- ProviderError                  unclassified provider errors
+    +-- EmptySolutionError          solved-but-empty payload (ADR-0040 amendment)
 ```
 
-- `ErrorKind` (12 values): NETWORK, AUTH, BALANCE, UNSUPPORTED,
+- `ErrorKind` (13 values): NETWORK, AUTH, BALANCE, UNSUPPORTED,
   INVALID_CHALLENGE, TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE,
-  CLOSED, INVALID_CONFIG, PROVIDER (ADR-0009, ADR-0059 amendment).
+  EMPTY_SOLUTION, CLOSED, INVALID_CONFIG, PROVIDER (ADR-0009; ADR-0059
+  and ADR-0040 amendments).
 - No `provider_code` attribute; the message travels via standard Exception
   machinery; `raw_response` preserves the verbatim provider bytes.
 - No `SolveCancelledError` (ADR-0016); no `UnknownTaskError` (ADR-0050).
@@ -345,6 +347,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result
            - transient failures tolerated, bounded by total_timeout
            - UNSOLVABLE response -> UnsolvableCaptchaError (no auto-resubmit)
            - UNKNOWN (task not found) -> ProviderError, fail fast (ADR-0058)
+           - solved-but-empty payload -> EmptySolutionError (ADR-0040 amendment)
     terminal:
         READY -> Result[T] (emit "solved")
         budget exhausted -> SolveTimeoutError (emit "failed")

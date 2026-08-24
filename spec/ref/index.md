@@ -28,7 +28,7 @@ supersede.
 | [0006](ADR/0006-provider-specific-challenge-classes.md) | Provider-specific challenge classes | frozen dataclasses; amended: 0048, 0066 |
 | [0007](ADR/0007-provider-facades-via-composition.md) | Provider facades | amended: peers over SolveEngine |
 | [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | Result[T], Decimal cost |
-| [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057; ServiceBusyError per 0059 |
+| [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057; ServiceBusyError per 0059; EmptySolutionError per 0040 |
 | [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics; scoped to solve() by 0067 |
 | [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter; 0059 |
 | [0012](ADR/0012-proxy-handling.md) | Proxy handling | optional challenge field + client default; amended: 0069 |
@@ -59,7 +59,7 @@ supersede.
 | [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | amended: 0055 |
 | [0038](ADR/0038-abandoned-task-registry.md) | Abandoned-task registry | bounded, surviving close; deferral ≠ abandonment per 0067 |
 | [0039](ADR/0039-logging-taxonomy.md) | Logging taxonomy | |
-| [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | |
+| [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | amended: currency note; EmptySolutionError |
 | [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052, 0053 |
 | [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
 | [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge; amended: poll_delay |
