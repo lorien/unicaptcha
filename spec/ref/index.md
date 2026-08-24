@@ -53,7 +53,7 @@ supersede.
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
 | [0032](ADR/0032-taskstatus-split.md) | TaskStatus split from Result | amended: 0050, 0056 |
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |
-| [0034](ADR/0034-result-surface-and-metadata.md) | Result surface and metadata | raw bytes, provider/created_at/elapsed |
+| [0034](ADR/0034-result-surface-and-metadata.md) | Result surface and metadata | raw bytes, provider/created_at/elapsed; amended: cost presence-check |
 | [0035](ADR/0035-solution-bases-non-instantiable.md) | Solution bases non-instantiable | amended: 0056 |
 | [0036](ADR/0036-package-layout-and-naming.md) | Package layout and naming | *Client suffix everywhere; amended: 0052, 0054 |
 | [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | amended: 0055 |

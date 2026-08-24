@@ -1,6 +1,6 @@
 # ADR-0034: Result surface and metadata
 
-**Status:** Accepted
+**Status:** Accepted (amended: cost presence-check semantics pinned)
 **Date:** 2026-08-23
 
 ## Context
@@ -13,6 +13,11 @@ vs bytes — errors had settled on bytes) and the exact metadata field set.
 - **`raw: bytes`** — the untouched HTTP response body. One convention
   everywhere: "raw means the verbatim wire payload". Ergonomic access is
   what the typed fields are for.
+- **Cost parsing uses presence-check, not truthiness** (amendment): a
+  reported `"cost": 0` is `Decimal("0")` — a real, zero cost; `None`
+  strictly means the provider did not report a cost field. (Both
+  competitor libraries turn zero into None via truthiness — the exact
+  bug this pins out.)
 - Metadata set: `provider: str` (adapter provider string; also the aux-op routing
   key), `created_at: datetime` (task submission time, UTC, timezone-aware),
   `elapsed: timedelta` (submission -> ready). No poll-count (internal
@@ -38,5 +43,7 @@ vs bytes — errors had settled on bytes) and the exact metadata field set.
   loses wire fidelity.
 - **Poll count / captcha type in metadata**: rejected; derivable or
   event-sourced.
+- **Truthiness cost check** (`if cost:`): rejected; conflates "costs
+  nothing" with "not reported" — the competitors' observed bug.
 - **Full token display in repr**: rejected; tokens are secrets-adjacent
   single-use artifacts.
