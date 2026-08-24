@@ -1,10 +1,6 @@
 # Initial steps
 
 Study documents inside `spec/ref/` directory.
-Read `spec/skill/task_tracking.md`.
-I will specifically tell you what to do.
-If I tell you to create some task, like implement new feature or fix the issue, just
-create corresponding task files, DO NOT WRITE ANY CODE!
 Now wait for my further instructions.
 
 # IMPORTANT:
