@@ -1,7 +1,7 @@
 # ADR-0067: Two-phase submit/wait with TaskTicket
 
-**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains a `ready` field, wait fast-path for inline-answered submits)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains a `ready` field, wait fast-path for inline-answered submits; renamed 2026-08-24: `Result[T]` → `SolveResult[T]`, `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status`)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -46,12 +46,12 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
 
 | Method | Accepts | Returns | On terminal failure |
 |---|---|---|---|
-| `wait(ticket, timeout=None)` | `TaskTicket[T]` | `Result[T]` | **raises** (`UnsolvableCaptchaError`, `ProviderError` on UNKNOWN per ADR-0058, `SolveTimeoutError`) |
-| `wait_ref(ref, timeout=...)` | `TaskRef` | `TaskStatus` | **answers**; budget exhaustion returns PENDING `TaskStatus` |
-| `get_task_result(ref)` | `TaskRef` | `TaskStatus` | answers — single-shot, unchanged (ADR-0050) |
+| `wait(ticket, timeout=None)` | `TaskTicket[T]` | `SolveResult[T]` | **raises** (`UnsolvableCaptchaError`, `ProviderError` on UNKNOWN per ADR-0058, `SolveTimeoutError`) |
+| `wait_ref(ref, timeout=...)` | `TaskRef` | `TaskStatusResult` | **answers**; budget exhaustion returns PENDING `TaskStatusResult` |
+| `get_task_status(ref)` | `TaskRef` | `TaskStatusResult` | answers — single-shot, unchanged (ADR-0050) |
 
 - `wait` is an **operation** (solve-parity semantics); `wait_ref` and
-  `get_task_result` are **queries** (ADR-0050 semantics). A single
+  `get_task_status` are **queries** (ADR-0050 semantics). A single
   `wait` overloaded on argument type was rejected: its return type and
   error philosophy would depend on the argument — two methods wearing
   one name.
@@ -80,7 +80,7 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
   the per-kind `poll_delay` only when the ticket is **fresh**
   (submitted less than one `poll_interval` ago); stale tickets poll
   immediately — an old task is likely already mature. `wait_ref` /
-  `get_task_result` never apply a delay.
+  `get_task_status` never apply a delay.
 - `total_timeout` (ADR-0010) is thereby scoped to `solve()`; this
   closes deferred item 10 — the granular split exists, expressed as
   two calls rather than two config knobs.
@@ -124,11 +124,11 @@ per-kind method explosion; the challenge carries the kind.
 - **Overloaded `wait(ticket | ref)`**: rejected; union return type +
   error semantics that depend on the argument.
 - **`wait` accepting refs only** (no ticket): rejected; `T` unbindable
-  (ADR-0056's TaskStatus problem again) on the primary path.
+  (ADR-0056's TaskStatusResult problem again) on the primary path.
 - **Handle methods (`ticket.wait()`)**: rejected; engine reference in
   frozen data.
 - **Wall-clock deadline from `submitted_at`**: rejected; surprises
   late collectors, no operational gain.
-- **`get_task_result(ref, timeout=...)` loop variant**: rejected;
+- **`get_task_status(ref, timeout=...)` loop variant**: rejected;
   pollutes a settled single-shot method (ADR-0050) — hence separate
   `wait_ref`.

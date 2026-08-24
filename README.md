@@ -63,7 +63,7 @@ Two-phase batch workflows split submit from collection (ADR-0067):
 ```python
 ticket = client.submit(ImageChallenge(Path("a.png")))   # collect later
 ...
-result = client.wait(ticket)                            # -> Result, typed
+result = client.wait(ticket)                            # -> SolveResult, typed
 status = client.wait_ref(TaskRef("twocaptcha", 12345), timeout=120)  # from persisted ids
 ```
 

@@ -22,7 +22,7 @@ our own `total_timeout` design depends on.
   delivery the entry is removed; after cancellation the entry remains.
   Registry updates are **pure-synchronous** (no awaits) so they are safe
   during cancellation unwinding.
-- Callers reclaim paid-for answers later via `get_task_result(TaskRef)`.
+- Callers reclaim paid-for answers later via `get_task_status(TaskRef)`.
 - Billing caveat documented: abandoned tasks may still be billed; the
   library makes them reclaimable, not refundable.
 - Internal timeout: the solve runs inside `asyncio.timeout()`; the

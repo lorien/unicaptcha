@@ -1,6 +1,6 @@
 # ADR-0008: Rich generic result objects
 
-**Status:** Accepted (amended: solution typing via kind bases; metadata set ratified in ADR-0034; non-optional solution reaffirmed in ADR-0032)
+**Status:** Accepted (amended: solution typing via kind bases; metadata set ratified in ADR-0034; non-optional solution reaffirmed in ADR-0032; renamed 2026-08-24: `Result[T]` → `SolveResult[T]` to disambiguate from the status-query answer `TaskStatusResult`)
 **Date:** 2026-08-22
 
 ## Context
@@ -11,11 +11,11 @@ must not degrade into optional-everywhere bags.
 
 ## Decision
 
-`solve()` returns `Result[T]` where `T` is the solution type:
+`solve()` returns `SolveResult[T]` where `T` is the solution type:
 
-- `solution: T` — **non-optional**; a returned Result always carries its
+- `solution: T` — **non-optional**; a returned SolveResult always carries its
   solution (pending states never masquerade as results; single-shot status
-  queries return `TaskStatus` instead, ADR-0032).
+  queries return `TaskStatusResult` instead, ADR-0032).
 - `task_id: int` — all three providers use integer task ids.
 - `cost: Decimal | None` — `Decimal(str(raw_value))`; money is parsed as
   exact decimal, never float; None when the provider does not report cost.
@@ -44,8 +44,8 @@ does not pretend to be the token.
 
 - **Bare token/string returns**: rejected; loses task id/cost/raw needed by
   report-bad and reclaim flows.
-- **Result that stringifies to the token**: rejected by owner decision.
+- **SolveResult that stringifies to the token**: rejected by owner decision.
 - **One result class with union-typed solution**: rejected; weaker typing.
 - **`float` cost**: rejected; monetary drift.
-- **`status` field on Result with optional solution**: rejected (ADR-0032);
+- **`status` field on SolveResult with optional solution**: rejected (ADR-0032);
   it would weaken every `solve()` annotation for one cold-path method.

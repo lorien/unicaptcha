@@ -14,7 +14,7 @@ API obvious.
 ```
 unicaptcha/
     __init__.py        # curated re-exports: clients, errors, ErrorKind,
-                       # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
+                       # SolveResult, TaskStatusResult, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, kind bases
     _version.py        # single version source
     client.py          # CaptchaSolver / AsyncCaptchaSolver (ADR-0062)

@@ -1,7 +1,7 @@
-# ADR-0034: Result surface and metadata
+# ADR-0034: SolveResult surface and metadata
 
-**Status:** Accepted (amended: cost presence-check semantics pinned)
-**Date:** 2026-08-23
+**Status:** Accepted (amended: cost presence-check semantics pinned; renamed 2026-08-24: `Result` → `SolveResult`, consistent with `TaskStatusResult`)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 

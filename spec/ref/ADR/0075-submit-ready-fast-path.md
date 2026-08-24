@@ -1,7 +1,7 @@
 # ADR-0075: Submit-phase ready fast-path with SubmitAccepted
 
-**Status:** Accepted (amends ADR-0053, ADR-0067; formalizes `ParsedTask` from ADR-0058)
-**Date:** 2026-08-24
+**Status:** Accepted (amends ADR-0053, ADR-0067; formalizes `ParsedTask` from ADR-0058; renamed 2026-08-24: `Result[T]` → `SolveResult[T]`, enum `TaskState` → `TaskStatus`, `parse_task_result` → `parse_task_status` for a single status vocabulary)
+**Date:** 2026-08-24, amendment 2026-08-24
 
 ## Context
 
@@ -18,7 +18,7 @@ the other three providers' adapters never return a ready parse.
 
 Design review of the first sketch (`int | ParsedTask` union) found two
 flaws, fixed here: the union loses `task_id` on the ready arm (breaking
-`report_*_result` and `get_task_result` addressing), and an engine-side
+`report_*_result` and `get_task_status` addressing), and an engine-side
 cache keyed by TaskRef (to bridge separate `submit()`/`wait()` calls) is
 hidden mutable state — the ADR-0060 anti-pattern.
 
@@ -29,7 +29,7 @@ hidden mutable state — the ADR-0060 anti-pattern.
 ```python
 @dataclass(frozen=True, slots=True)
 class ParsedTask:                      # public adapter-SDK vocabulary
-    state: TaskState                   # PENDING | READY | UNSOLVABLE | UNKNOWN
+    state: TaskStatus                   # PENDING | READY | UNSOLVABLE | UNKNOWN
     solution: BaseSolution | None      # provider subclass; populated only when READY
     cost: Decimal | None               # presence-check (ADR-0034)
     raw: bytes                         # verbatim body
@@ -65,16 +65,16 @@ Tickets remain dumb, picklable, user-inspectable.
 
 ### Behavior
 
-- `wait(ticket)`: `ticket.ready is not None` → return `Result[T]`
+- `wait(ticket)`: `ticket.ready is not None` → return `SolveResult[T]`
   immediately — no poll, no `poll_delay` (the fresh-ticket delay question
   is moot; there is no poll). Otherwise the unchanged poll path.
-- `wait_ref(ref)` / `get_task_result(ref)`: **unchanged**. They take
+- `wait_ref(ref)` / `get_task_status(ref)`: **unchanged**. They take
   `TaskRef`, never see the field, and poll the provider — which returns
   READY with solution and cost on the first request, since the task is
   genuinely finished there. The provider is the source of truth; the
   ticket is a shortcut. One truth, two presentations (ADR-0050 ethos).
 - `solve()`: consumes `SubmitAccepted` as a local variable; short-circuits
-  submit → `Result[T]` without an intermediate ticket when the caller
+  submit → `SolveResult[T]` without an intermediate ticket when the caller
   hasn't split the phases.
 - Events: `submitted` then `solved`; no poll phase (ADR-0067 invariant
   intact). Cost from `ready.cost`; `None` unless the submit response
@@ -96,7 +96,7 @@ Tickets remain dumb, picklable, user-inspectable.
   answer off the ticket is cheaper and more honest than a confirming
   round trip.
 - `task_id` stays guaranteed on both arms (ADR-0040 required-field rule),
-  so aux-op addressing (`report_bad_result`, `get_task_result`) and the
+  so aux-op addressing (`report_bad_result`, `get_task_status`) and the
   abandoned-registry story are untouched.
 - No hidden state: everything the fast path needs travels on the ticket
   as data; the engine holds nothing between calls.

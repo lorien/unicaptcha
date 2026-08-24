@@ -14,11 +14,11 @@ it states *what is* per the settled decisions; ADRs state *why*.
                                |  both delegate to
 +---------------------------------------------------------------+
 | SolveEngine (internal)                                        |
-| submit -> poll -> Result; retries, timeouts, events,          |
+| submit -> poll -> SolveResult; retries, timeouts, events,          |
 | abandoned-task registry, aux operations                       |
 +---------------------------------------------------------------+
 | Provider adapters (pure, no I/O)                              |
-| challenge -> payload; response bytes -> typed Result          |
+| challenge -> payload; response bytes -> typed SolveResult          |
 +---------------------------------------------------------------+
 | HTTP layer (internal implementation behind a public Protocol) |
 | httpx wiring, retry policy, per-request User-Agent, pool      |
@@ -58,7 +58,7 @@ it states *what is* per the settled decisions; ADRs state *why*.
 ### Provider identification
 
 Each adapter declares `provider: ClassVar[str]` (e.g. `"twocaptcha"`). This
-string is the single source of truth: registry key, `Result.provider`,
+string is the single source of truth: registry key, `SolveResult.provider`,
 `TaskRef.provider`, `SolveEvent.provider`. Provider strings are public API.
 Duplicate providers in one client are rejected at construction with
 `ValueError` (ADR-0037).
@@ -143,7 +143,7 @@ BaseSolution (public abstract root; open for custom kinds; ADR-0056)
   service did not return are `None`, never present in the base.
 - Bases **reject direct instantiation** (`TypeError` from `__post_init__` when
   `type(self) is Base`); adapters always construct provider subclasses.
-- The universal path types results as `Result[<Kind>Solution]`; facades and
+- The universal path types results as `SolveResult[<Kind>Solution]`; facades and
   the challenge->solution link allow statically precise subclasses.
 
 ## 4. Models and public types
@@ -151,7 +151,7 @@ BaseSolution (public abstract root; open for custom kinds; ADR-0056)
 All models are frozen dataclasses (slots where beneficial; slotscheck in CI)
 living in `unicaptcha.types` and re-exported from the root (ADR-0036).
 
-### Result[T]
+### SolveResult[T]
 
 | Field | Type | Notes |
 |---|---|---|
@@ -179,7 +179,7 @@ TaskRef`, `submitted_at: datetime` (UTC), `ready: ParsedTask | None`
 tasks). Not user-constructible — provenance is its value. Bridges to
 persistence via `.task_ref`.
 
-### TaskStatus
+### TaskStatusResult
 
 Returned by single-shot status queries (ADR-0032, ADR-0050; surface per
 ADR-0056 — non-generic, no submission metadata):
@@ -188,12 +188,12 @@ ADR-0056 — non-generic, no submission metadata):
 |---|---|
 | `task_id` | `int` |
 | `provider` | `str` |
-| `status` | `TaskState` — enum: `PENDING \| READY \| UNSOLVABLE \| UNKNOWN` |
+| `status` | `TaskStatus` — enum: `PENDING \| READY \| UNSOLVABLE \| UNKNOWN` |
 | `solution` | `BaseSolution \| None` | populated only when READY; narrow via isinstance |
 | `cost` | `Decimal \| None` |
 | `raw` | `bytes` | untouched response body |
 
-`Result[T]` is the solve()-only return; TaskStatus never embeds it.
+`SolveResult[T]` is the solve()-only return; TaskStatusResult never embeds it.
 
 Provider-side outcomes are always returned values; exceptions on this method
 are reserved for caller-side faults (wrong provider -> TypeError, client
@@ -327,7 +327,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 ## 7. Solve flow and behavior
 
 ```
-solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result[T]
+solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> SolveResult[T]
     validate client open
     dispatch challenge -> adapter (universal) or direct (facade):
         concrete class -> its adapter (provider= must match if given, else TypeError)
@@ -347,7 +347,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result
           - backoff: full jitter, base 1s, cap 30s, max 3 attempts
      poll phase:
          initial poll_delay before first poll (per-kind; skipped for stale
-           tickets in wait() and never applied in wait_ref/get_task_result;
+           tickets in wait() and never applied in wait_ref/get_task_status;
            counted within total_timeout — ADR-0030 amendment)
          POST getTaskResult every poll_interval
            - transient failures tolerated, bounded by total_timeout
@@ -355,7 +355,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result
            - UNKNOWN (task not found) -> ProviderError, fail fast (ADR-0058)
            - solved-but-empty payload -> EmptySolutionError (ADR-0040 amendment)
     terminal:
-        READY -> Result[T] (emit "solved")
+        READY -> SolveResult[T] (emit "solved")
         budget exhausted -> SolveTimeoutError (emit "failed")
         any raised library error emits "failed" first, then raises
 ```
@@ -364,7 +364,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result
   `solve()` call (ADR-0010). Enforced internally via `asyncio.timeout()` on
   the async side, converted to `SolveTimeoutError` at our scope boundary
   only; external cancellation passes through untouched.
-- Aux operations (`get_balance`, `report_bad_result`, `get_task_result`)
+- Aux operations (`get_balance`, `report_bad_result`, `get_task_status`)
   use the **same** retry policy as submission (ADR-0011).
 - Polling only; no webhooks (ADR-0015).
 
@@ -374,22 +374,22 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result
 
 ```python
 ticket = solver.submit(challenge, provider=None, retry=None)   # -> TaskTicket[T]
-result = solver.wait(ticket, timeout=None)                     # -> Result[T], raises on failure
-status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatus, answers (PENDING on budget out)
+result = solver.wait(ticket, timeout=None)                     # -> SolveResult[T], raises on failure
+status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusResult, answers (PENDING on budget out)
 ```
 
 - `submit` routes exactly like `solve()` (ADR-0064); bounded by the
   retry policy only.
-- `wait`: operation semantics — `Result[T]` typed, raises
+- `wait`: operation semantics — `SolveResult[T]` typed, raises
   (`UnsolvableCaptchaError`, UNKNOWN -> `ProviderError` per ADR-0058,
   `SolveTimeoutError`); clock starts at the call, default = per-kind
   `total_timeout` (ADR-0030) via the merge chain. Fast path (ADR-0075):
   a ticket with `ready` set returns immediately — no poll, no delay;
-  `wait_ref`/`get_task_result` never see the field and poll the provider
+  `wait_ref`/`get_task_status` never see the field and poll the provider
   (first poll answers READY).
 - `wait_ref`: query semantics — polls until terminal or budget out
-  (returns PENDING `TaskStatus` on exhaustion).
-- `get_task_result` unchanged: single-shot (ADR-0050).
+  (returns PENDING `TaskStatusResult` on exhaustion).
+- `get_task_status` unchanged: single-shot (ADR-0050).
 - Events: `submitted` at submit; `solved`/`failed` at wait's terminal
   state; never-waited tickets eventless (ADR-0018 as amended).
   Deferral is not abandonment (ADR-0038 as amended): the registry
@@ -402,7 +402,7 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatus, 
 | Operation | Universal client | Facade |
 |---|---|---|
 | `get_balance(provider)` | provider discriminator: instance / class / provider string; returns `Decimal` USD | implicit provider |
-| `get_task_result(task)` | `TaskRef` | `int \| TaskRef` |
+| `get_task_status(task)` | `TaskRef` | `int \| TaskRef` |
 | `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` |
 | `report_good_result(task)` | `TaskRef` | `TaskRef \| int` (ADR-0068; returns bool, feeds worker quality routing where supported) |
 | `abandoned_tasks()` | snapshot `tuple[TaskRef, ...]` | same |
@@ -419,7 +419,7 @@ provider lacks coverage (ADR-0057). Balance is pinned to USD `Decimal`
 - The abandoned `task_id` lands in the abandoned-task registry via
   synchronous bookkeeping (no awaits during cancellation unwinding).
 - Billing caveat documented: abandoned tasks may still be billed; reclaim
-  via `get_task_result` later.
+  via `get_task_status` later.
 - Sync side: `KeyboardInterrupt` propagates naturally.
 
 ### Client lifecycle (ADR-0033)
@@ -444,12 +444,12 @@ provider lacks coverage (ADR-0057). Balance is pinned to USD `Decimal`
 - Bounded: default cap 1000, one WARNING log per eviction, cap configurable
   client-side (`abandoned_registry_limit`), `None` = unbounded.
 - Per-client, best-effort, **advisory** (ADR-0060): entries removed when a
-  same-client `get_task_result` reaches a terminal state; cleared never
+  same-client `get_task_status` reaches a terminal state; cleared never
   (survives close); cross-client reclaim leaves stale entries (harmless,
   bounded).
 - No automatic reclaim loop; the caller drives reclamation:
   snapshot `abandoned_tasks()` -> new client with the same adapters ->
-  `get_task_result(ref)` per entry -> terminal states are answers
+  `get_task_status(ref)` per entry -> terminal states are answers
   (ADR-0050, ADR-0056); persist TaskRefs to survive restarts.
 
 ## 8. Logging and events
@@ -477,13 +477,13 @@ occupy known payload positions; we construct all payloads).
 ```
 unicaptcha/
     __init__.py        # curated re-exports: clients, errors, ErrorKind,
-                       # Result, TaskStatus, SolveEvent, TaskRef, SecretStr,
+                       # SolveResult, TaskStatusResult, SolveEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, challenge/solution kind bases
     _version.py        # single version source (pyproject reads it)
     client.py          # CaptchaSolver / AsyncCaptchaSolver
     errors.py          # hierarchy + ErrorKind
     events.py          # SolveEvent
-    types.py           # public model vocabulary (Result, TaskStatus, TaskRef,
+    types.py           # public model vocabulary (SolveResult, TaskStatusResult, TaskRef,
                        # Proxy, SecretStr, configs, kind bases re-exported)
     challenge/         # abstract challenge kind bases (ADR-0048)
         base.py        # BaseChallenge
@@ -532,7 +532,7 @@ unicaptcha/
   (ADR-0036).
 - Facade methods: `solve_image`, `solve_text`, `solve_recaptcha_v2`,
   `solve_recaptcha_v3`, `solve_hcaptcha`; aux ops named identically on both
-  tiers (`get_balance`, `get_task_result`, `report_bad_result`).
+  tiers (`get_balance`, `get_task_status`, `report_bad_result`).
 
 ### Adapter SDK (ADR-0041)
 
@@ -543,7 +543,7 @@ class MyServiceAdapter(BaseAdapter):
     default_solve_config: ClassVar[...]        # per-kind timing defaults; optional
     endpoints: ClassVar[Endpoints]             # JSON-family default; all-or-nothing
                                                # override (ADR-0073): submit,
-                                               # get_task_result, get_balance,
+                                               # get_task_status, get_balance,
                                                # report_good_result, report_bad_result
 
     def __init__(self, api_key: SecretStr | str, base_url: str | None = None,
@@ -552,7 +552,7 @@ class MyServiceAdapter(BaseAdapter):
     def parse_submit_response(self, raw: bytes) -> SubmitAccepted: ...
                                            # SubmitAccepted{task_id: int, ready: ParsedTask | None}
                                            # (ADR-0075); ready set iff createTask answered inline
-    def parse_task_result(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable|unknown (ADR-0058):
+    def parse_task_status(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable|unknown (ADR-0058):
                                            # ParsedTask{state, solution, cost, raw, detail} — public
                                            # vocabulary per ADR-0075
     def parse_balance(self, raw: bytes) -> Decimal: ...

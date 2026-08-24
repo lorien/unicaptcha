@@ -1,19 +1,19 @@
-# ADR-0056: TaskStatus surface — no Result, no submission metadata; BaseSolution root
+# ADR-0056: TaskStatusResult surface — no SolveResult, no submission metadata; BaseSolution root
 
-**Status:** Accepted (amends ADR-0032, ADR-0035; supersedes the `result: Result[T] | None` field of TaskStatus; complements ADR-0050)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0032, ADR-0035; supersedes the `result: SolveResult[T] | None` field of TaskStatusResult; complements ADR-0050; renamed 2026-08-24: object `TaskStatus` → `TaskStatusResult`, enum `TaskState` → `TaskStatus`, `get_task_result` → `get_task_status`)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
-ADR-0032 gave `TaskStatus` a `result: Result[T] | None` field. Two flaws:
+ADR-0032 gave `TaskStatusResult` a `result: SolveResult[T] | None` field. Two flaws:
 
-1. **Unbindable generic.** `get_task_result(task: TaskRef)` carries no
-   type parameter — the `T` in `TaskStatus.result` can never be bound
+1. **Unbindable generic.** `get_task_status(task: TaskRef)` carries no
+   type parameter — the `T` in `TaskStatusResult.result` can never be bound
    by the signature. In a mypy/pyright-strict library (goal 3) this is
    a type that lies.
-2. **Dishonest metadata.** `Result` requires non-optional `created_at`
+2. **Dishonest metadata.** `SolveResult` requires non-optional `created_at`
    and `elapsed` (ADR-0008, ADR-0034) — submission-time facts. But the
-   primary `get_task_result` caller reclaims tasks with no submission
+   primary `get_task_status` caller reclaims tasks with no submission
    context: post-close or post-restart, on a fresh client, via a
    persisted `TaskRef` (ADR-0050, ADR-0045). The adapter parsing a
    `getTaskResult` response cannot know them; only the submitting
@@ -31,23 +31,23 @@ solution" on a status query.
   bases, non-instantiable by the same enforcement as all bases
   (ADR-0035). Custom-kind solutions subclass it; the taxonomy is now
   symmetric with `BaseChallenge`.
-- **`TaskStatus` is non-generic** and carries what the provider
+- **`TaskStatusResult` is non-generic** and carries what the provider
   response actually carries:
 
 | Field | Type |
 |---|---|
 | `task_id` | `int` |
 | `provider` | `str` |
-| `status` | `TaskState` — new enum: `PENDING`, `READY`, `UNSOLVABLE`, `UNKNOWN` (ADR-0050) |
+| `status` | `TaskStatus` — new enum: `PENDING`, `READY`, `UNSOLVABLE`, `UNKNOWN` (ADR-0050) |
 | `solution` | `BaseSolution \| None` — populated only when READY; narrow via isinstance |
 | `cost` | `Decimal \| None` |
 | `raw` | `bytes` — untouched response body |
 
-- **No `created_at`, no `elapsed`** on TaskStatus — deliberately, not
+- **No `created_at`, no `elapsed`** on TaskStatusResult — deliberately, not
   as None-able fields. Submission metadata exists exactly where
-  submission context exists: `Result[T]` from `solve()`. One honest
+  submission context exists: `SolveResult[T]` from `solve()`. One honest
   shape serves same-client and post-restart reclaim alike.
-- **`Result[T]` is the solve()-only return**; `TaskStatus` never
+- **`SolveResult[T]` is the solve()-only return**; `TaskStatusResult` never
   embeds it.
 
 ## Rationale
@@ -63,13 +63,13 @@ solution" on a status query.
 
 ## Alternatives considered
 
-- **Keep `result: Result[T] | None`, bind T via generic method
-  (`get_task_result(ref) -> TaskStatus[T]`)**: rejected; the caller
+- **Keep `result: SolveResult[T] | None`, bind T via generic method
+  (`get_task_status(ref) -> TaskStatusResult[T]`)**: rejected; the caller
   cannot name T — the TaskRef carries no type information; any
   annotation would be cast-theater.
-- **Result with None-able `created_at`/`elapsed`**: rejected; weakens
+- **SolveResult with None-able `created_at`/`elapsed`**: rejected; weakens
   the solve()-path guarantee (ADR-0032's whole point) or forks a
-  second Result variant.
-- **TaskStatus keeps only status + ids, solution fetched separately**:
+  second SolveResult variant.
+- **TaskStatusResult keeps only status + ids, solution fetched separately**:
   rejected; READY would then cost two round trips, and the response
   already holds the solution.

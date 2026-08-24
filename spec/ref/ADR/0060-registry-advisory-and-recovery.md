@@ -5,11 +5,11 @@
 
 ## Context
 
-ADR-0038 says entries are removed "when a later `get_task_result` on
+ADR-0038 says entries are removed "when a later `get_task_status` on
 that id reaches a terminal state" and markets "close-then-reclaim a
 supported workflow". But registries are per-client (ADR-0038) and any
 client able to reclaim after its own close must be a *new* client —
-whose `get_task_result` cannot touch the closed client's registry.
+whose `get_task_status` cannot touch the closed client's registry.
 The cleanup promise is unimplementable across the very workflow that
 motivates it: reclaimed tasks stay listed in the dead client's
 `abandoned_tasks()` forever (bounded, but misleading).
@@ -25,9 +25,9 @@ in one place.
   what *this client instance* abandoned; it is a hint list, not a
   ledger of record. Stale entries in a closed client are intentional
   and harmless: the snapshot is bounded (cap, ADR-0038) and the truth
-  about any entry is one `get_task_result` away.
+  about any entry is one `get_task_status` away.
 - **Same-client cleanup** (the implementable part of ADR-0038's
-  promise) is kept: a `get_task_result` reaching a terminal state
+  promise) is kept: a `get_task_status` reaching a terminal state
   removes the entry *from that same client's registry*.
 - **Documented recovery workflow**:
   1. `abandoned_tasks()` on the closed (or live) client — snapshot of
@@ -35,7 +35,7 @@ in one place.
   2. construct a new client (optionally) registering the same
      adapters; TaskRefs route by provider string (ADR-0045), no
      cross-instance coupling exists or is needed;
-  3. `get_task_result(ref)` each entry — terminal states
+  3. `get_task_status(ref)` each entry — terminal states
      (READY/UNSOLVABLE/UNKNOWN) are answers (ADR-0050); READY yields
      solution + cost (ADR-0056);
   4. persist TaskRefs (provider + task_id) if reclamation must

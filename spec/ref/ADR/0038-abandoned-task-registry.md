@@ -23,14 +23,14 @@ workers.
   strict-losslessness use cases that accept the memory contract.
 - **Entry lifecycle**: entries are added at submission time and removed
   when the solve delivers successfully; after abandonment they are removed
-  only when a later `get_task_result` on that id reaches a terminal state
+  only when a later `get_task_status` on that id reaches a terminal state
   (READY / UNSOLVABLE / UNKNOWN) **on the same client** — the registry is
   per-client, best-effort, advisory (ADR-0060); cross-client reclaim
   cannot clean a closed client's registry.
 - **Registry survives close** (supersedes an earlier "cleared on close" --
   clearing would erase exactly the tasks close-orphaning creates).
   `abandoned_tasks()` remains readable on a closed client.
-- **No automatic reclaim**: the caller drives `get_task_result`
+- **No automatic reclaim**: the caller drives `get_task_status`
   explicitly.
 - Sync and async clients each carry their own registry (separate
   instances).

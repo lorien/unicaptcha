@@ -1,11 +1,11 @@
 # ADR-0050: Status queries answer, operations raise
 
-**Status:** Accepted (supersedes the UnknownTaskError decision; TaskStatus surface per ADR-0056; UNKNOWN mapping and solve-poll behavior per ADR-0058)
-**Date:** 2026-08-23
+**Status:** Accepted (supersedes the UnknownTaskError decision; TaskStatusResult surface per ADR-0056; UNKNOWN mapping and solve-poll behavior per ADR-0058; renamed 2026-08-24: `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status`)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
-`get_task_result()` originally inherited exception semantics from
+`get_task_status()` originally inherited exception semantics from
 `solve()`: UNSOLVABLE would raise `UnsolvableCaptchaError`, unknown ids
 would raise `UnknownTaskError` (settled during malformed-response
 mapping). But the method's primary caller is a reclaim loop over the
@@ -15,17 +15,17 @@ outcomes that, from a query's perspective, are perfectly good answers.
 ## Decision
 
 - **Principle**: status queries answer; operations raise.
-- `TaskStatus.status` has **four values**: `PENDING`, `READY`,
+- `TaskStatusResult.status` has **four values**: `PENDING`, `READY`,
   `UNSOLVABLE`, `UNKNOWN`. Provider-side outcomes are always returned
-  values on `get_task_result`.
+  values on `get_task_status`.
 - Exceptions on the query are reserved for caller-side faults:
   provider-mismatch `TypeError` (ADR-0045), `ClientClosedError`,
   `NetworkError` (transport), `InvalidConfigError`.
 - **`UnknownTaskError` is removed** from the hierarchy; `ErrorKind` loses
   `UNKNOWN_TASK` (11 values remain, ADR-0009).
 - The engine maps provider responses to states exactly once; `solve()`
-  translates terminal states into exceptions (it must return a `Result`),
-  `get_task_result()` exposes the same states raw. Single truth, two
+  translates terminal states into exceptions (it must return a `SolveResult`),
+  `get_task_status()` exposes the same states raw. Single truth, two
   honest presentations.
 
 ## Rationale

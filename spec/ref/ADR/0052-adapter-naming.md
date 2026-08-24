@@ -9,7 +9,7 @@ The universal client's constructor argument was specified as
 `providers=[...]`, but the objects it accepts are adapter instances — not
 providers (the services) and not facades (peers, never registerable).
 "Provider" already has a precise meaning in the taxonomy: the external
-service, identified by its provider string (`Result.provider`,
+service, identified by its provider string (`SolveResult.provider`,
 `TaskRef.provider`, `SolveEvent.provider`, `get_balance(provider)`
 discriminator). Overloading it with a second, object-shaped meaning made
 the tier boundary fuzzy: the README example even showed a
@@ -69,5 +69,5 @@ leaving bare **Adapter** as the term.
 - **`ServiceAdapter` family** (`TwoCaptchaServiceAdapter`): rejected;
   "service" is used descriptively (goals, README prose) but is not the
   formal identity word — adopting it here forks terminology unless the
-  whole identity vocabulary (`provider`, `Result.provider`, ...) renames
+  whole identity vocabulary (`provider`, `SolveResult.provider`, ...) renames
   too, for no clarity gain.

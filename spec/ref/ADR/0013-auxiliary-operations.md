@@ -1,15 +1,15 @@
 # ADR-0013: Auxiliary operations
 
-**Status:** Accepted (amended twice: routing via TaskRef instead of bare ids/Result; four-state status semantics per ADR-0050; `report_good_result` added per ADR-0068)
-**Date:** 2026-08-22
+**Status:** Accepted (amended twice: routing via TaskRef instead of bare ids/SolveResult; four-state status semantics per ADR-0050; `report_good_result` added per ADR-0068; renamed 2026-08-24: `get_task_result` → `get_task_status`, `TaskStatus` → `TaskStatusResult`)
+**Date:** 2026-08-22, amendment 2026-08-24
 
 ## Context
 
 Beyond solving, providers expose balance checks, bad-solution reports, and
 task-status queries. On a multi-provider client, "whose balance?" and "which
 provider's task 42?" must be answerable. An early design routed task ops via
-typed `Result` arguments; that conflated operations and made abandoned-task
-reclaim (no Result exists) impossible.
+typed `SolveResult` arguments; that conflated operations and made abandoned-task
+reclaim (no SolveResult exists) impossible.
 
 ## Decision
 
@@ -18,7 +18,7 @@ All three operations exist on both tiers:
 | Operation | Universal client | Facade |
 |---|---|---|
 | `get_balance(...)` | discriminator: provider instance / class / provider string (all three accepted, normalized internally) | implicit provider |
-| `get_task_result(task)` | `TaskRef` | `int \| TaskRef` |
+| `get_task_status(task)` | `TaskRef` | `int \| TaskRef` |
 | `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` |
 | `report_good_result(task)` | `TaskRef` | `TaskRef \| int` (ADR-0068) |
 
@@ -30,7 +30,7 @@ All three operations exist on both tiers:
   no network traffic (ADR-0057, ADR-0068; probe-by-exception;
   introspection deferred). Good reports feed worker quality routing
   on providers that accept them.
-- `get_task_result` returns `TaskStatus` with four states
+- `get_task_status` returns `TaskStatusResult` with four states
   (PENDING/READY/UNSOLVABLE/UNKNOWN) — provider outcomes are returned
   values, never exceptions (ADR-0050).
 - All task-addressing arguments are validated pre-flight: a `TaskRef` whose
@@ -42,16 +42,16 @@ All three operations exist on both tiers:
 ## Rationale
 
 - `TaskRef` carries routing; ids alone are ambiguous on multi-provider
-  clients, and `Result`-routed `get_task_result` was circular (you already
+  clients, and `SolveResult`-routed `get_task_status` was circular (you already
   had the result).
 - Facades may accept bare ints because their provider is implicit; the
   universal client cannot.
-- Uniform naming across tiers (`report_bad_result`, `get_task_result`,
+- Uniform naming across tiers (`report_bad_result`, `get_task_status`,
   `get_balance`) — one vocabulary.
 
 ## Alternatives considered
 
-- **`get_task_result(result: Result)`**: superseded; circular semantics,
+- **`get_task_status(result: SolveResult)`**: superseded; circular semantics,
   blocked abandoned-task reclaim.
 - **`report_bad_result` + `report_bad_result_id` pair**: superseded by the
   single-name, typed-union signature (owner decision).

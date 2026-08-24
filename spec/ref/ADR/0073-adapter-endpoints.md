@@ -1,7 +1,7 @@
 # ADR-0073: Adapter `Endpoints` declaration
 
-**Status:** Accepted (amends ADR-0053)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0053; renamed 2026-08-24: `Endpoints.get_task_result` operation key → `get_task_status`, consistent with the public method; wire path stays `/getTaskResult`)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -24,7 +24,7 @@ scattered across the codebase.)
 @dataclass(frozen=True)
 class Endpoints:
     submit: str                # solve() / submit() post here
-    get_task_result: str       # wait() / wait_ref() / get_task_result() poll here
+    get_task_status: str       # wait() / wait_ref() / get_task_status() poll here
     get_balance: str           # get_balance() asks here
     report_good_result: str    # report_good_result() sends praise here
     report_bad_result: str     # report_bad_result() complains here

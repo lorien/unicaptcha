@@ -28,7 +28,7 @@ The engine's per-kind default table:
   operational data: image ~5 s, reCAPTCHA-class ~15-20 s). Applies
   always in `solve()`; in `wait(ticket)` only when the ticket is
   **fresh** (submitted less than one `poll_interval` ago — stale
-  tickets poll immediately); never in `wait_ref`/`get_task_result`
+  tickets poll immediately); never in `wait_ref`/`get_task_status`
   (reconstruction assumes the task may be mature). Counted within
   `total_timeout`.
 - **Draft token-kind rows** (amendment, 2026-08-24): FunCaptcha,

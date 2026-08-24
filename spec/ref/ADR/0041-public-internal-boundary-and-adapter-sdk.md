@@ -15,7 +15,7 @@ from day one.
 
 **Public surface** (documented, root + provider packages):
 
-- Root `unicaptcha`: clients, errors + ErrorKind, Result/TaskStatus/
+- Root `unicaptcha`: clients, errors + ErrorKind, SolveResult/TaskStatusResult/
   SolveEvent/TaskRef, SecretStr, configs, Proxy/ProxyKind, challenge and
   solution kind bases.
 - `unicaptcha.provider.<name>`: that provider's challenges, solutions,

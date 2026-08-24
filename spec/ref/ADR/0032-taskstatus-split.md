@@ -1,20 +1,20 @@
-# ADR-0032: TaskStatus split from Result
+# ADR-0032: TaskStatusResult split from SolveResult
 
-**Status:** Accepted (amended by ADR-0050: four states, UNKNOWN as returned status; amended by ADR-0056: `result` field replaced by `solution`/`cost`/`raw`, no submission metadata)
-**Date:** 2026-08-23
+**Status:** Accepted (amended by ADR-0050: four states, UNKNOWN as returned status; amended by ADR-0056: `result` field replaced by `solution`/`cost`/`raw`, no submission metadata; renamed 2026-08-24: query-answer object `TaskStatus` → `TaskStatusResult`, enum `TaskState` → `TaskStatus`, `get_task_result` → `get_task_status` — public method and adapter operation key — for one coherent status vocabulary)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
-The single-shot `get_task_result` originally returned the same `Result[T]`
+The single-shot `get_task_status` originally returned the same `SolveResult[T]`
 with `status: PENDING | READY` and solution populated only when ready.
-This forces `solution: T | None` onto the entire generic Result class —
+This forces `solution: T | None` onto the entire generic SolveResult class —
 an always-None-check weakening every `solve()` annotation for one cold-path
 method.
 
 ## Decision
 
-- `solve()` returns `Result[T]` with **non-optional `solution`**.
-- The single-shot query returns a separate lightweight **`TaskStatus`**
+- `solve()` returns `SolveResult[T]` with **non-optional `solution`**.
+- The single-shot query returns a separate lightweight **`TaskStatusResult`**
   (non-generic, per ADR-0056): `task_id`, `provider`, `status`
   (four states), `solution: BaseSolution | None` populated only when
   READY, plus `cost` and `raw`. Optionality here is honest: it is the
@@ -30,7 +30,7 @@ method.
 
 ## Alternatives considered
 
-- **One Result with status field**: rejected; weakens the primary API's
+- **One SolveResult with status field**: rejected; weakens the primary API's
   typing guarantee.
 - **Pending queries returning None**: rejected; None-checking loses
   task_id/provider context and forces a second call for it.
