@@ -1,6 +1,6 @@
 # ADR-0019: Toolchain
 
-**Status:** Accepted (amended: slotscheck added; pre-commit/vulture/freezegun/basedpyright rejected)
+**Status:** Accepted (amended: slotscheck added; pre-commit/vulture/freezegun/basedpyright rejected; test-style commitments added per third-pass competitive analysis)
 **Date:** 2026-08-22
 
 ## Context
@@ -24,6 +24,17 @@ chosen before implementation begins so configuration is written once.
   deselected by default (`addopts = "-m 'not integration'"`).
 - No optional dependency extras in v1 (no optional features).
 - Runtime dependencies: `httpx>=0.27` only.
+- **Test-style commitments** (amendment; the QA machinery that would
+  have caught both competitors' annotation/field bugs):
+  1. **Golden payload tests** — exact expected request dicts per
+     provider x captcha type (field names, values, encodings; catches
+     dead-field drift like their never-sent `recaptchaDataSValue`).
+  2. **Contract tests** — public classes' signatures and return
+     shapes verified as designed (catches annotations that lie, like
+     their `task.wait() -> solution` actually returning a tuple).
+  3. **Error-mapping tables** — every known provider error code ->
+     expected exception class, data-driven (catches mapping drift,
+     including the unknown-code fallback path).
 
 Rejected additions, with reasons:
 
