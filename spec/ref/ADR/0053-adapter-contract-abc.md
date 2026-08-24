@@ -1,6 +1,6 @@
 # ADR-0053: Adapter contract enforcement — ABC
 
-**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042; `api_key` union per ADR-0063; report methods become bad/good pairs per ADR-0068; `referral` kwarg per ADR-0072; `endpoints` declaration per ADR-0073)
+**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042; `api_key` union per ADR-0063; report methods become bad/good pairs per ADR-0068; `referral` kwarg per ADR-0072; `endpoints` declaration per ADR-0073; `parse_submit_response` returns `SubmitAccepted` per ADR-0075)
 **Date:** 2026-08-23
 
 ## Context

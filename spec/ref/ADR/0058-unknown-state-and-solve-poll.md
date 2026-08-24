@@ -1,6 +1,6 @@
 # ADR-0058: UNKNOWN in the adapter contract; solve-poll fail-fast
 
-**Status:** Accepted (amends the adapter SDK sketch in architecture.md; complements ADR-0050 and ADR-0056)
+**Status:** Accepted (amends the adapter SDK sketch in architecture.md; complements ADR-0050 and ADR-0056; `ParsedTask` typed surface formalized by ADR-0075)
 **Date:** 2026-08-23
 
 ## Context

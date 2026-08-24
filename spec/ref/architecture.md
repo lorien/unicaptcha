@@ -174,8 +174,10 @@ API). Routing vehicle for all task-addressing operations (ADR-0045).
 
 Issued by `submit()` (ADR-0067): frozen dataclass, generic over the
 solution type (bound via the challenge->solution link); `task_ref:
-TaskRef`, `submitted_at: datetime` (UTC). Not user-constructible —
-provenance is its value. Bridges to persistence via `.task_ref`.
+TaskRef`, `submitted_at: datetime` (UTC), `ready: ParsedTask | None`
+(ADR-0075; set iff the provider answered the submit itself — instant
+tasks). Not user-constructible — provenance is its value. Bridges to
+persistence via `.task_ref`.
 
 ### TaskStatus
 
@@ -381,7 +383,10 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatus, 
 - `wait`: operation semantics — `Result[T]` typed, raises
   (`UnsolvableCaptchaError`, UNKNOWN -> `ProviderError` per ADR-0058,
   `SolveTimeoutError`); clock starts at the call, default = per-kind
-  `total_timeout` (ADR-0030) via the merge chain.
+  `total_timeout` (ADR-0030) via the merge chain. Fast path (ADR-0075):
+  a ticket with `ready` set returns immediately — no poll, no delay;
+  `wait_ref`/`get_task_result` never see the field and poll the provider
+  (first poll answers READY).
 - `wait_ref`: query semantics — polls until terminal or budget out
   (returns PENDING `TaskStatus` on exhaustion).
 - `get_task_result` unchanged: single-shot (ADR-0050).
@@ -520,8 +525,12 @@ class MyServiceAdapter(BaseAdapter):
     def __init__(self, api_key: SecretStr | str, base_url: str | None = None,
                  referral: bool | str = True): ...   # referral per ADR-0072
     def build_payload(self, challenge) -> dict[str, Any]: ...
-    def parse_submit_response(self, raw: bytes) -> int: ...
-    def parse_task_result(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable|unknown (ADR-0058)
+    def parse_submit_response(self, raw: bytes) -> SubmitAccepted: ...
+                                           # SubmitAccepted{task_id: int, ready: ParsedTask | None}
+                                           # (ADR-0075); ready set iff createTask answered inline
+    def parse_task_result(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable|unknown (ADR-0058):
+                                           # ParsedTask{state, solution, cost, raw, detail} — public
+                                           # vocabulary per ADR-0075
     def parse_balance(self, raw: bytes) -> Decimal: ...
     def report_bad_supported(self, challenge_type) -> bool: ...
     def build_report_bad(self, task: TaskRef) -> dict[str, Any]: ...
