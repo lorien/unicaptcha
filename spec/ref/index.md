@@ -49,7 +49,7 @@ supersede.
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |
 | [0028](ADR/0028-no-proxy-validation.md) | No proxy validation | |
 | [0029](ADR/0029-unsolvable-captcha-error.md) | UnsolvableCaptchaError | dedicated exception, no auto-resubmit |
-| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows |
+| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
 | [0032](ADR/0032-taskstatus-split.md) | TaskStatus split from Result | amended: 0050, 0056 |
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |
@@ -62,7 +62,7 @@ supersede.
 | [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | |
 | [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052, 0053 |
 | [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
-| [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge |
+| [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge; amended: poll_delay |
 | [0044](ADR/0044-event-attachment-and-parity.md) | Event handler attachment | constructor + per-call |
 | [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | amended: 0064; TaskTicket per 0067 |
 | [0046](ADR/0046-version-single-source-and-reference-adapter.md) | Version single source + reference adapter | |
@@ -86,7 +86,7 @@ supersede.
 | [0064](ADR/0064-kind-solve-and-provider-selection.md) | Kind-level solve + provider selection | amends 0005/0045/0048; random among supporting adapters |
 | [0065](ADR/0065-path-body.md) | Path accepted for image bodies | amends 0025: `bytes \| Path`, normalized to bytes |
 | [0066](ADR/0066-challenge-call-style.md) | Challenge call-style | amends 0006: keyword-only fields, positional payload |
-| [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10 |
+| [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10; poll-delay skip |
 | [0068](ADR/0068-report-good-result.md) | report_good_result | amends 0013/0053: bool return, adapter report pairs |
 | [0069](ADR/0069-worker-context.md) | Worker context parameters | amends 0012: `user_agent`/`cookies` challenge fields |
 | [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags |

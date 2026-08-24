@@ -255,7 +255,7 @@ Three frozen, all-fields-None-able config types (ADR-0043):
 
 ```python
 HttpClientConfig(timeout, max_connections, max_keepalive_connections)
-SolveConfig(total_timeout, poll_interval)
+SolveConfig(total_timeout, poll_interval, poll_delay)
 RetryConfig(max_attempts, backoff_base, backoff_cap)
 ```
 
@@ -337,7 +337,10 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> Result
              ServiceBusyError on exhaustion (ADR-0059 amendment)
           - read timeout, reset-after-send, 502/504: fail fast NetworkError
           - backoff: full jitter, base 1s, cap 30s, max 3 attempts
-    poll phase:
+     poll phase:
+         initial poll_delay before first poll (per-kind; skipped for stale
+           tickets in wait() and never applied in wait_ref/get_task_result;
+           counted within total_timeout — ADR-0030 amendment)
          POST getTaskResult every poll_interval
            - transient failures tolerated, bounded by total_timeout
            - UNSOLVABLE response -> UnsolvableCaptchaError (no auto-resubmit)

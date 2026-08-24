@@ -1,6 +1,6 @@
 # ADR-0043: Config shape and merge semantics
 
-**Status:** Accepted
+**Status:** Accepted (amended: `poll_delay` added to SolveConfig per the ADR-0030 amendment)
 **Date:** 2026-08-23
 
 ## Context
@@ -19,7 +19,7 @@ scalars stay flat constructor kwargs (`name`, `user_agent`,
 
 ```python
 HttpClientConfig(timeout, max_connections, max_keepalive_connections)
-SolveConfig(total_timeout, poll_interval)
+SolveConfig(total_timeout, poll_interval, poll_delay)
 RetryConfig(max_attempts, backoff_base, backoff_cap)
 ```
 

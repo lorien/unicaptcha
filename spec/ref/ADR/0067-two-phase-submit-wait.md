@@ -1,6 +1,6 @@
 # ADR-0067: Two-phase submit/wait with TaskTicket
 
-**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7)
+**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment)
 **Date:** 2026-08-23
 
 ## Context
@@ -76,6 +76,11 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
   not bill by our clock.
 - `wait_ref` shares the semantics (call-start clock); exhaustion
   answers PENDING, never raises.
+- **Poll-delay skip** (ADR-0030 amendment): `wait(ticket)` applies
+  the per-kind `poll_delay` only when the ticket is **fresh**
+  (submitted less than one `poll_interval` ago); stale tickets poll
+  immediately — an old task is likely already mature. `wait_ref` /
+  `get_task_result` never apply a delay.
 - `total_timeout` (ADR-0010) is thereby scoped to `solve()`; this
   closes deferred item 10 — the granular split exists, expressed as
   two calls rather than two config knobs.
