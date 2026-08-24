@@ -43,7 +43,8 @@ it states *what is* per the settled decisions; ADRs state *why*.
   (ADR-0041).
 - The HTTP layer is the **sole injection seam** for network resources. A
   caller-supplied httpx client is injected here, never mutated, and never
-  closed by us (ADR-0024, ADR-0049).
+  closed by us (ADR-0024, ADR-0049). Request URLs are built by the engine:
+  `adapter.base_url + adapter.endpoints.<operation>` (ADR-0073).
 
 ### Ownership rules
 
@@ -508,6 +509,10 @@ class MyServiceAdapter(BaseAdapter):
     provider: ClassVar[str] = "myservice"
     challenges: ClassVar[frozenset[type[BaseChallenge]]]
     default_solve_config: ClassVar[...]        # per-kind timing defaults; optional
+    endpoints: ClassVar[Endpoints]             # JSON-family default; all-or-nothing
+                                               # override (ADR-0073): submit,
+                                               # get_task_result, get_balance,
+                                               # report_good_result, report_bad_result
 
     def __init__(self, api_key: SecretStr | str, base_url: str | None = None,
                  referral: bool | str = True): ...   # referral per ADR-0072

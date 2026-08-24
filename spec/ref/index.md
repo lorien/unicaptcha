@@ -72,7 +72,7 @@ supersede.
 | [0050](ADR/0050-status-queries-answer.md) | Status queries answer, operations raise | |
 | [0051](ADR/0051-facade-parameter-parity.md) | Facade parameter parity | extended to submit/wait/wait_ref by 0067 |
 | [0052](ADR/0052-adapter-naming.md) | Adapter naming | amends 0005/0036/0041/0042: `adapters=` kwarg, `<Provider>Adapter` |
-| [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063, 0068, 0072 |
+| [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063, 0068, 0072, 0073 |
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | superseded by 0062 |
 | [0055](ADR/0055-adapter-provider-attribute.md) | Adapter `provider` attribute | amends 0037/0041/0052/0053: `kind` renamed `provider` |
 | [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatus surface + BaseSolution root | amends 0032/0035: no `Result` embedding, `TaskState` enum |
@@ -92,6 +92,7 @@ supersede.
 | [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags |
 | [0071](ADR/0071-capsolver-provider.md) | Capsolver provider | amends 0001: 4th provider; RuCaptcha v2 verified |
 | [0072](ADR/0072-referral-embedding.md) | Referral embedding | amends 0053/0061: trinary `referral` kwarg, on by default |
+| [0073](ADR/0073-adapter-endpoints.md) | Adapter Endpoints | amends 0053: operation-keyed paths, all-or-nothing override |
 
 ## Conventions
 

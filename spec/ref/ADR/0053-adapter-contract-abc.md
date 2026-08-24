@@ -1,6 +1,6 @@
 # ADR-0053: Adapter contract enforcement — ABC
 
-**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042; `api_key` union per ADR-0063; report methods become bad/good pairs per ADR-0068; `referral` kwarg per ADR-0072)
+**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042; `api_key` union per ADR-0063; report methods become bad/good pairs per ADR-0068; `referral` kwarg per ADR-0072; `endpoints` declaration per ADR-0073)
 **Date:** 2026-08-23
 
 ## Context
@@ -47,6 +47,7 @@ Four facts decide it:
 | `provider`, `challenges` | abstract declarations (`provider` per ADR-0055) |
 | `__init__(api_key: SecretStr \| str, base_url: str \| None = None, referral: bool \| str = True)` | concrete: wrap plain str into SecretStr (ADR-0063), store key; resolve `base_url or default_base_url`; store referral flag — the base embeds nothing, shipped adapters serialize their provider's affiliate field (ADR-0072) |
 | `default_base_url: ClassVar[str]` | declared per provider (README table) |
+| `endpoints: ClassVar[Endpoints]` | concrete JSON-family default; complete-set override only (ADR-0073) |
 | `__repr__` / `__str__` | concrete, key masked (ADR-0014) |
 | `build_payload`, `parse_submit_response`, `parse_task_result`, `parse_balance`, `map_provider_error` | abstract — the translation core |
 | `report_bad_supported` / `build_report_bad` / `parse_report_bad` and good twins (`report_good_supported` / `build_report_good` / `parse_report_good`) | default unsupported (`False` / raise `UnsupportedCaptchaError`); shipped adapters override per the support matrix (ADR-0068) |
