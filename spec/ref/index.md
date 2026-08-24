@@ -10,6 +10,7 @@ what the project is, how it is designed, and why each decision was made.
 | [goals.md](goals.md) | Motivation, goals, non-goals, target users, v1 scope |
 | [architecture.md](architecture.md) | Complete technical design: components, models, flows, defaults, toolchain |
 | [deferred.md](deferred.md) | Canonical list of explicitly deferred decisions |
+| [competitors.md](competitors.md) | Competitor survey: Go and Python universal libraries (2026-08-24) |
 | [ADR/](ADR/) | Architecture Decision Records, one per settled decision |
 
 ## ADR directory
