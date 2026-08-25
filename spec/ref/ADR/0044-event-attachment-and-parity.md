@@ -1,7 +1,7 @@
 # ADR-0044: Event handler attachment
 
-**Status:** Accepted
-**Date:** 2026-08-23
+**Status:** Accepted (amended 2026-08-24: `on_event` also accepted on `submit()` per ADR-0067/0051 parity — emits SUBMIT_REQUESTED/SUBMIT_ACCEPTED/SUBMIT_FAILED)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -11,8 +11,10 @@ Handlers are per-solve progress (a UI tick) or client-wide observability
 ## Decision
 
 - `on_event` is accepted at **both** levels: client constructor and every
-  solve call (universal `solve()` and facade convenience methods,
-  ADR-0051).
+  solve call — universal `solve()`, facade convenience methods
+  (ADR-0051), and `submit()` (which emits SUBMIT_REQUESTED/SUBMIT_ACCEPTED/
+  SUBMIT_FAILED; two-phase `wait()` uses the client-level handler, amended
+  2026-08-24 per ADR-0067/ADR-0051 parity).
 - **Per-call overrides client-level, all-or-nothing** — the per-call
   handler replaces the client handler for that call; no chaining, no
   composition. (A composition helper can be added later if wanted.)
