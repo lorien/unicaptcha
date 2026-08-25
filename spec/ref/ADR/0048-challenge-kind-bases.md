@@ -1,6 +1,6 @@
 # ADR-0048: Challenge kind bases
 
-**Status:** Accepted (amended by ADR-0064: kind bases are instantiable, carrying universal fields, for kind-level solve; the abstract rule survives for solutions and custom-kind roots; amended 2026-08-24: kind bases live in the root `challenge/` package per the ADR-0036 naming rule)
+**Status:** Accepted (amended by ADR-0064: kind bases are instantiable, carrying universal fields, for kind-level solve; the abstract rule survives for solutions and custom-kind roots; amended 2026-08-24: kind bases live in the root `challenge/` package per the ADR-0036 naming rule; confirmed as-is 2026-08-24: nine-kind taxonomy reviewed and locked)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
