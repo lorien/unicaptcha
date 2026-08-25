@@ -1,7 +1,7 @@
 # ADR-0039: Logging taxonomy
 
-**Status:** Accepted
-**Date:** 2026-08-23
+**Status:** Accepted (confirmed as-is 2026-08-24: logging taxonomy reviewed and locked)
+**Date:** 2026-08-23, confirmation 2026-08-24
 
 ## Context
 
