@@ -15,7 +15,7 @@ Image challenge `body` accepts **`bytes` only** — amended by
 ADR-0065 to `bytes | Path`, the Path read and normalized to bytes in
 `__post_init__` (snapshot semantics; stored value is always bytes).
 The library base64-encodes
-internally (all three APIs expect base64). No file-like objects, no
+internally (all four APIs expect base64). No file-like objects, no
 URL fetching, no pre-encoded string acceptance.
 
 Text challenges take `str` (the question text) plus provider-specific

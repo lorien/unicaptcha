@@ -16,7 +16,7 @@ must not degrade into optional-everywhere bags.
 - `solution: T` — **non-optional**; a returned TaskResult always carries its
   solution (pending states never masquerade as results; single-shot status
   queries return `TaskStatusResult` instead, ADR-0032).
-- `task_id: int` — all three providers use integer task ids.
+- `task_id: int` — all four providers use integer task ids.
 - `cost: Decimal | None` — `Decimal(str(raw_value))`; money is parsed as
   exact decimal, never float; None when the provider does not report cost.
 - `raw: bytes` — untouched response body (uniform "raw = verbatim HTTP

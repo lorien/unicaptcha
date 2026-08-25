@@ -66,7 +66,7 @@ Duplicate providers in one client are rejected at construction with
 ### 2Captcha API flavor
 
 2Captcha uses its **modern JSON API** (`createTask`/`getTaskResult`), not the
-legacy `in.php`/`res.php` text protocol; all three providers then share one
+legacy `in.php`/`res.php` text protocol; all four providers then share one
 request/response shape family (ADR-0001).
 
 ## 2. Challenge taxonomy
@@ -136,7 +136,7 @@ BaseSolution (public abstract root; open for custom kinds; ADR-0056)
 +-- TurnstileSolution      token: str                 (abstract; ADR-0074)
 ```
 
-- Bases contain only fields all three providers return for that kind
+- Bases contain only fields all four providers return for that kind
   (ADR-0035, ADR-0034).
 - Provider subclasses add provider-specific extras (e.g. Anti-Captcha's
   `user_agent`, `resp_key` for reCAPTCHA v2); optional provider fields the

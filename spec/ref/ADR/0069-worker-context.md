@@ -43,7 +43,7 @@ RecaptchaV2Challenge(
   ergonomics; challenges are not hashed).
 - **Per-provider surface** (universal field vs provider extra, per
   kind) folds into deferred item 2's per-provider field lists.
-  Preliminary expectation: `user_agent` universal (all three
+  Preliminary expectation: `user_agent` universal (all four
   providers accept `userAgent` on proxied tasks), `cookies`
   provider-specific; verify against each API reference at
   implementation.
