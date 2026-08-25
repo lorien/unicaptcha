@@ -1,7 +1,7 @@
 # ADR-0028: No proxy validation
 
-**Status:** Accepted
-**Date:** 2026-08-23
+**Status:** Accepted (amended 2026-08-24: the two constructor fail-fast basics — non-empty `host`, `port` in 1..65535 — raise `InvalidConfigError`)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 

@@ -25,7 +25,7 @@ TwoCaptchaClient(
     referral: bool | str = True,    # affiliate id: True=project's, False=off, str=own (ADR-0072)
     # client kwargs, identical names/defaults/validation as Solver:
     name=..., time=..., retry=..., http=..., http_client=...,
-    on_event=..., abandoned_registry_limit=...,
+    on_event=..., abandoned_registry_limit=..., proxy=...,
 )
 ```
 

@@ -256,10 +256,17 @@ class Proxy:
 ```
 
 Structured fields, not a URL string; no normalization machinery (ADR-0012,
-ADR-0028). Placement: optional `proxy` field on proxy-capable challenges;
-client-level default proxy applied only to proxy-capable challenges,
-challenge field wins. CapMonster is entirely proxyless; its challenge classes
-carry no proxy field.
+ADR-0028). Construction validates the fail-fast basics — `host` non-empty,
+`port` in 1..65535 — raising `InvalidConfigError` (the object is a
+configuration value; the same rule applies whether it lands on a challenge
+or as the client default). `kind` is enum-enforced; SOCKS4/SOCKS5 support is
+provider-side, values sent verbatim. `password` stays plain `str` (masking
+contracts are scoped to API keys, ADR-0014).
+
+Placement: optional `proxy` field on proxy-capable challenges; client-level
+default proxy passed as a flat `proxy=` constructor kwarg, applied only to
+proxy-capable challenges, challenge field wins. CapMonster is entirely
+proxyless; its challenge classes carry no proxy field.
 
 ### Worker context (ADR-0069)
 
@@ -323,7 +330,7 @@ RetryConfig(max_attempts, backoff_base, backoff_cap)
   (ADR-0030), extended by adapter declarations for custom kinds
   (ADR-0041).
 - Identity scalars stay flat constructor kwargs: `name`, `user_agent`,
-  `abandoned_registry_limit`.
+  `abandoned_registry_limit`, `proxy` (default proxy, ADR-0012).
 - Event handler: `on_event` accepted at construction and per call; per-call
   replaces client-level all-or-nothing (ADR-0044). On sync clients,
   coroutine-function handlers are rejected at attachment with
