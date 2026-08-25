@@ -1,7 +1,7 @@
 # ADR-0064: Kind-level solve with optional provider selection
 
-**Status:** Accepted (amends ADR-0005, ADR-0045, ADR-0048; partially covers deferred item 4)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0005, ADR-0045, ADR-0048; partially covers deferred item 4; confirmed as-is 2026-08-24: the instantiable-kind-base rule extends to all nine kinds per ADR-0070/0074 — reviewed and locked)
+**Date:** 2026-08-23, confirmation 2026-08-24
 
 ## Context
 
