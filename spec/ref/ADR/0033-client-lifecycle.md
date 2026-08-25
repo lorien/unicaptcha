@@ -1,7 +1,7 @@
 # ADR-0033: Client lifecycle
 
-**Status:** Accepted (amended 2026-08-23: shutdown-event close semantics; registry survives close; recovery workflow per ADR-0060)
-**Date:** 2026-08-23
+**Status:** Accepted (amended 2026-08-23: shutdown-event close semantics; registry survives close; recovery workflow per ADR-0060; confirmed as-is 2026-08-24: client lifecycle reviewed and locked)
+**Date:** 2026-08-23, confirmation 2026-08-24
 
 ## Context
 
