@@ -1,7 +1,7 @@
 # ADR-0072: Referral embedding — affiliate ID by default, disable or replace per adapter
 
-**Status:** Accepted (amends ADR-0053, ADR-0061)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0053, ADR-0061; confirmed as-is 2026-08-24: referral embedding reviewed and locked)
+**Date:** 2026-08-23, confirmation 2026-08-24
 
 ## Context
 
