@@ -38,7 +38,7 @@ solution" on a status query.
 |---|---|
 | `task_id` | `int` |
 | `provider` | `str` |
-| `status` | `TaskStatus` — new enum: `PENDING`, `READY`, `UNSOLVABLE`, `UNKNOWN` (ADR-0050) |
+| `status` | `TaskStatus` — new enum: `PENDING`, `READY`, `NO_SOLUTION`, `UNKNOWN` (ADR-0050) |
 | `solution` | `BaseSolution \| None` — populated only when READY; narrow via isinstance |
 | `cost` | `Decimal \| None` |
 | `raw` | `bytes` — untouched response body |

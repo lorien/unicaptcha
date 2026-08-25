@@ -6,7 +6,7 @@
 ## Context
 
 `get_task_status()` originally inherited exception semantics from
-`solve()`: UNSOLVABLE would raise `NoSolutionError`, unknown ids
+`solve()`: NO_SOLUTION would raise `NoSolutionError`, unknown ids
 would raise `UnknownTaskError` (settled during malformed-response
 mapping). But the method's primary caller is a reclaim loop over the
 abandoned registry — every iteration would need try/except armor for
@@ -16,7 +16,7 @@ outcomes that, from a query's perspective, are perfectly good answers.
 
 - **Principle**: status queries answer; operations raise.
 - `TaskStatusResult.status` has **four values**: `PENDING`, `READY`,
-  `UNSOLVABLE`, `UNKNOWN`. Provider-side outcomes are always returned
+  `NO_SOLUTION`, `UNKNOWN`. Provider-side outcomes are always returned
   values on `get_task_status`.
 - Exceptions on the query are reserved for caller-side faults:
   provider-mismatch `TypeError` (ADR-0045), `ClientClosedError`,
@@ -40,7 +40,7 @@ outcomes that, from a query's perspective, are perfectly good answers.
 
 - **All outcomes raise** (solve-parity): rejected; armored polling
   loops.
-- **Mixed** (UNKNOWN raises as caller bug, UNSOLVABLE returned):
+- **Mixed** (UNKNOWN raises as caller bug, NO_SOLUTION returned):
   rejected; adjacent cases, two mechanisms, easy to misremember.
 - **Keep `UnknownTaskError` for solve() only**: rejected; solve() on an
   unknown task is impossible (ids originate from the engine), so the

@@ -19,7 +19,7 @@ method.
   (four states), `solution: BaseSolution | None` populated only when
   READY, plus `cost` and `raw`. Optionality here is honest: it is the
   point of the call.
-- Per ADR-0050, `status` has four values: PENDING, READY, UNSOLVABLE,
+- Per ADR-0050, `status` has four values: PENDING, READY, NO_SOLUTION,
   UNKNOWN — provider-side outcomes are returned, not raised.
 
 ## Rationale

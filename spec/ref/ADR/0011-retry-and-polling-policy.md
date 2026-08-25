@@ -31,7 +31,7 @@ initially candidates for a reduced policy.
 **Polling phase** — tolerate all transient failures (network errors, 5xx):
 a failed poll never aborts the solve; retries continue bounded by
 `total_timeout`. Only budget exhaustion or terminal provider states
-(READY / UNSOLVABLE) end the loop.
+(READY / NO_SOLUTION) end the loop.
 
 **Auxiliary operations** — same policy as submission, uniformly, for
 consistency (owner decision over a reduced/single-retry variant).
@@ -52,4 +52,4 @@ consistency (owner decision over a reduced/single-retry variant).
 - **Reduced aux-op retry (single attempt) / no aux retries**: rejected;
   consistency chosen.
 - **Plain exponential (no jitter)**: rejected; synchronized retry waves.
-- **Auto-resubmit on UNSOLVABLE**: rejected (ADR-0029); caller decides.
+- **Auto-resubmit on NO_SOLUTION**: rejected (ADR-0029); caller decides.

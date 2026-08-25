@@ -1,6 +1,6 @@
 # ADR-0029: NoSolutionError, no auto-resubmit
 
-**Status:** Accepted (renamed 2026-08-24: `UnsolvableCaptchaError` → `UnsolvableChallengeError` → `NoSolutionError`; `ErrorKind.UNSOLVABLE` → `UNSOLVABLE_CHALLENGE` → `NO_SOLUTION` — named for the outcome, "no solution produced," paired with `EmptySolutionError` rather than the call-shape Challenge family)
+**Status:** Accepted (renamed 2026-08-24: class `UnsolvableCaptchaError` → `UnsolvableChallengeError` → `NoSolutionError`, `ErrorKind.UNSOLVABLE` → `UNSOLVABLE_CHALLENGE` → `NO_SOLUTION`; status-enum member `TaskStatus.UNSOLVABLE` → `TaskStatus.NO_SOLUTION` — one word `NO_SOLUTION` for the outcome across both status and error enums, paired with `EmptySolutionError` rather than the call-shape Challenge family)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
@@ -15,7 +15,7 @@ retry with a fresh task. The library could resubmit automatically.
 - Dedicated **`NoSolutionError`** exception (`ErrorKind.NO_SOLUTION`),
   distinct from the catch-all `ProviderError`.
 - **No auto-resubmit option** in v1: `solve()` raises; the caller decides
-  whether/how to retry. (Related: status queries return UNSOLVABLE as a
+  whether/how to retry. (Related: status queries return NO_SOLUTION as a
   state, ADR-0050.)
 - Documented billing note: unsolved image/text tasks are typically not
   billed; abandoned polling tasks may be.

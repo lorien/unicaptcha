@@ -188,7 +188,7 @@ ADR-0056 — non-generic, no submission metadata):
 |---|---|
 | `task_id` | `int` |
 | `provider` | `str` |
-| `status` | `TaskStatus` — enum: `PENDING \| READY \| UNSOLVABLE \| UNKNOWN` |
+| `status` | `TaskStatus` — enum: `PENDING \| READY \| NO_SOLUTION \| UNKNOWN` |
 | `solution` | `BaseSolution \| None` | populated only when READY; narrow via isinstance |
 | `cost` | `Decimal \| None` |
 | `raw` | `bytes` | untouched response body |
@@ -351,7 +351,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> SolveR
            counted within total_timeout — ADR-0030 amendment)
          POST getTaskResult every poll_interval
            - transient failures tolerated, bounded by total_timeout
-           - UNSOLVABLE response -> NoSolutionError (no auto-resubmit)
+           - NO_SOLUTION response -> NoSolutionError (no auto-resubmit)
            - UNKNOWN (task not found) -> ProviderError, fail fast (ADR-0058)
            - solved-but-empty payload -> EmptySolutionError (ADR-0040 amendment)
     terminal:

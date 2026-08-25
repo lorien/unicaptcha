@@ -31,7 +31,7 @@ All three operations exist on both tiers:
   introspection deferred). Good reports feed worker quality routing
   on providers that accept them.
 - `get_task_status` returns `TaskStatusResult` with four states
-  (PENDING/READY/UNSOLVABLE/UNKNOWN) — provider outcomes are returned
+  (PENDING/READY/NO_SOLUTION/UNKNOWN) — provider outcomes are returned
   values, never exceptions (ADR-0050).
 - All task-addressing arguments are validated pre-flight: a `TaskRef` whose
   provider does not match the facade (or is missing from the registry)

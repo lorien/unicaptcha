@@ -24,7 +24,7 @@ workers.
 - **Entry lifecycle**: entries are added at submission time and removed
   when the solve delivers successfully; after abandonment they are removed
   only when a later `get_task_status` on that id reaches a terminal state
-  (READY / UNSOLVABLE / UNKNOWN) **on the same client** — the registry is
+  (READY / NO_SOLUTION / UNKNOWN) **on the same client** — the registry is
   per-client, best-effort, advisory (ADR-0060); cross-client reclaim
   cannot clean a closed client's registry.
 - **Registry survives close** (supersedes an earlier "cleared on close" --

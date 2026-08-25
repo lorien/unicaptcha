@@ -29,7 +29,7 @@ hidden mutable state — the ADR-0060 anti-pattern.
 ```python
 @dataclass(frozen=True, slots=True)
 class ParsedTask:                      # public adapter-SDK vocabulary
-    state: TaskStatus                   # PENDING | READY | UNSOLVABLE | UNKNOWN
+    state: TaskStatus                   # PENDING | READY | NO_SOLUTION | UNKNOWN
     solution: BaseSolution | None      # provider subclass; populated only when READY
     cost: Decimal | None               # presence-check (ADR-0034)
     raw: bytes                         # verbatim body

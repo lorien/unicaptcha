@@ -45,6 +45,6 @@ engine itself submitted.
   after burning the whole budget.
 - **Raise `UnknownTaskError`**: rejected; removed from the hierarchy
   by ADR-0050 and impossible to hit on solve() by construction.
-- **Map not-found to UNSOLVABLE**: rejected; conflates "solved but
+- **Map not-found to NO_SOLUTION**: rejected; conflates "solved but
   unsatisfiable" (possibly billed, caller may report bad) with "no
   such task" (different remediation).

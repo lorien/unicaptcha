@@ -36,7 +36,7 @@ in one place.
      adapters; TaskRefs route by provider string (ADR-0045), no
      cross-instance coupling exists or is needed;
   3. `get_task_status(ref)` each entry — terminal states
-     (READY/UNSOLVABLE/UNKNOWN) are answers (ADR-0050); READY yields
+     (READY/NO_SOLUTION/UNKNOWN) are answers (ADR-0050); READY yields
      solution + cost (ADR-0056);
   4. persist TaskRefs (provider + task_id) if reclamation must
      survive process restarts (ADR-0045: TaskRef is the durable
