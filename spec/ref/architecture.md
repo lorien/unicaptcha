@@ -465,8 +465,9 @@ solve(challenge, provider=None, time=None, retry=None, on_event=None) -> TaskRes
   `solve()` call (ADR-0010). Enforced internally via `asyncio.timeout()` on
   the async side, converted to `TaskTimeoutError` at our scope boundary
   only; external cancellation passes through untouched.
-- Aux operations (`get_balance`, `report_bad_result`, `get_task_status`)
-  use the **same** retry policy as submission (ADR-0011).
+- Aux operations (`get_balance`, `get_task_status`, `report_bad_result`,
+  `report_good_result`, `get_abandoned_tasks`) use the **same** retry
+  policy as submission (ADR-0011).
 - Polling only; no webhooks (ADR-0015).
 
 ### Two-phase operations (ADR-0067)
@@ -474,13 +475,16 @@ solve(challenge, provider=None, time=None, retry=None, on_event=None) -> TaskRes
 `solve() = submit() + wait()`, exposed as separate calls on both tiers:
 
 ```python
-ticket = solver.submit(challenge, provider=None, retry=None)   # -> TaskTicket[T]
+ticket = solver.submit(challenge, provider=None, retry=None, on_event=None)  # -> TaskTicket[T]
 result = solver.wait(ticket, timeout=None)                     # -> TaskResult[T], raises on failure
 status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusResult, answers (PENDING on budget out)
 ```
 
 - `submit` routes exactly like `solve()` (ADR-0064); bounded by the
-  retry policy only.
+  retry policy only — takes `retry=` (RetryConfig) and `on_event=`
+  (it emits SUBMIT_REQUESTED/SUBMIT_ACCEPTED/SUBMIT_FAILED), but **no
+  `time=`**: submission is not bounded by a total budget, only by
+  retries (ADR-0067).
 - `wait`: operation semantics — `TaskResult[T]` typed, raises
   (`NoSolutionError`, UNKNOWN -> `ProviderError` per ADR-0058,
   `TaskTimeoutError`); clock starts at the call, default = per-kind

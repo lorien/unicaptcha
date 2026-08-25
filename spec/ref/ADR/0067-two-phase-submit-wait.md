@@ -1,6 +1,6 @@
 # ADR-0067: Two-phase submit/wait with TaskTicket
 
-**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains an `instant_answer` field, wait fast-path for inline-answered submits; renamed 2026-08-24: `Result[T]` → `SolveResult[T]` → `TaskResult[T]`, `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status` — task-centric vocabulary)
+**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains an `instant_answer` field, wait fast-path for inline-answered submits; renamed 2026-08-24: `Result[T]` → `SolveResult[T]` → `TaskResult[T]`, `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status` — task-centric vocabulary; amended 2026-08-24: `submit` takes `on_event=`, no `time=` — retry-bounded, not budget-bounded)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
@@ -21,7 +21,7 @@ placement, budgets, facade parity, vehicle).
 ### Phase 1 — submit
 
 ```python
-ticket = solver.submit(challenge, provider=None, retry=None)   # -> TaskTicket[SolutionOf[C]]
+ticket = solver.submit(challenge, provider=None, retry=None, on_event=None)   # -> TaskTicket[SolutionOf[C]]
 ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implicit provider
 ```
 
@@ -29,7 +29,8 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
   dispatch with optional `provider=` / random; concrete classes
   direct).
 - Submission itself is bounded by the retry policy (ADR-0011), not by
-  `total_timeout`.
+  `total_timeout` — `submit` takes `retry=` and `on_event=` but **no
+  `time=`** (no total budget on a bare submit; amended 2026-08-24).
 
 ### TaskTicket
 
