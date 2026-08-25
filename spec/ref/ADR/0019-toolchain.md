@@ -1,7 +1,7 @@
 # ADR-0019: Toolchain
 
-**Status:** Accepted (amended: slotscheck added; pre-commit/vulture/freezegun/basedpyright rejected; test-style commitments added per third-pass competitive analysis)
-**Date:** 2026-08-22
+**Status:** Accepted (amended: slotscheck added; pre-commit/vulture/freezegun/basedpyright rejected; test-style commitments added per third-pass competitive analysis; confirmed as-is 2026-08-24: toolchain/CI setup reviewed and locked, consistent with bootstrap.md)
+**Date:** 2026-08-22, confirmation 2026-08-24
 
 ## Context
 
