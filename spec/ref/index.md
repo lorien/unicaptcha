@@ -50,7 +50,7 @@ supersede.
 | [0026](ADR/0026-user-agent-and-repo-url.md) | User-Agent and repo URL | |
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |
 | [0028](ADR/0028-no-proxy-validation.md) | No proxy validation | |
-| [0029](ADR/0029-unsolvable-captcha-error.md) | UnsolvableChallengeError | dedicated exception, no auto-resubmit |
+| [0029](ADR/0029-unsolvable-captcha-error.md) | NoSolutionError | dedicated exception, no auto-resubmit |
 | [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column; draft token-kind rows (2026-08-24) pending review — deferred item 15 |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
 | [0032](ADR/0032-taskstatus-split.md) | TaskStatusResult split from SolveResult | amended: 0050, 0056 |

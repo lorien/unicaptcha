@@ -1,6 +1,6 @@
 # ADR-0009: Unified error hierarchy
 
-**Status:** Accepted (amended: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added; UnsupportedChallengeError scope widened by ADR-0057; ServiceBusyError added by ADR-0059 amendment; EmptySolutionError added by ADR-0040 amendment; renamed 2026-08-24: `UnsupportedCaptchaError` → `UnsupportedChallengeError`, `UnsolvableCaptchaError` → `UnsolvableChallengeError`; ErrorKind values mirror class names — class minus `Error`, SCREAMING_SNAKE — per the 1:1 invariant)
+**Status:** Accepted (amended: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added; UnsupportedChallengeError scope widened by ADR-0057; ServiceBusyError added by ADR-0059 amendment; EmptySolutionError added by ADR-0040 amendment; renamed 2026-08-24: `UnsupportedCaptchaError` → `UnsupportedChallengeError`, `UnsolvableCaptchaError` → `NoSolutionError`; ErrorKind values mirror class names — class minus `Error`, SCREAMING_SNAKE — per the 1:1 invariant)
 **Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
@@ -25,7 +25,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- SolveTimeoutError
 +-- RateLimitError
 +-- ServiceBusyError               provider capacity: no workers free (ADR-0059 amendment)
-+-- UnsolvableChallengeError
++-- NoSolutionError
 +-- InvalidConfigError
 +-- ClientClosedError
 +-- ProviderError                  unclassified provider errors
@@ -36,7 +36,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
   No `provider_code` attribute: adapters normalize semantics into the
   hierarchy; the original bytes are attached for debugging.
 - `ErrorKind` (13 values): NETWORK, AUTHENTICATION, INSUFFICIENT_BALANCE, UNSUPPORTED_CHALLENGE,
-  INVALID_CHALLENGE, SOLVE_TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE_CHALLENGE,
+  INVALID_CHALLENGE, SOLVE_TIMEOUT, RATE_LIMIT, SERVICE_BUSY, NO_SOLUTION,
   EMPTY_SOLUTION, CLIENT_CLOSED, INVALID_CONFIG, PROVIDER. First nested leaf:
   `EmptySolutionError` under `ProviderError` (ADR-0040 amendment).
 - Message travels via standard `Exception` machinery.

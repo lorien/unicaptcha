@@ -46,7 +46,7 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
 
 | Method | Accepts | Returns | On terminal failure |
 |---|---|---|---|
-| `wait(ticket, timeout=None)` | `TaskTicket[T]` | `SolveResult[T]` | **raises** (`UnsolvableChallengeError`, `ProviderError` on UNKNOWN per ADR-0058, `SolveTimeoutError`) |
+| `wait(ticket, timeout=None)` | `TaskTicket[T]` | `SolveResult[T]` | **raises** (`NoSolutionError`, `ProviderError` on UNKNOWN per ADR-0058, `SolveTimeoutError`) |
 | `wait_ref(ref, timeout=...)` | `TaskRef` | `TaskStatusResult` | **answers**; budget exhaustion returns PENDING `TaskStatusResult` |
 | `get_task_status(ref)` | `TaskRef` | `TaskStatusResult` | answers — single-shot, unchanged (ADR-0050) |
 

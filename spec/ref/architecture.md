@@ -301,7 +301,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- SolveTimeoutError
 +-- RateLimitError
 +-- ServiceBusyError               provider capacity: no workers free (ADR-0059 amendment)
-+-- UnsolvableChallengeError
++-- NoSolutionError
 +-- InvalidConfigError
 +-- ClientClosedError
 +-- ProviderError                  unclassified provider errors
@@ -309,7 +309,7 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 ```
 
 - `ErrorKind` (13 values): NETWORK, AUTHENTICATION, INSUFFICIENT_BALANCE, UNSUPPORTED_CHALLENGE,
-  INVALID_CHALLENGE, SOLVE_TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE_CHALLENGE,
+  INVALID_CHALLENGE, SOLVE_TIMEOUT, RATE_LIMIT, SERVICE_BUSY, NO_SOLUTION,
   EMPTY_SOLUTION, CLIENT_CLOSED, INVALID_CONFIG, PROVIDER (ADR-0009; ADR-0059
   and ADR-0040 amendments).
 - No `provider_code` attribute; the message travels via standard Exception
@@ -351,7 +351,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> SolveR
            counted within total_timeout — ADR-0030 amendment)
          POST getTaskResult every poll_interval
            - transient failures tolerated, bounded by total_timeout
-           - UNSOLVABLE response -> UnsolvableChallengeError (no auto-resubmit)
+           - UNSOLVABLE response -> NoSolutionError (no auto-resubmit)
            - UNKNOWN (task not found) -> ProviderError, fail fast (ADR-0058)
            - solved-but-empty payload -> EmptySolutionError (ADR-0040 amendment)
     terminal:
@@ -381,7 +381,7 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusRe
 - `submit` routes exactly like `solve()` (ADR-0064); bounded by the
   retry policy only.
 - `wait`: operation semantics — `SolveResult[T]` typed, raises
-  (`UnsolvableChallengeError`, UNKNOWN -> `ProviderError` per ADR-0058,
+  (`NoSolutionError`, UNKNOWN -> `ProviderError` per ADR-0058,
   `SolveTimeoutError`); clock starts at the call, default = per-kind
   `total_timeout` (ADR-0030) via the merge chain. Fast path (ADR-0075):
   a ticket with `instant_answer` set returns immediately — no poll, no delay;

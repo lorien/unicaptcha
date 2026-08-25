@@ -1,6 +1,6 @@
-# ADR-0029: UnsolvableChallengeError, no auto-resubmit
+# ADR-0029: NoSolutionError, no auto-resubmit
 
-**Status:** Accepted (renamed 2026-08-24: `UnsolvableCaptchaError` → `UnsolvableChallengeError`, `ErrorKind.UNSOLVABLE` → `UNSOLVABLE_CHALLENGE` — the challenge-side error family uses one word)
+**Status:** Accepted (renamed 2026-08-24: `UnsolvableCaptchaError` → `UnsolvableChallengeError` → `NoSolutionError`; `ErrorKind.UNSOLVABLE` → `UNSOLVABLE_CHALLENGE` → `NO_SOLUTION` — named for the outcome, "no solution produced," paired with `EmptySolutionError` rather than the call-shape Challenge family)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
@@ -12,7 +12,7 @@ retry with a fresh task. The library could resubmit automatically.
 
 ## Decision
 
-- Dedicated **`UnsolvableChallengeError`** exception (`ErrorKind.UNSOLVABLE_CHALLENGE`),
+- Dedicated **`NoSolutionError`** exception (`ErrorKind.NO_SOLUTION`),
   distinct from the catch-all `ProviderError`.
 - **No auto-resubmit option** in v1: `solve()` raises; the caller decides
   whether/how to retry. (Related: status queries return UNSOLVABLE as a
@@ -24,7 +24,7 @@ retry with a fresh task. The library could resubmit automatically.
 
 - Retrying is a policy (new challenge? new provider? backoff?); the
   library must not own policy.
-- A dedicated class makes `except UnsolvableChallengeError` retry loops
+- A dedicated class makes `except NoSolutionError` retry loops
   trivial without string-matching provider messages.
 
 ## Alternatives considered
