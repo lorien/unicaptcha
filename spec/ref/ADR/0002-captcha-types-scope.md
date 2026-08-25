@@ -1,7 +1,7 @@
 # ADR-0002: CAPTCHA types scope
 
-**Status:** Accepted (amended by ADR-0070: scope extended to eight kinds — FunCaptcha, GeeTest v3/v4 added; reCAPTCHA Enterprise covered as flags on V2/V3; amended by ADR-0074: Cloudflare Turnstile added as ninth kind)
-**Date:** 2026-08-22
+**Status:** Accepted (amended by ADR-0070: scope extended to eight kinds — FunCaptcha, GeeTest v3/v4 added; reCAPTCHA Enterprise covered as flags on V2/V3; amended by ADR-0074: Cloudflare Turnstile added as ninth kind; renamed 2026-08-24: `GeeTestChallenge` → `GeeTestV3Challenge`, `GeeTestSolution` → `GeeTestV3Solution` per ADR-0070 amendment)
+**Date:** 2026-08-22, amendment 2026-08-24
 
 ## Context
 

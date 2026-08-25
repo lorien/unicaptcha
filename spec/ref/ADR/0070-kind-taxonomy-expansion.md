@@ -1,7 +1,7 @@
 # ADR-0070: Kind taxonomy expansion — FunCaptcha, GeeTest v3/v4, enterprise flags
 
-**Status:** Accepted (amends ADR-0002; extends ADR-0030's timing table; amended by ADR-0074: Turnstile added as ninth kind)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0002; extends ADR-0030's timing table; amended by ADR-0074: Turnstile added as ninth kind; renamed 2026-08-24: `GeeTestChallenge` → `GeeTestV3Challenge`, `GeeTestSolution` → `GeeTestV3Solution` — versioned kinds symmetric: reCAPTCHA V2/V3, GeeTest V3/V4)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -18,7 +18,7 @@ structurally novel ones are deferred by name.
 | Kind base | Universal challenge fields | Solution base | Solution fields |
 |---|---|---|---|
 | `FunCaptchaChallenge` | `public_key`, `pageurl` | `FunCaptchaSolution` | `token: str` |
-| `GeeTestChallenge` (v3) | `gt_key`, `challenge`, `pageurl` | `GeeTestSolution` | `challenge`, `validate`, `seccode` |
+| `GeeTestV3Challenge` | `gt_key`, `challenge`, `pageurl` | `GeeTestV3Solution` | `challenge`, `validate`, `seccode` |
 | `GeeTestV4Challenge` | `captcha_id`, `pageurl` | `GeeTestV4Solution` | `captcha_id`, `lot_number`, `pass_token`, `gen_time`, `captcha_output` |
 
 - Provider extras (e.g. FunCaptcha's `blob`, `service_url`) ride the

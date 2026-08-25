@@ -84,7 +84,7 @@ BaseChallenge (public abstract root; open for custom kinds)
 +-- HCaptchaChallenge       sitekey: str; pageurl: str
 |                           flags: is_invisible, rqdata (ADR-0070)
 +-- FunCaptchaChallenge     public_key: str; pageurl: str (ADR-0070)
-+-- GeeTestChallenge        gt_key: str; challenge: str; pageurl: str (ADR-0070)
++-- GeeTestV3Challenge      gt_key: str; challenge: str; pageurl: str (ADR-0070)
 +-- GeeTestV4Challenge      captcha_id: str; pageurl: str (ADR-0070)
 +-- TurnstileChallenge      sitekey: str; pageurl: str (ADR-0074)
 |                           flags: action, c_data, chl_page_data (ADR-0074)
@@ -130,7 +130,7 @@ BaseSolution (public abstract root; open for custom kinds; ADR-0056)
 +-- RecaptchaV3Solution    token: str; score; action  (abstract)
 +-- HCaptchaSolution       token: str                 (abstract)
 +-- FunCaptchaSolution     token: str                 (abstract; ADR-0070)
-+-- GeeTestSolution        challenge; validate; seccode        (abstract; ADR-0070)
++-- GeeTestV3Solution      challenge; validate; seccode        (abstract; ADR-0070)
 +-- GeeTestV4Solution      captcha_id; lot_number; pass_token; gen_time; captcha_output
                                                            (abstract; ADR-0070)
 +-- TurnstileSolution      token: str                 (abstract; ADR-0074)
@@ -544,7 +544,7 @@ unicaptcha/
         recaptcha_v3.py  # RecaptchaV3Challenge
         hcaptcha.py    # HCaptchaChallenge
         funcaptcha.py  # FunCaptchaChallenge
-        geetest.py     # GeeTestChallenge, GeeTestV4Challenge
+        geetest.py     # GeeTestV3Challenge, GeeTestV4Challenge
         turnstile.py   # TurnstileChallenge
     solution/          # abstract solution kind bases (ADR-0035)
         base.py        # BaseSolution
@@ -554,7 +554,7 @@ unicaptcha/
         recaptcha_v3.py  # RecaptchaV3Solution
         hcaptcha.py    # HCaptchaSolution
         funcaptcha.py  # FunCaptchaSolution
-        geetest.py     # GeeTestSolution, GeeTestV4Solution
+        geetest.py     # GeeTestV3Solution, GeeTestV4Solution
         turnstile.py   # TurnstileSolution
     provider/          # one package per provider; singular one-per-concern files
         twocaptcha/    # challenge.py, solution.py, adapter.py, client.py
