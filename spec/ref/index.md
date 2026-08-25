@@ -100,7 +100,7 @@ supersede.
 
 ## Conventions
 
-- Dates in ADRs reflect when the decision was settled (2026-08-22/23 design sessions).
+- Dates in ADRs reflect when the decision was settled (2026-08-22/23 design sessions, plus 2026-08-24 amendments/confirmations).
 - "Superseded by" links point forward; later ADRs link back to what they amend.
 - The project is experimental: pre-1.0, no public API stability obligations. The
   public/internal boundary communicates intent, not commitment.
