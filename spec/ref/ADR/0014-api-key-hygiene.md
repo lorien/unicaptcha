@@ -1,7 +1,7 @@
 # ADR-0014: API key hygiene
 
-**Status:** Accepted (amended: no env-var helpers; own SecretStr after pydantic was dropped; `SecretStr | str` accepted and normalized at construction per ADR-0063)
-**Date:** 2026-08-22
+**Status:** Accepted (amended: no env-var helpers; own SecretStr after pydantic was dropped; `SecretStr | str` accepted and normalized at construction per ADR-0063; surface pinned 2026-08-24: accessor `get_secret_value()`, full-mask repr/str, value equality, picklable)
+**Date:** 2026-08-22, amendment 2026-08-24
 
 ## Context
 

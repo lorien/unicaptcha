@@ -272,8 +272,24 @@ kinds of which providers accept them) lands with deferred item 2.
 
 ### SecretStr
 
-Hand-rolled (~30 lines), masking in repr/str; used for API keys
-(ADR-0014). No pydantic dependency.
+Hand-rolled (~30 lines), no pydantic dependency; used for API keys
+(ADR-0014).
+
+```python
+class SecretStr:
+    def __init__(self, value: str): ...
+    def get_secret_value(self) -> str: ...
+    def __repr__(self) -> str: ...   # fully masked (***)
+    def __str__(self) -> str: ...    # fully masked (***)
+```
+
+- `repr`/`str` render the value as `***` (full mask — no partial
+  characters; keys are short enough that fragments aid guessing).
+- Value equality: `__eq__`/`__hash__` compare the wrapped string
+  (usable in tests, dedup, registry keys).
+- Picklable (consistent with the frozen-data vocabulary).
+- Constructors accept `SecretStr | str`; a plain `str` is wrapped at
+  the boundary, stored type is always `SecretStr` (ADR-0063).
 
 ### repr policy
 
