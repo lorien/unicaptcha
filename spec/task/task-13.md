@@ -2,6 +2,8 @@
 
 Status: new
 
+First read `var/analysis-py-capmonster-python.md`.
+
 Implement `provider/capmonster/`:
 
 - `challenge.py`: concrete challenge subclasses per ADR-0076 — proxyless

@@ -2,6 +2,8 @@
 
 Status: new
 
+First read `var/analysis-py-anticaptcha-python.md`.
+
 Implement `provider/anticaptcha/`:
 
 - `challenge.py`: concrete challenge subclasses per ADR-0076 (nine kinds;

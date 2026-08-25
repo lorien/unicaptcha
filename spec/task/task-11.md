@@ -2,6 +2,10 @@
 
 Status: new
 
+First read `var/analysis-py-2captcha-python.md` (note: that SDK is the
+legacy `in.php` protocol — modern JSON field mapping is in
+architecture.md §2).
+
 Implement `provider/twocaptcha/`:
 
 - `challenge.py`: concrete challenge subclasses per ADR-0076 field table

@@ -2,6 +2,8 @@
 
 Status: new
 
+First read `var/analysis-py-capsolver-python.md`.
+
 Implement `provider/capsolver/`:
 
 - `challenge.py`: concrete challenge subclasses per ADR-0076 (GeeTest
