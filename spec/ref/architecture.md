@@ -120,6 +120,77 @@ BaseChallenge (public abstract root; open for custom kinds)
   `numeric=True`) are keyword-only. Kills the same-typed-string swap
   hazard and the non-default-after-default inheritance wart.
 
+### Provider-specific challenge field surface (ADR-0076, closes deferred item 2)
+
+Concrete classes add provider extras beyond the universal kind-base
+fields. Convention: `sitekey`→`websiteKey` and `pageurl`→`websiteURL`
+unless the wire name differs (noted per row). Provider extras type as
+primitives in v1 (`str | None`, `int | None`, `bool`); enum promotion
+deferred (StrEnum later). Worker-context (`user_agent`/`cookies`,
+ADR-0069) and `proxy` (ADR-0012) ride as keyword-only fields where the
+provider API accepts them; CapMonster challenges carry **no** proxy
+field (proxyless, ADR-0012).
+
+#### 2Captcha (`twocaptcha`; all nine kinds)
+
+| Kind | Concrete class | Provider extras → wire | Proxy / worker |
+|---|---|---|---|
+| image | `TwoCaptchaImageChallenge` | `phrase→phrase`, `case→case`, `numeric→numeric` (0-4), `math→math`, `min_len→min_len`, `max_len→max_len`, `lang→lang`, `comment→comment` | proxy opt. |
+| text | `TwoCaptchaTextChallenge` | `lang→lang` | — |
+| reCAPTCHA v2 | `TwoCaptchaRecaptchaV2Challenge` | `is_enterprise→RecaptchaV2EnterpriseTask` (+`enterprisePayload`), `data_s→recaptchaDataSValue`, `api_domain→apiDomain` | proxy opt.; UA + cookies |
+| reCAPTCHA v3 | `TwoCaptchaRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore`, `is_enterprise→RecaptchaV3EnterpriseTask` (+`enterprisePayload`), `api_domain→apiDomain` | proxy opt.; UA + cookies |
+| hCaptcha | `TwoCaptchaHCaptchaChallenge` | `rqdata→enterprisePayload` | proxy opt.; UA + cookies |
+| FunCaptcha | `TwoCaptchaFunCaptchaChallenge` | `public_key→websitePublicKey`, `data→data` (blob), `service_url→funcaptchaApiJSSubdomain` | proxy opt.; UA |
+| GeeTest v3 | `TwoCaptchaGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge`, `api_server→geetestApiServerSubdomain` | proxy opt.; UA |
+| GeeTest v4 | `TwoCaptchaGeeTestV4Challenge` | `captcha_id→initParameters.captcha_id` (+`version:4`), `risk_type→risk_type` | proxy opt.; UA |
+| Turnstile | `TwoCaptchaTurnstileChallenge` | `action→action`, `c_data→cData`, `chl_page_data→chlPageData` | proxy opt.; UA |
+
+#### Anti-Captcha (`anti-captcha`; nine kinds — text via API's `TextCaptchaTask`, absent from the official SDK)
+
+| Kind | Concrete class | Provider extras → wire | Proxy / worker |
+|---|---|---|---|
+| image | `AntiCaptchaImageChallenge` | `phrase→phrase`, `case→case`, `numeric→numeric`, `math→math`, `min_len→minLength`, `max_len→maxLength`, `comment→comment`, `language_pool→languagePool` | — |
+| text | `AntiCaptchaTextChallenge` | `lang→lang` | — |
+| reCAPTCHA v2 | `AntiCaptchaRecaptchaV2Challenge` | `data_s→recaptchaDataSValue`, `stoken→websiteSToken`, `is_enterprise→RecaptchaV2EnterpriseTask` (+`enterprisePayload`; no data_s/isInvisible on ent) | proxy opt. (`RecaptchaV2Task`); UA + cookies on proxy-on |
+| reCAPTCHA v3 | `AntiCaptchaRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore` (validated 0.5/0.7/0.9), `is_enterprise→isEnterprise:true` | proxyless only |
+| hCaptcha | `AntiCaptchaHCaptchaChallenge` | `rqdata→enterprisePayload` | proxy opt.; UA (also proxyless) + cookies on proxy-on |
+| FunCaptcha | `AntiCaptchaFunCaptchaChallenge` | `public_key→websitePublicKey`, `data→data` (blob), `service_url→funcaptchaApiJSSubdomain` | proxy opt.; UA on proxy-on |
+| GeeTest v3 | `AntiCaptchaGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge`, `api_server→geetestApiServerSubdomain`, `geetest_lib→geetestGetLib` | proxy opt.; UA |
+| GeeTest v4 | `AntiCaptchaGeeTestV4Challenge` | `captcha_id→gt` (v4 id rides `gt`) + `version:4` + `initParameters`, `risk_type→initParameters.riskType` | proxy opt.; UA |
+| Turnstile | `AntiCaptchaTurnstileChallenge` | `action→action`, `c_data→cData`, `chl_page_data→chlPageData` | proxy opt. (`TurnstileTask`; adds `isInvisible` quirk) |
+
+#### CapMonster (`capmonster`; proxyless — no proxy field anywhere, ADR-0012)
+
+| Kind | Concrete class | Provider extras → wire | Worker |
+|---|---|---|---|
+| image | `CapMonsterImageChallenge` | `module_name→CapMonsterModule` (17-value enum), `threshold→recognizingThreshold` (0-100), `case→Case`, `numeric→numeric`, `math→math` | — |
+| reCAPTCHA v2 | `CapMonsterRecaptchaV2Challenge` | `data_s→recaptchaDataSValue`, `is_enterprise→RecaptchaV2EnterpriseTask` (+`enterprisePayload` wrapped `{'s': ...}`, `api_domain→apiDomain`, `action→pageAction`) | UA + cookies |
+| reCAPTCHA v3 | `CapMonsterRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore` (0.1-0.9), `is_enterprise→RecaptchaV3EnterpriseTask` | — |
+| hCaptcha | `CapMonsterHCaptchaChallenge` | `rqdata→data`, `fallback_to_actual_ua→fallbackToActualUA` | UA + cookies |
+| FunCaptcha | `CapMonsterFunCaptchaChallenge` | `public_key→websitePublicKey`, `data→data` (blob), `service_url→funcaptchaApiJSSubdomain` | UA + cookies |
+| GeeTest v3 | `CapMonsterGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge`, `api_server→geetestApiServerSubdomain`, `geetest_lib→geetestGetLib` | UA |
+| GeeTest v4 | `CapMonsterGeeTestV4Challenge` | `captcha_id→initParameters.captcha_id` (+`version:4`), `risk_type→initParameters.riskType` | — |
+| Turnstile | `CapMonsterTurnstileChallenge` | `action→pageAction`, `c_data→data`, `chl_page_data→pageData`, `cloudflare_task_type→cloudflareTaskType` (`token` only in v1 — `cf_clearance`/`wait_room` require a proxy, impossible under ADR-0012's proxyless rule), `html_page_base64→htmlPageBase64`, `api_js_url→apiJsUrl` | UA (required for any `cloudflare_task_type`) |
+
+#### Capsolver (`capsolver`; dict-driven SDK — pass-through extras, minimal validation)
+
+| Kind | Concrete class | Provider extras → wire | Proxy / worker |
+|---|---|---|---|
+| image | `CapsolverImageChallenge` | — (unchecked pass-through) | proxy opt. |
+| reCAPTCHA v2 | `CapsolverRecaptchaV2Challenge` | — | proxy opt. (`ReCaptchaV2Task`); UA + cookies pass-through |
+| reCAPTCHA v3 | `CapsolverRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore` | proxyless only |
+| hCaptcha | `CapsolverHCaptchaChallenge` | `rqdata→rqdata` | proxy opt.; UA pass-through |
+| FunCaptcha | `CapsolverFunCaptchaChallenge` | `public_key→websitePublicKey` | proxy opt. |
+| GeeTest v3 | `CapsolverGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge` | proxy opt. |
+| Turnstile | `CapsolverTurnstileChallenge` | `action→metadata.action`, `c_data→metadata.cdata` | proxy opt. (`AntiCloudflareTask`) |
+
+- **Coverage boundary** (ADR-0076): text = 2Captcha + Anti-Captcha only;
+  CapMonster/Capsolver have no text task. GeeTest v4 = 2Captcha +
+  Anti-Captcha + CapMonster; **Capsolver excluded** (its official SDK
+  ships GeeTest v3 only — thin coverage is fine, ADR-0070). reCAPTCHA
+  v3 is proxyless-only on Anti-Captcha/CapMonster/Capsolver; 2Captcha
+  also offers a proxy variant.
+
 ## 3. Solution taxonomy
 
 ```
@@ -266,7 +337,10 @@ contracts are scoped to API keys, ADR-0014).
 Placement: optional `proxy` field on proxy-capable challenges; client-level
 default proxy passed as a flat `proxy=` constructor kwarg, applied only to
 proxy-capable challenges, challenge field wins. CapMonster is entirely
-proxyless; its challenge classes carry no proxy field.
+proxyless; its challenge classes carry no proxy field. Anti-Captcha
+accepts proxy IP addresses only — hostname→IP resolution is a network
+operation performed by the engine (async-safe, executor-backed) before the
+adapter sees the proxy; adapters stay pure (ADR-0041, ADR-0076).
 
 ### Worker context (ADR-0069)
 
