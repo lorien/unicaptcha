@@ -3,7 +3,7 @@
 v1 implementation plan. Statuses: `new` / `failed` / `done`. Details in
 `spec/task/task-{N}.md`; conventions in `spec/skill/task_tracking.md`.
 
- - [new] 1: Toolchain + package scaffold
+ - [done] 1: Toolchain + package scaffold
  - [new] 2: Core models and public types
  - [new] 3: Error hierarchy
  - [new] 4: Events

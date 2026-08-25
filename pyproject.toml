@@ -41,6 +41,9 @@ packages = ["unicaptcha"]
 target-version = "py311"
 line-length = 88
 
+[tool.ruff.format]
+exclude = ["*.md", "*.markdown"]
+
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF"]
 
@@ -49,6 +52,7 @@ strict = true
 
 [tool.pyright]
 typeCheckingMode = "strict"
+include = ["unicaptcha"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
