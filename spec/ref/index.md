@@ -96,7 +96,7 @@ supersede.
 | [0072](ADR/0072-referral-embedding.md) | Referral embedding | amends 0053/0061: trinary `referral` kwarg, on by default |
 | [0073](ADR/0073-adapter-endpoints.md) | Adapter Endpoints | amends 0053: operation-keyed paths, all-or-nothing override |
 | [0074](ADR/0074-turnstile-kind.md) | Cloudflare Turnstile kind | amends 0002/0070: ninth v1 kind; resolves dangling deferred claim |
-| [0075](ADR/0075-submit-ready-fast-path.md) | Submit-ready fast path | amends 0053/0067, formalizes ParsedTask (0058): SubmitAccepted, ticket-carried `ready` |
+| [0075](ADR/0075-submit-ready-fast-path.md) | Submit-ready fast path | amends 0053/0067, formalizes ParsedTask (0058): SubmitAccepted, ticket-carried `instant_answer` |
 
 ## Conventions
 

@@ -1,6 +1,6 @@
 # ADR-0075: Submit-phase ready fast-path with SubmitAccepted
 
-**Status:** Accepted (amends ADR-0053, ADR-0067; formalizes `ParsedTask` from ADR-0058; renamed 2026-08-24: `Result[T]` → `SolveResult[T]`, enum `TaskState` → `TaskStatus`, `parse_task_result` → `parse_task_status` for a single status vocabulary)
+**Status:** Accepted (amends ADR-0053, ADR-0067; formalizes `ParsedTask` from ADR-0058; renamed 2026-08-24: `Result[T]` → `SolveResult[T]`, enum `TaskState` → `TaskStatus`, `parse_task_result` → `parse_task_status` for a single status vocabulary; field `ready` → `instant_answer` on both `SubmitAccepted` and `TaskTicket[T]`)
 **Date:** 2026-08-24, amendment 2026-08-24
 
 ## Context
@@ -39,7 +39,7 @@ class ParsedTask:                      # public adapter-SDK vocabulary
 @dataclass(frozen=True, slots=True)
 class SubmitAccepted:
     task_id: int                       # ALWAYS present; missing = malformed response (ADR-0040)
-    ready: ParsedTask | None = None    # set iff createTask answered inline
+    instant_answer: ParsedTask | None = None    # set iff createTask answered inline
 ```
 
 `BaseAdapter.parse_submit_response(raw: bytes) -> SubmitAccepted`
@@ -56,7 +56,7 @@ root re-exports), alongside `SubmitAccepted`; the adapter SDK is public
 class TaskTicket[T]:
     task_ref: TaskRef
     submitted_at: datetime             # UTC-aware
-    ready: ParsedTask | None = None    # ADR-0075
+    instant_answer: ParsedTask | None = None    # ADR-0075
 ```
 
 ADR-0067 rejected handle **methods** because an engine reference inside
@@ -65,7 +65,7 @@ Tickets remain dumb, picklable, user-inspectable.
 
 ### Behavior
 
-- `wait(ticket)`: `ticket.ready is not None` → return `SolveResult[T]`
+- `wait(ticket)`: `ticket.instant_answer is not None` → return `SolveResult[T]`
   immediately — no poll, no `poll_delay` (the fresh-ticket delay question
   is moot; there is no poll). Otherwise the unchanged poll path.
 - `wait_ref(ref)` / `get_task_status(ref)`: **unchanged**. They take
@@ -77,7 +77,7 @@ Tickets remain dumb, picklable, user-inspectable.
   submit → `SolveResult[T]` without an intermediate ticket when the caller
   hasn't split the phases.
 - Events: `submitted` then `solved`; no poll phase (ADR-0067 invariant
-  intact). Cost from `ready.cost`; `None` unless the submit response
+  intact). Cost from `instant_answer.cost`; `None` unless the submit response
   reported one (ADR-0034 presence-check).
 - Persisted/reconstructed `TaskRef`s take the poll path — already correct
   under ADR-0030's stale-ticket rule.
@@ -87,7 +87,7 @@ Tickets remain dumb, picklable, user-inspectable.
 - `ParsedTask.__repr__` follows the repr policy (tokens `***abcd`, bytes
   `<N bytes>` stubs — ADR-0034) because it rides public objects.
 - Adapters that never see inline-ready responses return
-  `SubmitAccepted(task_id=..., ready=None)` — zero impact on the other
+  `SubmitAccepted(task_id=..., instant_answer=None)` — zero impact on the other
   three providers and third-party adapters.
 
 ## Rationale

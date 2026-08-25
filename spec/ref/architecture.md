@@ -174,7 +174,7 @@ API). Routing vehicle for all task-addressing operations (ADR-0045).
 
 Issued by `submit()` (ADR-0067): frozen dataclass, generic over the
 solution type (bound via the challenge->solution link); `task_ref:
-TaskRef`, `submitted_at: datetime` (UTC), `ready: ParsedTask | None`
+TaskRef`, `submitted_at: datetime` (UTC), `instant_answer: ParsedTask | None`
 (ADR-0075; set iff the provider answered the submit itself — instant
 tasks). Not user-constructible — provenance is its value. Bridges to
 persistence via `.task_ref`.
@@ -384,7 +384,7 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusRe
   (`UnsolvableCaptchaError`, UNKNOWN -> `ProviderError` per ADR-0058,
   `SolveTimeoutError`); clock starts at the call, default = per-kind
   `total_timeout` (ADR-0030) via the merge chain. Fast path (ADR-0075):
-  a ticket with `ready` set returns immediately — no poll, no delay;
+  a ticket with `instant_answer` set returns immediately — no poll, no delay;
   `wait_ref`/`get_task_status` never see the field and poll the provider
   (first poll answers READY).
 - `wait_ref`: query semantics — polls until terminal or budget out
@@ -550,8 +550,8 @@ class MyServiceAdapter(BaseAdapter):
                  referral: bool | str = True): ...   # referral per ADR-0072
     def build_payload(self, challenge) -> dict[str, Any]: ...
     def parse_submit_response(self, raw: bytes) -> SubmitAccepted: ...
-                                           # SubmitAccepted{task_id: int, ready: ParsedTask | None}
-                                           # (ADR-0075); ready set iff createTask answered inline
+                                           # SubmitAccepted{task_id: int, instant_answer: ParsedTask | None}
+                                           # (ADR-0075); instant_answer set iff createTask answered inline
     def parse_task_status(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable|unknown (ADR-0058):
                                            # ParsedTask{state, solution, cost, raw, detail} — public
                                            # vocabulary per ADR-0075
