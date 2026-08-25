@@ -1,7 +1,7 @@
 # ADR-0007: Provider facades as peers over a shared engine
 
-**Status:** Accepted (supersedes the original "facades compose a universal client" decision)
-**Date:** 2026-08-22, restructured 2026-08-23
+**Status:** Accepted (supersedes the original "facades compose a universal client" decision; amended 2026-08-24: facade convenience methods extended from five to all nine kinds per ADR-0070/0074)
+**Date:** 2026-08-22, restructured 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -34,7 +34,11 @@ Solver (registry + dispatch)           TwoCaptchaClient (facade)
   network_client=my_http)` and `Solver(..., network_client=my_http)`
   inject the same object at the layer where the resource actually lives.
 - Facade method surface: `solve_image`, `solve_text`, `solve_recaptcha_v2`,
-  `solve_recaptcha_v3`, `solve_hcaptcha`, plus aux ops with identical names
+  `solve_recaptcha_v3`, `solve_hcaptcha`, `solve_funcaptcha`,
+  `solve_geetest_v3`, `solve_geetest_v4`, `solve_turnstile` — one per kind,
+  exposed per-provider based on which kinds that facade supports (amended
+  2026-08-24: the original five-method list extended to all nine kinds per
+  ADR-0070/0074), plus aux ops with identical names
   to the universal client. Facade methods carry full parameter parity
   (`time=`, `retry=`, `on_event=`, ADR-0051).
 - The earlier inheritance option was rejected on LSP grounds: a

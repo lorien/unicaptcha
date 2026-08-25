@@ -1,6 +1,6 @@
 # ADR-0036: Package layout and naming
 
-**Status:** Accepted (amended: `unicaptcha.types` module added; adapter classes named `<Provider>Adapter` per ADR-0052; universal tier renamed `Solver`/`AsyncSolver` per ADR-0062, Client suffix scoped to facades; amended 2026-08-24: singular/plural naming rule — root files plural, root directories singular, provider internals singular one-per-concern; `challenge/` kind-base package added per ADR-0048)
+**Status:** Accepted (amended: `unicaptcha.types` module added; adapter classes named `<Provider>Adapter` per ADR-0052; universal tier renamed `Solver`/`AsyncSolver` per ADR-0062, Client suffix scoped to facades; amended 2026-08-24: singular/plural naming rule — root files plural, root directories singular, provider internals singular one-per-concern; `challenge/` kind-base package added per ADR-0048; facade methods extended to all nine kinds per ADR-0070/0074)
 **Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
@@ -56,7 +56,9 @@ unicaptcha/
   module was explicitly rejected (junk-drawer reputation; these are domain
   types, not utilities).
 - Facade method names: `solve_image`, `solve_text`, `solve_recaptcha_v2`,
-  `solve_recaptcha_v3`, `solve_hcaptcha`; aux ops identical on both tiers.
+  `solve_recaptcha_v3`, `solve_hcaptcha`, `solve_funcaptcha`,
+  `solve_geetest_v3`, `solve_geetest_v4`, `solve_turnstile`; aux ops
+  identical on both tiers.
 - Root `__init__` exports core vocabulary only; provider classes require
   `from unicaptcha.provider.<name> import ...` (four providers x nine
   kinds x two clients would drown the root).

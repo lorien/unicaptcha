@@ -632,8 +632,11 @@ unicaptcha/
   `<Provider><Kind>Challenge`; solutions `<Provider><Kind>Solution`
   (ADR-0036).
 - Facade methods: `solve_image`, `solve_text`, `solve_recaptcha_v2`,
-  `solve_recaptcha_v3`, `solve_hcaptcha`; aux ops named identically on both
-  tiers (`get_balance`, `get_task_status`, `report_bad_result`).
+  `solve_recaptcha_v3`, `solve_hcaptcha`, `solve_funcaptcha`,
+  `solve_geetest_v3`, `solve_geetest_v4`, `solve_turnstile` — one per kind,
+  exposed per-provider based on which kinds that facade supports; aux ops
+  named identically on both tiers (`get_balance`, `get_task_status`,
+  `report_bad_result`, `report_good_result`, `abandoned_tasks`).
 
 ### Adapter SDK (ADR-0041)
 
