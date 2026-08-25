@@ -321,8 +321,9 @@ RetryConfig(max_attempts, backoff_base, backoff_cap)
   whole-solve budget (ADR-0024).
 
 - `None` means "unspecified", never a value. Explicit bad values
-  (`total_timeout=0`, `poll_interval=-5`) raise `InvalidConfigError` at config
-  construction; `None` is always valid (ADR-0042).
+  (`total_timeout=0`, `poll_interval=-5`, `backoff_cap < backoff_base`)
+  raise `InvalidConfigError` at config construction; `None` is always
+  valid (ADR-0042).
 - Resolution chain, field-wise (per-call value -> client value -> per-kind
   default table -> generic fallback). A per-call config **inherits** unset
   fields from the client config; it never discards them.

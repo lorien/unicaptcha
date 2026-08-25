@@ -1,7 +1,7 @@
 # ADR-0042: Config validation — InvalidConfigError, fail-fast at construction
 
-**Status:** Accepted (amended by ADR-0052: the argument is the adapters list)
-**Date:** 2026-08-23
+**Status:** Accepted (amended by ADR-0052: the argument is the adapters list; amended 2026-08-24: added the `backoff_cap >= backoff_base` invariant)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -17,6 +17,10 @@ mistakes are the same class of caller bug.
   (`ErrorKind.INVALID_CONFIG`), a leaf under `UnicaptchaError`.
 - `None` is always valid (it means "unspecified", ADR-0043); only explicit
   bad values raise.
+- Per-type invariants: `total_timeout > 0`, `poll_interval > 0`,
+  `max_attempts > 0`, `backoff_base > 0`, `backoff_cap > 0`, and
+  **`backoff_cap >= backoff_base`** (a cap below its own base is a
+  backoff that cannot back off) — all `InvalidConfigError`.
 - Constructed config objects are trustable: per-call overrides can never
   smuggle garbage past construction.
 - Client construction additionally validates composite invariants:

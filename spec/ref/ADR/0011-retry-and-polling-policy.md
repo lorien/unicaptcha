@@ -1,7 +1,7 @@
 # ADR-0011: Retry and polling policy
 
-**Status:** Accepted (amended 2026-08-23: refined retry scope by failure knowledge; full jitter added; aux-op parity settled; rate-limit retryability added per ADR-0059)
-**Date:** 2026-08-22
+**Status:** Accepted (amended 2026-08-23: refined retry scope by failure knowledge; full jitter added; aux-op parity settled; rate-limit retryability added per ADR-0059; amended 2026-08-24: `backoff_cap >= backoff_base` constructor invariant — ADR-0042)
+**Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
 
