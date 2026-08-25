@@ -1,7 +1,23 @@
 """Universal async/sync interface to multiple anti-captcha services."""
 
 from unicaptcha._version import __version__
-from unicaptcha.errors import ErrorKind, InvalidConfigError, UnicaptchaError
+from unicaptcha.errors import (
+    AuthenticationError,
+    ClientClosedError,
+    EmptySolutionError,
+    ErrorKind,
+    InsufficientBalanceError,
+    InvalidChallengeError,
+    InvalidConfigError,
+    NetworkError,
+    NoSolutionError,
+    ProviderError,
+    RateLimitError,
+    ServiceBusyError,
+    TaskTimeoutError,
+    UnicaptchaError,
+    UnsupportedChallengeError,
+)
 from unicaptcha.solution.base import BaseSolution
 from unicaptcha.types import (
     NetworkConfig,
@@ -20,22 +36,34 @@ from unicaptcha.types import (
 )
 
 __all__ = [
+    "AuthenticationError",
     "BaseSolution",
+    "ClientClosedError",
+    "EmptySolutionError",
     "ErrorKind",
+    "InsufficientBalanceError",
+    "InvalidChallengeError",
     "InvalidConfigError",
     "NetworkConfig",
+    "NetworkError",
+    "NoSolutionError",
     "ParsedTask",
+    "ProviderError",
     "Proxy",
     "ProxyKind",
+    "RateLimitError",
     "RetryConfig",
     "SecretStr",
+    "ServiceBusyError",
     "SubmitAccepted",
     "TaskRef",
     "TaskResult",
     "TaskStatus",
     "TaskStatusResult",
     "TaskTicket",
+    "TaskTimeoutError",
     "TimeConfig",
     "UnicaptchaError",
+    "UnsupportedChallengeError",
     "__version__",
 ]
