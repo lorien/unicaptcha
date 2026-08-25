@@ -1,7 +1,7 @@
 # ADR-0066: Challenge call-style — keyword-only fields, positional payload
 
-**Status:** Accepted (amends ADR-0006)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0006; the keyword-only discipline extends to client constructors per ADR-0043's 2026-08-24 amendment — `adapters`/`api_key` positional, the rest keyword-only)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 

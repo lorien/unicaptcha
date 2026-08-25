@@ -1,7 +1,7 @@
 # ADR-0043: Config shape and merge semantics
 
-**Status:** Accepted (amended: `poll_delay` added to TimeConfig per the ADR-0030 amendment; renamed 2026-08-24: `SolveConfig` → `TimeConfig`, `solve=` per-call kwarg → `time=` per the task-centric vocabulary)
-**Date:** 2026-08-23, amendment 2026-08-24
+**Status:** Accepted (amended: `poll_delay` added to TimeConfig per the ADR-0030 amendment; renamed 2026-08-24: `SolveConfig` → `TimeConfig`, `solve=` per-call kwarg → `time=` per the task-centric vocabulary; amended 2026-08-24: client constructors take `adapters` positional and everything else keyword-only — `*` after `adapters`)
+**Date:** 2026-08-23, amendments 2026-08-24
 
 ## Context
 
@@ -42,6 +42,15 @@ table (ADR-0030; adapter-declared for custom kinds, generic fallback)
 fields from the client config. It never discards client-level values —
 the all-or-nothing alternative would silently reset a client's
 `total_timeout` because an unrelated per-call field was set.
+
+**Keyword-only constructor rule** (2026-08-24 amendment): on the client
+constructors (`Solver` / `AsyncSolver` and facades), `adapters` (or
+`api_key` on facades) is the only positional parameter; everything after
+is keyword-only (`name`, `user_agent`, `proxy`,
+`abandoned_registry_limit`, `time`, `retry`, `network`, `network_client`,
+`on_event`). Kills the same-typed-swap hazards between the three configs,
+`network` vs `network_client`, and the identity scalars — mirroring the
+ADR-0066 keyword-only discipline for challenges.
 
 ## Rationale
 

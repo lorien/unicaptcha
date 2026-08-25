@@ -332,11 +332,61 @@ RetryConfig(max_attempts, backoff_base, backoff_cap)
   (ADR-0041).
 - Identity scalars stay flat constructor kwargs: `name`, `user_agent`,
   `abandoned_registry_limit`, `proxy` (default proxy, ADR-0012).
-- Event handler: `on_event` accepted at construction and per call; per-call
-  replaces client-level all-or-nothing (ADR-0044). On sync clients,
+
+### Client constructor (ADR-0043 as amended)
+
+`Solver` / `AsyncSolver` take one positional argument and otherwise
+keyword-only parameters — `adapters` is the only positional; everything
+after `*` must be named (kills the same-typed-swap hazards between the
+three configs, `network` vs `network_client`, and the identity scalars;
+mirrors the ADR-0066 keyword-only discipline for challenges):
+
+```python
+class Solver:
+    def __init__(
+        self,
+        adapters: list[BaseAdapter],               # positional; required, non-empty
+        *,
+        name: str | None = None,
+        user_agent: str | None = None,             # transport User-Agent (ADR-0026)
+        proxy: Proxy | None = None,                # default proxy (ADR-0012)
+        abandoned_registry_limit: int | None = None,  # ADR-0038
+        time: TimeConfig | None = None,
+        retry: RetryConfig | None = None,
+        network: NetworkConfig | None = None,
+        network_client: httpx.Client | None = None,  # mutually exclusive with network= (ADR-0049)
+        on_event: Callable[[TaskEvent], None] | None = None,  # sync tier (ADR-0018/0044)
+    ): ...
+
+class AsyncSolver:
+    def __init__(
+        self,
+        adapters: list[BaseAdapter],
+        *,
+        name: str | None = None,
+        user_agent: str | None = None,
+        proxy: Proxy | None = None,
+        abandoned_registry_limit: int | None = None,
+        time: TimeConfig | None = None,
+        retry: RetryConfig | None = None,
+        network: NetworkConfig | None = None,
+        network_client: httpx.AsyncClient | None = None,
+        on_event: Callable[[TaskEvent], Awaitable[None] | None] | None = None,  # async tier; awaited inline
+    ): ...
+```
+
+- `on_event` typing and attachment: `on_event` accepted at construction
+  and per call; per-call replaces client-level all-or-nothing (ADR-0044).
+  The sync tier types the handler `Callable[[TaskEvent], None]`;
   coroutine-function handlers are rejected at attachment with
-  `InvalidConfigError`; an awaitable returned at runtime logs a WARNING and
-  is discarded. On async clients, awaitable results are awaited inline.
+  `InvalidConfigError`, an awaitable returned at runtime logs a WARNING
+  and is discarded. The async tier types it
+  `Callable[[TaskEvent], Awaitable[None] | None]`; awaitable results are
+  awaited inline. Handler errors propagate raw (ADR-0018).
+- Facade constructors (`TwoCaptchaClient` / `AsyncTwoCaptchaClient`)
+  follow the same rule: `api_key` positional, then `*`, then keyword-only
+  (`base_url`, `referral`, and every client kwarg above except
+  `adapters` — ADR-0061/0063/0072).
 - Facade convenience methods accept `time=`, `retry=`, `on_event=` with
   identical semantics (ADR-0051).
 
