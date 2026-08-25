@@ -1,7 +1,7 @@
 # ADR-0016: Cancellation semantics
 
-**Status:** Accepted (supersedes the original SolveCancelledError design)
-**Date:** 2026-08-22, redesigned 2026-08-23
+**Status:** Accepted (supersedes the original SolveCancelledError design; confirmed as-is 2026-08-24: cancellation semantics reviewed and locked)
+**Date:** 2026-08-22, redesigned 2026-08-23, confirmation 2026-08-24
 
 ## Context
 
