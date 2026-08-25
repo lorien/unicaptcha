@@ -26,7 +26,7 @@ All three operations exist on both tiers:
 - `report_bad_result` and `report_good_result` are uniform methods
   everywhere; adapters enforce the per-provider/per-kind support
   matrix pre-flight for both, raising
-  `UnsupportedCaptchaError` where coverage is missing — client-side,
+  `UnsupportedChallengeError` where coverage is missing — client-side,
   no network traffic (ADR-0057, ADR-0068; probe-by-exception;
   introspection deferred). Good reports feed worker quality routing
   on providers that accept them.

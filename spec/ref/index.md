@@ -50,7 +50,7 @@ supersede.
 | [0026](ADR/0026-user-agent-and-repo-url.md) | User-Agent and repo URL | |
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |
 | [0028](ADR/0028-no-proxy-validation.md) | No proxy validation | |
-| [0029](ADR/0029-unsolvable-captcha-error.md) | UnsolvableCaptchaError | dedicated exception, no auto-resubmit |
+| [0029](ADR/0029-unsolvable-captcha-error.md) | UnsolvableChallengeError | dedicated exception, no auto-resubmit |
 | [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column; draft token-kind rows (2026-08-24) pending review — deferred item 15 |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
 | [0032](ADR/0032-taskstatus-split.md) | TaskStatusResult split from SolveResult | amended: 0050, 0056 |
@@ -78,7 +78,7 @@ supersede.
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | superseded by 0062 |
 | [0055](ADR/0055-adapter-provider-attribute.md) | Adapter `provider` attribute | amends 0037/0041/0052/0053: `kind` renamed `provider` |
 | [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatusResult surface + BaseSolution root | amends 0032/0035: no `SolveResult` embedding, `TaskStatus` enum |
-| [0057](ADR/0057-unsupported-captcha-error-scope.md) | UnsupportedCaptchaError scope | amends 0009/0013/0053: client-side gaps included |
+| [0057](ADR/0057-unsupported-captcha-error-scope.md) | UnsupportedChallengeError scope | amends 0009/0013/0053: client-side gaps included |
 | [0058](ADR/0058-unknown-state-and-solve-poll.md) | UNKNOWN state in adapter contract | 4-state parse_task_status; solve-poll fail-fast; ParsedTask typed per 0075 |
 | [0059](ADR/0059-rate-limit-retry.md) | Rate-limit retry | amends 0011: 429 + provider payloads retryable; ServiceBusyError amendment |
 | [0060](ADR/0060-registry-advisory-and-recovery.md) | Registry advisory + recovery | amends 0033/0038: per-client semantics, workflow |

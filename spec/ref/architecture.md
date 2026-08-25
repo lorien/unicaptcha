@@ -296,21 +296,21 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- NetworkError
 +-- AuthenticationError
 +-- InsufficientBalanceError
-+-- UnsupportedCaptchaError        provider lacks the operation/kind (both sides, ADR-0057)
++-- UnsupportedChallengeError        provider lacks the operation/kind (both sides, ADR-0057)
 +-- InvalidChallengeError          client-side challenge validation
 +-- SolveTimeoutError
 +-- RateLimitError
 +-- ServiceBusyError               provider capacity: no workers free (ADR-0059 amendment)
-+-- UnsolvableCaptchaError
++-- UnsolvableChallengeError
 +-- InvalidConfigError
 +-- ClientClosedError
 +-- ProviderError                  unclassified provider errors
     +-- EmptySolutionError          solved-but-empty payload (ADR-0040 amendment)
 ```
 
-- `ErrorKind` (13 values): NETWORK, AUTH, BALANCE, UNSUPPORTED,
-  INVALID_CHALLENGE, TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE,
-  EMPTY_SOLUTION, CLOSED, INVALID_CONFIG, PROVIDER (ADR-0009; ADR-0059
+- `ErrorKind` (13 values): NETWORK, AUTHENTICATION, INSUFFICIENT_BALANCE, UNSUPPORTED_CHALLENGE,
+  INVALID_CHALLENGE, SOLVE_TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE_CHALLENGE,
+  EMPTY_SOLUTION, CLIENT_CLOSED, INVALID_CONFIG, PROVIDER (ADR-0009; ADR-0059
   and ADR-0040 amendments).
 - No `provider_code` attribute; the message travels via standard Exception
   machinery; `raw_response` preserves the verbatim provider bytes.
@@ -332,7 +332,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> SolveR
     dispatch challenge -> adapter (universal) or direct (facade):
         concrete class -> its adapter (provider= must match if given, else TypeError)
         kind base + provider="name" -> that adapter (TypeError if unknown,
-            UnsupportedCaptchaError if kind unsupported)
+            UnsupportedChallengeError if kind unsupported)
         kind base + provider=None -> uniform random choice among supporting
             adapters (ADR-0064); upcast to concrete class before build_payload
     submit phase:
@@ -351,7 +351,7 @@ solve(challenge, provider=None, solve=None, retry=None, on_event=None) -> SolveR
            counted within total_timeout — ADR-0030 amendment)
          POST getTaskResult every poll_interval
            - transient failures tolerated, bounded by total_timeout
-           - UNSOLVABLE response -> UnsolvableCaptchaError (no auto-resubmit)
+           - UNSOLVABLE response -> UnsolvableChallengeError (no auto-resubmit)
            - UNKNOWN (task not found) -> ProviderError, fail fast (ADR-0058)
            - solved-but-empty payload -> EmptySolutionError (ADR-0040 amendment)
     terminal:
@@ -381,7 +381,7 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusRe
 - `submit` routes exactly like `solve()` (ADR-0064); bounded by the
   retry policy only.
 - `wait`: operation semantics — `SolveResult[T]` typed, raises
-  (`UnsolvableCaptchaError`, UNKNOWN -> `ProviderError` per ADR-0058,
+  (`UnsolvableChallengeError`, UNKNOWN -> `ProviderError` per ADR-0058,
   `SolveTimeoutError`); clock starts at the call, default = per-kind
   `total_timeout` (ADR-0030) via the merge chain. Fast path (ADR-0075):
   a ticket with `instant_answer` set returns immediately — no poll, no delay;
@@ -408,7 +408,7 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusRe
 | `abandoned_tasks()` | snapshot `tuple[TaskRef, ...]` | same |
 
 Report-bad coverage differs per provider and captcha kind; adapters enforce
-the support matrix pre-flight and raise `UnsupportedCaptchaError` where the
+the support matrix pre-flight and raise `UnsupportedChallengeError` where the
 provider lacks coverage (ADR-0057). Balance is pinned to USD `Decimal`
 (ADR-0040).
 

@@ -6,7 +6,7 @@
 ## Context
 
 `get_task_status()` originally inherited exception semantics from
-`solve()`: UNSOLVABLE would raise `UnsolvableCaptchaError`, unknown ids
+`solve()`: UNSOLVABLE would raise `UnsolvableChallengeError`, unknown ids
 would raise `UnknownTaskError` (settled during malformed-response
 mapping). But the method's primary caller is a reclaim loop over the
 abandoned registry — every iteration would need try/except armor for

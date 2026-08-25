@@ -50,7 +50,7 @@ Four facts decide it:
 | `endpoints: ClassVar[Endpoints]` | concrete JSON-family default; complete-set override only (ADR-0073) |
 | `__repr__` / `__str__` | concrete, key masked (ADR-0014) |
 | `build_payload`, `parse_submit_response`, `parse_task_status`, `parse_balance`, `map_provider_error` | abstract — the translation core |
-| `report_bad_supported` / `build_report_bad` / `parse_report_bad` and good twins (`report_good_supported` / `build_report_good` / `parse_report_good`) | default unsupported (`False` / raise `UnsupportedCaptchaError`); shipped adapters override per the support matrix (ADR-0068) |
+| `report_bad_supported` / `build_report_bad` / `parse_report_bad` and good twins (`report_good_supported` / `build_report_good` / `parse_report_good`) | default unsupported (`False` / raise `UnsupportedChallengeError`); shipped adapters override per the support matrix (ADR-0068) |
 | `default_solve_config` | optional; default None |
 
 ## Rationale

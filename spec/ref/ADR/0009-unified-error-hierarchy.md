@@ -1,7 +1,7 @@
 # ADR-0009: Unified error hierarchy
 
-**Status:** Accepted (amended: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added; UnsupportedCaptchaError scope widened by ADR-0057; ServiceBusyError added by ADR-0059 amendment; EmptySolutionError added by ADR-0040 amendment)
-**Date:** 2026-08-22, amendments 2026-08-23
+**Status:** Accepted (amended: SolveCancelledError removed; UnknownTaskError removed; InvalidConfigError and ClientClosedError added; UnsupportedChallengeError scope widened by ADR-0057; ServiceBusyError added by ADR-0059 amendment; EmptySolutionError added by ADR-0040 amendment; renamed 2026-08-24: `UnsupportedCaptchaError` → `UnsupportedChallengeError`, `UnsolvableCaptchaError` → `UnsolvableChallengeError`; ErrorKind values mirror class names — class minus `Error`, SCREAMING_SNAKE — per the 1:1 invariant)
+**Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
 
@@ -20,12 +20,12 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 +-- NetworkError
 +-- AuthenticationError
 +-- InsufficientBalanceError
-+-- UnsupportedCaptchaError        provider lacks the operation/kind (both sides, ADR-0057)
++-- UnsupportedChallengeError        provider lacks the operation/kind (both sides, ADR-0057)
 +-- InvalidChallengeError          client-side challenge validation
 +-- SolveTimeoutError
 +-- RateLimitError
 +-- ServiceBusyError               provider capacity: no workers free (ADR-0059 amendment)
-+-- UnsolvableCaptchaError
++-- UnsolvableChallengeError
 +-- InvalidConfigError
 +-- ClientClosedError
 +-- ProviderError                  unclassified provider errors
@@ -35,14 +35,14 @@ UnicaptchaError                    kind: ErrorKind; raw_response: bytes
 - Base carries `kind: ErrorKind` and `raw_response: bytes` (verbatim body).
   No `provider_code` attribute: adapters normalize semantics into the
   hierarchy; the original bytes are attached for debugging.
-- `ErrorKind` (13 values): NETWORK, AUTH, BALANCE, UNSUPPORTED,
-  INVALID_CHALLENGE, TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE,
-  EMPTY_SOLUTION, CLOSED, INVALID_CONFIG, PROVIDER. First nested leaf:
+- `ErrorKind` (13 values): NETWORK, AUTHENTICATION, INSUFFICIENT_BALANCE, UNSUPPORTED_CHALLENGE,
+  INVALID_CHALLENGE, SOLVE_TIMEOUT, RATE_LIMIT, SERVICE_BUSY, UNSOLVABLE_CHALLENGE,
+  EMPTY_SOLUTION, CLIENT_CLOSED, INVALID_CONFIG, PROVIDER. First nested leaf:
   `EmptySolutionError` under `ProviderError` (ADR-0040 amendment).
 - Message travels via standard `Exception` machinery.
 - Every wrapped cause uses `raise ... from cause`; event-handler exceptions
   propagate raw (ADR-0018).
-- `UnsupportedCaptchaError` covers server-side task-type rejections
+- `UnsupportedChallengeError` covers server-side task-type rejections
   (task type unavailable on plan/account, provider dropped support)
   **and** client-side pre-flight coverage gaps such as the report-bad
   support matrix (ADR-0057); wrong-provider arguments are `TypeError`

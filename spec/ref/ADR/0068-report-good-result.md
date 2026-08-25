@@ -22,7 +22,7 @@ worker quality routing (2Captcha docs).
   `TaskRef`; facades take `TaskRef | int` (implicit provider).
 - Returns **`bool`** — provider accepted the report or not (symmetric
   with `parse_report_*`; zero cost for callers who ignore it).
-- Unsupported coverage raises `UnsupportedCaptchaError` pre-flight,
+- Unsupported coverage raises `UnsupportedChallengeError` pre-flight,
   no network traffic (ADR-0057's both-sides scope applies unchanged);
   wrong provider -> pre-flight `TypeError` (ADR-0045); same aux retry
   policy as submission (ADR-0011).
@@ -37,7 +37,7 @@ worker quality routing (2Captcha docs).
 | `parse_report_bad(raw) -> bool` | `parse_report_good(raw) -> bool` |
 
   Defaults: `*_supported -> False`; build/parse raise
-  `UnsupportedCaptchaError`. Shipped adapters override per the real
+  `UnsupportedChallengeError`. Shipped adapters override per the real
   per-provider/per-kind matrix.
 - **Naming**: `report_good_result` — adjective-first, the consistent
   twin of `report_bad_result`.

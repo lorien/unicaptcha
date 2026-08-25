@@ -1,11 +1,11 @@
-# ADR-0057: UnsupportedCaptchaError — client-side coverage gaps included
+# ADR-0057: UnsupportedChallengeError — client-side coverage gaps included
 
-**Status:** Accepted (amends ADR-0009, ADR-0013, ADR-0053)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0009, ADR-0013, ADR-0053; renamed 2026-08-24: `UnsupportedCaptchaError` → `UnsupportedChallengeError`, `ErrorKind.UNSUPPORTED` → `UNSUPPORTED_CHALLENGE` — pairs with `InvalidChallengeError` in the challenge-side error family)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
-ADR-0009 scoped `UnsupportedCaptchaError` to **server-side** task-type
+ADR-0009 scoped `UnsupportedChallengeError` to **server-side** task-type
 rejection "only". But three settled mechanisms raise it client-side,
 pre-flight, without any network traffic:
 
@@ -25,7 +25,7 @@ does not extend to *operation* gaps: report-bad coverage is per
 
 ## Decision
 
-`UnsupportedCaptchaError` means: **the provider does not support this
+`UnsupportedChallengeError` means: **the provider does not support this
 operation for this captcha kind.** Both sources raise it:
 
 - **server-side**: provider rejects a submitted task type (plan,
@@ -50,7 +50,7 @@ ADR-0050).
 
 ## Alternatives considered
 
-- **Split classes** (`UnsupportedCaptchaError` +
+- **Split classes** (`UnsupportedChallengeError` +
   `ReportNotSupportedError`): rejected; two leaves for one meaning,
   catch complexity for nothing.
 - **`NotImplementedError`**: rejected; a builtin reserved for

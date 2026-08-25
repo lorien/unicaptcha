@@ -52,9 +52,9 @@ ADR-0051/0061):
 - **Kind-base challenge, `provider="capmonster"`**: that adapter.
   Unknown provider string -> pre-flight `TypeError` (ADR-0045
   discriminator treatment). Registered adapter that does not support
-  the kind -> pre-flight `UnsupportedCaptchaError` (ADR-0057
+  the kind -> pre-flight `UnsupportedChallengeError` (ADR-0057
   client-side scope). No supporting adapter at all ->
-  `UnsupportedCaptchaError`.
+  `UnsupportedChallengeError`.
 - **Concrete challenge, matching `provider=`**: allowed; redundant,
   ignored.
 - **Concrete challenge, contradicting `provider=`**: pre-flight
