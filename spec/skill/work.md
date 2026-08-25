@@ -14,7 +14,8 @@ Do not do github commit and do not create report file if you have not worked on 
 
 ## Task Done Check List
 
-1. Ensure code is clean and correctly formatted
+1. Run the test suite and checks described in `spec/ref/testing.md`,
+   and fix anything they surface.
 2. Ensure the security credentials are not hard-coded
 
 ## Report

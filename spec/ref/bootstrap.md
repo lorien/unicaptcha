@@ -41,19 +41,9 @@ Note: `uv.lock` is intentionally **not committed** (stays gitignored).
 
 ## Development loop
 
-All checks run through `uv run`:
-
-```
-uv run ruff check .
-uv run ruff format --check .
-uv run mypy unicaptcha          # strict mode ([tool.mypy] strict = true)
-uv run pyright                  # strict type checking ([tool.pyright] typeCheckingMode = "strict")
-uv run pytest                   # tests; integration tests deselected by default
-uv run slotscheck unicaptcha
-```
-
-Mypy and pyright both run in strict mode, enforced by `pyproject.toml`
-configuration; the plain `uv run` invocations pick it up automatically.
+All checks (lint, formatting, type checking, tests, slotscheck) run through
+`uv run`; the commands and acceptance criteria live in
+[testing.md](testing.md).
 
 ## Scope
 
