@@ -45,7 +45,7 @@ The engine's per-kind default table:
 
 - All values overridable at client level and per call via the None-merge
   chain (ADR-0043).
-- The table is extended by custom adapters' `default_solve_config`
+- The table is extended by custom adapters' `default_task_config`
   declarations with a generic fallback for adapters that declare none
   (ADR-0041).
 - Kinds not in the table and not declared by the adapter receive the

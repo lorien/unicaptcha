@@ -1,6 +1,6 @@
 # ADR-0053: Adapter contract enforcement — ABC
 
-**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042; `api_key` union per ADR-0063; report methods become bad/good pairs per ADR-0068; `referral` kwarg per ADR-0072; `endpoints` declaration per ADR-0073; `parse_submit_response` returns `SubmitAccepted` per ADR-0075; renamed 2026-08-24: `parse_task_result` → `parse_task_status`)
+**Status:** Accepted (settles the question left open by ADR-0052; amends ADR-0041, ADR-0042; `api_key` union per ADR-0063; report methods become bad/good pairs per ADR-0068; `referral` kwarg per ADR-0072; `endpoints` declaration per ADR-0073; `parse_submit_response` returns `SubmitAccepted` per ADR-0075; renamed 2026-08-24: `parse_task_result` → `parse_task_status`, `default_solve_config` → `default_task_config` per the task-centric vocabulary)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
@@ -51,7 +51,7 @@ Four facts decide it:
 | `__repr__` / `__str__` | concrete, key masked (ADR-0014) |
 | `build_payload`, `parse_submit_response`, `parse_task_status`, `parse_balance`, `map_provider_error` | abstract — the translation core |
 | `report_bad_supported` / `build_report_bad` / `parse_report_bad` and good twins (`report_good_supported` / `build_report_good` / `parse_report_good`) | default unsupported (`False` / raise `UnsupportedChallengeError`); shipped adapters override per the support matrix (ADR-0068) |
-| `default_solve_config` | optional; default None |
+| `default_task_config` | optional; default None |
 
 ## Rationale
 

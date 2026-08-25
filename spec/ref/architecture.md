@@ -648,7 +648,7 @@ unicaptcha/
 class MyServiceAdapter(BaseAdapter):
     provider: ClassVar[str] = "myservice"
     challenges: ClassVar[frozenset[type[BaseChallenge]]]
-    default_solve_config: ClassVar[...]        # per-kind timing defaults; optional
+    default_task_config: ClassVar[...]        # per-kind timing defaults; optional
     endpoints: ClassVar[Endpoints]             # JSON-family default; all-or-nothing
                                                # override (ADR-0073): submit,
                                                # get_task_status, get_balance,
