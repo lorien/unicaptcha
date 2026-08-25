@@ -1,11 +1,11 @@
-# ADR-0049: HTTP config and injected client are mutually exclusive
+# ADR-0049: Network config and injected client are mutually exclusive
 
-**Status:** Accepted
-**Date:** 2026-08-23
+**Status:** Accepted (renamed 2026-08-24: `HttpClientConfig` → `NetworkConfig`, kwargs `http=`/`http_client=` → `network=`/`network_client=` per the network-knobs scope, ADR-0024)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
-Callers can pass `http=HttpClientConfig(...)` (how to build) and/or an
+Callers can pass `network=NetworkConfig(...)` (how to build) and/or an
 injected httpx client (already built). Applying config onto an injected
 client means mutating a caller-owned object (forbidden by the ownership
 rule) or partially applying settings (false-expectation factory).
@@ -13,7 +13,7 @@ rule) or partially applying settings (false-expectation factory).
 ## Decision
 
 - Passing **both** raises `InvalidConfigError` at client construction:
-  "pass either `http` config or `http_client`, not both."
+  "pass either `network` config or `network_client`, not both."
 - Library-built path: config (or defaults) -> we construct, own, and
   close.
 - Injected path: caller-owned; never closed by us, never mutated —

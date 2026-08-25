@@ -19,7 +19,7 @@ Granular submit/solve split is deferred (deferred.md item 10).
 - Configurable at client level (`TimeConfig`) and per call; resolution via
   the None-merge chain (ADR-0043); concrete defaults per challenge kind in
   the engine's default table (ADR-0030).
-- **Per-request HTTP timeout**: separate `HttpClientConfig.timeout` (default
+- **Per-request HTTP timeout**: separate `NetworkConfig.timeout` (default
   20 s), independent of the solve budget.
 - Async enforcement: the engine runs the solve inside `asyncio.timeout()`;
   the resulting `TimeoutError` is converted to `TaskTimeoutError` at our

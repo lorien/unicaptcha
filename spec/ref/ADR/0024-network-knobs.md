@@ -1,7 +1,7 @@
 # ADR-0024: Network knobs
 
-**Status:** Accepted (amended 2026-08-23: TLS omitted → injection-only; HTTP/2 rejected; per-request User-Agent refined in ADR-0049's amendment note; per-stage timeout semantics pinned, name kept)
-**Date:** 2026-08-22
+**Status:** Accepted (amended 2026-08-23: TLS omitted → injection-only; HTTP/2 rejected; per-request User-Agent refined in ADR-0049's amendment note; per-stage timeout semantics pinned, name kept; renamed 2026-08-24: `HttpClientConfig` → `NetworkConfig` — the config matches this ADR's "network knobs" scope; kwargs `http=`/`http_client=` → `network=`/`network_client=`)
+**Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
 
@@ -12,7 +12,7 @@ httpx clients. Each knob costs config surface and documentation.
 
 ## Decision
 
-Exposed on the library (via `HttpClientConfig` or constructor):
+Exposed on the library (via `NetworkConfig` or constructor):
 
 1. **Per-request HTTP timeout** (`timeout`, default 20 s) — independent of
    the solve budget. Semantics: the float is passed as
@@ -29,12 +29,12 @@ Exposed on the library (via `HttpClientConfig` or constructor):
 4. **Injectable httpx client** — the escape hatch subsuming exotic needs
    (custom transports, TLS contexts, event hooks). Ownership: injected
    clients are caller-owned, never closed by us, never mutated.
-   Mutually exclusive with `HttpClientConfig` (ADR-0049).
+   Mutually exclusive with `NetworkConfig` (ADR-0049).
 
 Not exposed:
 
 - **TLS knobs** (`verify`, `cert`): custom TLS means constructing your own
-  httpx client and injecting it. `HttpClientConfig` stays behavior-only;
+  httpx client and injecting it. `NetworkConfig` stays behavior-only;
   no officially supported `verify=False` footgun.
 - **HTTP/2**: no `httpx[http2]` dependency; poll-based JSON APIs gain
   nothing measurable from it.
@@ -53,7 +53,7 @@ Overridable via constructor flat kwarg.
 
 ## Alternatives considered
 
-- **`verify`/`cert` passthrough in HttpClientConfig**: rejected; one-flag
+- **`verify`/`cert` passthrough in NetworkConfig**: rejected; one-flag
   insecure mode officially offered, config noise for a corporate-only
   case the injection hatch already serves.
 - **HTTP/2 extra**: rejected; negligible gain for poll-based traffic.

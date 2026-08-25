@@ -31,7 +31,7 @@ Solver (registry + dispatch)           TwoCaptchaClient (facade)
 - The facade creates its adapter and the engine directly; no universal
   client appears in its object graph.
 - Resource sharing happens at the **HTTP layer**: `TwoCaptchaClient(...,
-  http_client=my_http)` and `Solver(..., http_client=my_http)`
+  network_client=my_http)` and `Solver(..., network_client=my_http)`
   inject the same object at the layer where the resource actually lives.
 - Facade method surface: `solve_image`, `solve_text`, `solve_recaptcha_v2`,
   `solve_recaptcha_v3`, `solve_hcaptcha`, plus aux ops with identical names

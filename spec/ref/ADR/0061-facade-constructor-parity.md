@@ -24,7 +24,7 @@ TwoCaptchaClient(
     base_url: str | None = None,    # overrides default_base_url (RuCaptcha mirrors)
     referral: bool | str = True,    # affiliate id: True=project's, False=off, str=own (ADR-0072)
     # client kwargs, identical names/defaults/validation as Solver:
-    name=..., time=..., retry=..., http=..., http_client=...,
+    name=..., time=..., retry=..., network=..., network_client=...,
     on_event=..., abandoned_registry_limit=..., proxy=...,
 )
 ```
@@ -32,7 +32,7 @@ TwoCaptchaClient(
 - `base_url=None` resolves to the adapter's `default_base_url`
   (ADR-0053) — 2Captcha-protocol mirrors change one argument.
 - All validation rules apply unchanged: config mutual exclusion
-  (`http` vs `http_client`, ADR-0049), config construction checks
+  (`network` vs `network_client`, ADR-0049), config construction checks
   (ADR-0042), event-handler attachment rules (ADR-0044).
 - `adapters=` is absent by construction: the facade's provider is
   static (ADR-0007); passing one is not an option to forget.
@@ -55,8 +55,8 @@ TwoCaptchaClient(
   and re-exposing the registry question the facade exists to hide.
   (An adapter-typed escape hatch can be added later if demanded.)
 - **Facades take only `api_key`/`base_url`**: rejected; no path to
-  shared `http_client` pools (ADR-0007's own sharing story) or any
+  shared `network_client` pools (ADR-0007's own sharing story) or any
   tuning.
-- **`base_url` on `HttpClientConfig`**: rejected; it is provider
+- **`base_url` on `NetworkConfig`**: rejected; it is provider
   identity, not transport tuning — wrong home, and mirrors the
   per-provider default table (README).

@@ -48,11 +48,11 @@ it states *what is* per the settled decisions; ADRs state *why*.
 
 ### Ownership rules
 
-- HTTP layer constructed by the library (from `HttpClientConfig` or defaults):
+- HTTP layer constructed by the library (from `NetworkConfig` or defaults):
   library owns it; `close()` closes it.
 - HTTP layer injected by the caller (httpx client instance): caller retains
   ownership; our `close()` never closes it.
-- Passing both `http=HttpClientConfig(...)` and an injected httpx client is
+- Passing both `network=NetworkConfig(...)` and an injected httpx client is
   rejected with `InvalidConfigError` (ADR-0049).
 
 ### Provider identification
@@ -310,12 +310,12 @@ class SecretStr:
 Three frozen, all-fields-None-able config types (ADR-0043):
 
 ```python
-HttpClientConfig(timeout, max_connections, max_keepalive_connections)
+NetworkConfig(timeout, max_connections, max_keepalive_connections)
 TimeConfig(total_timeout, poll_interval, poll_delay)
 RetryConfig(max_attempts, backoff_base, backoff_cap)
 ```
 
-- `HttpClientConfig.timeout` is per-request: the float maps to
+- `NetworkConfig.timeout` is per-request: the float maps to
   `httpx.Timeout(timeout)`, limiting each stage (connect, read, write,
   pool) independently — distinct from `TimeConfig.total_timeout`, the
   whole-solve budget (ADR-0024).

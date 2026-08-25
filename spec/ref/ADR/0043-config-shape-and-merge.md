@@ -18,7 +18,7 @@ scalars stay flat constructor kwargs (`name`, `user_agent`,
 `abandoned_registry_limit`):
 
 ```python
-HttpClientConfig(timeout, max_connections, max_keepalive_connections)
+NetworkConfig(timeout, max_connections, max_keepalive_connections)
 TimeConfig(total_timeout, poll_interval, poll_delay)
 RetryConfig(max_attempts, backoff_base, backoff_cap)
 ```
