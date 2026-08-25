@@ -1,7 +1,7 @@
 # ADR-0030: Numeric defaults
 
-**Status:** Accepted (amended: table gains FunCaptcha / GeeTest v3 / GeeTest v4 rows per ADR-0070 — values at implementation, GeeTest/FunCaptcha class near reCAPTCHA cadence; `poll_delay` initial-wait column added; amended 2026-08-24: draft rows pinned for FunCaptcha / GeeTest v3/v4 / Turnstile from vendor-observed data (ADR-0074 session); pending thorough review — deferred item 18)
-**Date:** 2026-08-23
+**Status:** Accepted (amended: table gains FunCaptcha / GeeTest v3 / GeeTest v4 rows per ADR-0070 — values at implementation, GeeTest/FunCaptcha class near reCAPTCHA cadence; `poll_delay` initial-wait column added; amended 2026-08-24: draft rows pinned for FunCaptcha / GeeTest v3/v4 / Turnstile from vendor-observed data (ADR-0074 session), pending thorough review — deferred item 15; ratified 2026-08-25: final token-kind rows and the source-hierarchy methodology settled, closing deferred item 15)
+**Date:** 2026-08-23, ratification 2026-08-25
 
 ## Context
 
@@ -13,14 +13,14 @@ tasks take far longer than image/text tasks).
 
 The engine's per-kind default table:
 
-| Parameter | reCAPTCHA v2/v3, hCaptcha | image / text |
-|---|---|---|
-| poll delay (before first poll) | 15 s | 5 s |
-| poll interval | 5 s | 2 s |
-| total_timeout (default) | 120 s | 30 s |
-| per-request HTTP timeout | 20 s | 20 s |
-| submit retry attempts (total) | 3 | 3 |
-| backoff | full jitter, base 1 s, cap 30 s | same |
+| Parameter | reCAPTCHA v2/v3, hCaptcha | image / text | FunCaptcha, GeeTest v3/v4 | Turnstile |
+|---|---|---|---|---|
+| poll delay (before first poll) | 15 s | 5 s | 10 s | 5 s |
+| poll interval | 5 s | 2 s | 3 s | 3 s |
+| total_timeout (default) | 120 s | 30 s | 180 s | 120 s |
+| per-request HTTP timeout | 20 s | 20 s | 20 s | 20 s |
+| submit retry attempts (total) | 3 | 3 | 3 | 3 |
+| backoff | full jitter, base 1 s, cap 30 s | same | same | same |
 
 - **`poll_delay`** (amendment, from second-pass competitive analysis):
   the initial wait after submission before the first `getTaskResult`
@@ -31,16 +31,25 @@ The engine's per-kind default table:
   tickets poll immediately); never in `wait_ref`/`get_task_status`
   (reconstruction assumes the task may be mature). Counted within
   `total_timeout`.
-- **Draft token-kind rows** (amendment, 2026-08-24): FunCaptcha,
-  GeeTest v3/v4, and Turnstile (ADR-0074) pin draft values —
-  FunCaptcha 10/3/120, GeeTest v3/v4 10/3/120, Turnstile 5/3/120
-  (delay/interval/total). Sources conflict — CapMonster's official SDK
-  tunes all three to 1 s delay / 1 s interval / 80 s total, while
-  Anti-Captcha's official budgets run 300-600 s for the same kinds;
-  universal wrappers (unicaps/anycaptcha) carry no data for them.
-  Drafts take the defensible middle under our delay philosophy
-  (first-useful-poll) and uniform 120 s caller budget; **marked
-  draft + pending thorough review (deferred item 18)**.
+- **Token-kind rows** (ratified 2026-08-25, closes deferred item 15):
+  FunCaptcha 10/3/180, GeeTest v3/v4 10/3/180, Turnstile 5/3/120
+  (delay/interval/total). Each knob follows the same source hierarchy as
+  the original kinds:
+  - **poll_delay** — first-useful-poll from competitor operational data:
+    FunCaptcha/GeeTest typically solve in 10-30 s, Turnstile faster; the
+    10/10/5 s drafts are kept.
+  - **poll_interval** — provider-safe cadence: all four providers poll at
+    1 s internally (CapMonster / Anti-Captcha / Capsolver SDKs); 2captcha
+    legacy warns against <5 s; 3 s is the responsive, safe middle.
+  - **total_timeout** — provider guidance *for the kind*, not
+    universal-lib defaults: Anti-Captcha documents 300 s (Turnstile) and
+    600 s (FunCaptcha/GeeTest) budgets; CapMonster tunes all three to
+    80 s (its own-infra artifact, not a safe cross-provider default);
+    universal wrappers (unicaps/anycaptcha) carry no per-kind data and
+    fall back to 180-300 s. Final values take the defensible middle:
+    180 s for FunCaptcha/GeeTest (Anti-Captcha documents up-to-10-minute
+    solves; 120 s would false-timeout the slow tail) and 120 s for
+    Turnstile (reCAPTCHA-class parity; typically fast).
 - Generic fallback gains `poll_delay` ~10 s.
 
 - All values overridable at client level and per call via the None-merge
