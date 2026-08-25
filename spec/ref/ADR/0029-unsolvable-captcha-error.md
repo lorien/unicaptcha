@@ -1,11 +1,11 @@
 # ADR-0029: NoSolutionError, no auto-resubmit
 
-**Status:** Accepted (renamed 2026-08-24: class `UnsolvableCaptchaError` → `UnsolvableChallengeError` → `NoSolutionError`, `ErrorKind.UNSOLVABLE` → `UNSOLVABLE_CHALLENGE` → `NO_SOLUTION`; status-enum member `TaskStatus.UNSOLVABLE` → `TaskStatus.NO_SOLUTION` — one word `NO_SOLUTION` for the outcome across both status and error enums, paired with `EmptySolutionError` rather than the call-shape Challenge family)
-**Date:** 2026-08-23, amendment 2026-08-24
+**Status:** Accepted (renamed 2026-08-24: class `UnsolvableCaptchaError` → `UnsolvableChallengeError` → `NoSolutionError`, `ErrorKind.UNSOLVABLE` → `UNSOLVABLE_CHALLENGE` → `NO_SOLUTION`; status-enum member `TaskStatus.UNSOLVABLE` → `TaskStatus.NO_SOLUTION` — one word `NO_SOLUTION` for the outcome across both status and error enums, paired with `EmptySolutionError` rather than the call-shape Challenge family; amended 2026-08-24: provider count three → four per ADR-0071)
+**Date:** 2026-08-23, amendments 2026-08-24
 
 ## Context
 
-All three services can answer "workers could not solve this"
+All four services can answer "workers could not solve this"
 (`ERROR_CAPTCHA_UNSOLVABLE` and equivalents). This is a common, distinct
 terminal outcome — not a generic provider error — and callers often want to
 retry with a fresh task. The library could resubmit automatically.

@@ -1,7 +1,7 @@
 # ADR-0052: Adapter naming — `adapters=` argument, `<Provider>Adapter` classes
 
-**Status:** Accepted (amends ADR-0005, ADR-0036, ADR-0041, ADR-0042; corrects ADR-0014 example)
-**Date:** 2026-08-23
+**Status:** Accepted (amends ADR-0005, ADR-0036, ADR-0041, ADR-0042; corrects ADR-0014 example; amended 2026-08-24: shipped-adapter list adds `CapsolverAdapter` per ADR-0071)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -25,7 +25,8 @@ leaving bare **Adapter** as the term.
 - Constructor kwarg: `adapters=[TwoCaptchaAdapter(...), MyServiceAdapter(...)]`
   on `Solver` / `AsyncSolver`.
 - Class naming: shipped adapters are `<Provider>Adapter`
-  (`TwoCaptchaAdapter`, `AntiCaptchaAdapter`, `CapMonsterAdapter`);
+  (`TwoCaptchaAdapter`, `AntiCaptchaAdapter`, `CapMonsterAdapter`,
+  `CapsolverAdapter` — ADR-0071);
   third-party convention `<Name>Adapter` — parallel to `<Provider>Client`
   (ADR-0036) and `<Provider><Kind>Challenge`. The base contract class is
   `BaseAdapter`, symmetric with `BaseChallenge`.
