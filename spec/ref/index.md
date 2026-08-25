@@ -64,7 +64,7 @@ supersede.
 | [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | amended: currency note; EmptySolutionError; required fields |
 | [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052, 0053 |
 | [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
-| [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge; amended: poll_delay |
+| [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge; amended: poll_delay; TimeConfig ratified 2026-08-25 — closes deferred 19 |
 | [0044](ADR/0044-event-attachment-and-parity.md) | Event handler attachment | constructor + per-call |
 | [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | amended: 0064; TaskTicket per 0067 |
 | [0046](ADR/0046-version-single-source-and-reference-adapter.md) | Version single source + reference adapter | |

@@ -1,7 +1,7 @@
 # ADR-0043: Config shape and merge semantics
 
-**Status:** Accepted (amended: `poll_delay` added to TimeConfig per the ADR-0030 amendment; renamed 2026-08-24: `SolveConfig` → `TimeConfig`, `solve=` per-call kwarg → `time=` per the task-centric vocabulary; amended 2026-08-24: client constructors take `adapters` positional and everything else keyword-only — `*` after `adapters`)
-**Date:** 2026-08-23, amendments 2026-08-24
+**Status:** Accepted (amended: `poll_delay` added to TimeConfig per the ADR-0030 amendment; renamed 2026-08-24: `SolveConfig` → `TimeConfig`, `solve=` per-call kwarg → `time=` per the task-centric vocabulary; amended 2026-08-24: client constructors take `adapters` positional and everything else keyword-only — `*` after `adapters`; confirmed as-is 2026-08-25: `TimeConfig` name ratified, closing deferred item 19 — boundary vs `RetryConfig` clarified: TimeConfig is the solve-timeline config, RetryConfig is the retry strategy, `total_timeout` is the outer budget that contains retry time)
+**Date:** 2026-08-23, amendments 2026-08-24, confirmation 2026-08-25
 
 ## Context
 
@@ -25,6 +25,19 @@ RetryConfig(max_attempts, backoff_base, backoff_cap)
 
 Accepted at client construction and per call (`solve(challenge, time=...,
 retry=...)`), identical on facades (ADR-0051).
+
+**TimeConfig vs RetryConfig boundary** (confirmation 2026-08-25, closes
+deferred item 19) — the two types both hold durations but have disjoint
+responsibilities:
+
+- `TimeConfig` is the **solve-timeline** config: when polling starts
+  (`poll_delay`), how often (`poll_interval`), and the outer wall-clock
+  budget (`total_timeout`, which contains submit attempts + backoff +
+  polling per ADR-0010).
+- `RetryConfig` is the **retry strategy**: how many attempts
+  (`max_attempts`) and the backoff shape (`backoff_base`/`backoff_cap`).
+- The budget bounds; the strategy shapes what happens within it. No field
+  is shared between the two types; the overlap is conceptual only.
 
 **None-rule** — every field in all three types is `X | None = None`.
 `None` means "unspecified": not a value, an absence to be filled later.

@@ -315,6 +315,13 @@ TimeConfig(total_timeout, poll_interval, poll_delay)
 RetryConfig(max_attempts, backoff_base, backoff_cap)
 ```
 
+- Config responsibilities are disjoint though durations appear in both
+  `TimeConfig` and `RetryConfig` (ADR-0043 as ratified 2026-08-25):
+  `TimeConfig` is the solve-timeline config (budget + poll cadence),
+  `RetryConfig` is the retry strategy (count + backoff). `total_timeout`
+  is the outer wall-clock budget that contains retry time; the strategy
+  shapes the attempts within it.
+
 - `NetworkConfig.timeout` is per-request: the float maps to
   `httpx.Timeout(timeout)`, limiting each stage (connect, read, write,
   pool) independently — distinct from `TimeConfig.total_timeout`, the
