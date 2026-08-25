@@ -12,7 +12,7 @@ client able to reclaim after its own close must be a *new* client —
 whose `get_task_status` cannot touch the closed client's registry.
 The cleanup promise is unimplementable across the very workflow that
 motivates it: reclaimed tasks stay listed in the dead client's
-`abandoned_tasks()` forever (bounded, but misleading).
+`get_abandoned_tasks()` forever (bounded, but misleading).
 
 Second, the recovery workflow itself was only implicit — assembled
 from ADR-0033 (close semantics), ADR-0038 (registry survives close),
@@ -30,7 +30,7 @@ in one place.
   promise) is kept: a `get_task_status` reaching a terminal state
   removes the entry *from that same client's registry*.
 - **Documented recovery workflow**:
-  1. `abandoned_tasks()` on the closed (or live) client — snapshot of
+  1. `get_abandoned_tasks()` on the closed (or live) client — snapshot of
      TaskRefs (survives close, ADR-0038);
   2. construct a new client (optionally) registering the same
      adapters; TaskRefs route by provider string (ADR-0045), no
@@ -62,6 +62,6 @@ in one place.
 - **Remove the cross-client cleanup claim only, keep wording
   ambiguous**: rejected; half-fixed contradictions resurface as bugs
   and bug reports.
-- **Registry handoff on close (`new_client.adopt(old.abandoned_tasks())`)**:
+- **Registry handoff on close (`new_client.adopt(old.get_abandoned_tasks())`)**:
   rejected; explicit but adds API surface for what TaskRef
   persistence + the documented workflow already achieve.

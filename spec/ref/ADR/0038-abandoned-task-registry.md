@@ -15,7 +15,7 @@ workers.
 - **Type**: registry entries are `TaskRef`s (public type, ADR-0045) with
   abandoned-at metadata available from the registry view. Routing info
   travels with the id.
-- **Storage**: thread-safe append-only; `abandoned_tasks()` returns a
+- **Storage**: thread-safe append-only; `get_abandoned_tasks()` returns a
   snapshot `tuple`, never a live list.
 - **Bounded**: default cap 1000 entries; when full, oldest entries are
   evicted with one WARNING log per eviction; cap configurable client-side
@@ -29,7 +29,7 @@ workers.
   cannot clean a closed client's registry.
 - **Registry survives close** (supersedes an earlier "cleared on close" --
   clearing would erase exactly the tasks close-orphaning creates).
-  `abandoned_tasks()` remains readable on a closed client.
+  `get_abandoned_tasks()` remains readable on a closed client.
 - **No automatic reclaim**: the caller drives `get_task_status`
   explicitly.
 - Sync and async clients each carry their own registry (separate

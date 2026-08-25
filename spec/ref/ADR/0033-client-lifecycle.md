@@ -43,7 +43,7 @@ watches.
 **Registry interaction.**
 
 - The abandoned-task registry **survives close** (supersedes an earlier
-  "cleared on close"): `abandoned_tasks()` remains readable afterward;
+  "cleared on close"): `get_abandoned_tasks()` remains readable afterward;
   entries are removed only by terminal-state reclaim (ADR-0038). This
   gives close-then-reclaim a working story for tasks that may already be
   billed.

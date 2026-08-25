@@ -504,9 +504,9 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusRe
 |---|---|---|
 | `get_balance(provider)` | provider discriminator: instance / class / provider string; returns `Decimal` USD | implicit provider |
 | `get_task_status(task)` | `TaskRef` | `int \| TaskRef` |
-| `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` |
+| `report_bad_result(task)` | `TaskRef` | `TaskRef \| int` (returns bool, symmetric with report_good_result) |
 | `report_good_result(task)` | `TaskRef` | `TaskRef \| int` (ADR-0068; returns bool, feeds worker quality routing where supported) |
-| `abandoned_tasks()` | snapshot `tuple[TaskRef, ...]` | same |
+| `get_abandoned_tasks()` | snapshot `tuple[TaskRef, ...]` | same |
 
 Report-bad coverage differs per provider and captcha kind; adapters enforce
 the support matrix pre-flight and raise `UnsupportedChallengeError` where the
@@ -535,13 +535,13 @@ provider lacks coverage (ADR-0057). Balance is pinned to USD `Decimal`
   registry.
 - Async close: cancels in-flight tasks (clean CancelledError propagation),
   then closes connections.
-- The abandoned-task registry **survives** close; `abandoned_tasks()` remains
+- The abandoned-task registry **survives** close; `get_abandoned_tasks()` remains
   readable afterward (ADR-0038).
 
 ### Abandoned-task registry (ADR-0038)
 
 - Typed entries (TaskRef + abandoned-at metadata); thread-safe append-only
-  storage; `abandoned_tasks()` returns a snapshot tuple, never a live list.
+  storage; `get_abandoned_tasks()` returns a snapshot tuple, never a live list.
 - Bounded: default cap 1000, one WARNING log per eviction, cap configurable
   client-side (`abandoned_registry_limit`), `None` = unbounded.
 - Per-client, best-effort, **advisory** (ADR-0060): entries removed when a
@@ -549,7 +549,7 @@ provider lacks coverage (ADR-0057). Balance is pinned to USD `Decimal`
   (survives close); cross-client reclaim leaves stale entries (harmless,
   bounded).
 - No automatic reclaim loop; the caller drives reclamation:
-  snapshot `abandoned_tasks()` -> new client with the same adapters ->
+  snapshot `get_abandoned_tasks()` -> new client with the same adapters ->
   `get_task_status(ref)` per entry -> terminal states are answers
   (ADR-0050, ADR-0056); persist TaskRefs to survive restarts.
 
@@ -636,7 +636,7 @@ unicaptcha/
   `solve_geetest_v3`, `solve_geetest_v4`, `solve_turnstile` — one per kind,
   exposed per-provider based on which kinds that facade supports; aux ops
   named identically on both tiers (`get_balance`, `get_task_status`,
-  `report_bad_result`, `report_good_result`, `abandoned_tasks`).
+  `report_bad_result`, `report_good_result`, `get_abandoned_tasks`).
 
 ### Adapter SDK (ADR-0041)
 

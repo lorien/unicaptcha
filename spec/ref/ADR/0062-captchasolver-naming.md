@@ -53,7 +53,7 @@ collision risk) and `CaptchaSolver` (job + domain).
   classes cannot be confused at a skim, where prefix/suffix pairs can.
 - Consistent with the session's naming taste: specific over generic
   (`adapters=`, `provider` attribute, rejection of bare `Client`).
-- Known costs, accepted: aux ops (`get_balance`, `abandoned_tasks`,
+- Known costs, accepted: aux ops (`get_balance`, `get_abandoned_tasks`,
   `close`) strain "solver" mildly; providers self-market as "captcha
   solvers" (tolerable — nothing in-code shares the name; from the
   caller's chair the object does exactly this).
