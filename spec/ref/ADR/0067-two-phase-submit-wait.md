@@ -94,11 +94,11 @@ per-kind method explosion; the challenge carries the kind.
 
 ### Behavioral pins
 
-- **Events** (amends ADR-0018 invariant): `submitted` fires at
-  submit; `solved` / `failed` fire at wait's terminal state; tasks
-  never waited are eventless forever (mirroring cancellation's
-  eventlessness). Invariant reworded: "every *waited* solve ends in
-  exactly one of `solved` or `failed`."
+- **Events** (amends ADR-0018 invariant): `SUBMIT_ACCEPTED` fires at
+  submit; `RESULT_RECEIVED` / `RESULT_FAILED` fire at wait's terminal
+  state; tasks never waited are eventless forever (mirroring
+  cancellation's eventlessness). Invariant reworded: "every *waited*
+  solve ends in exactly one of `RESULT_RECEIVED` or `RESULT_FAILED`."
 - **Abandoned registry** (amends ADR-0038): intentional deferral is
   NOT abandonment. Registry entries appear only when a `wait` is
   cancelled mid-loop or orphaned by close. Process death between

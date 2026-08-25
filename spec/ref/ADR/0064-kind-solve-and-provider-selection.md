@@ -46,7 +46,7 @@ ADR-0051/0061):
   among registered adapters whose `challenges` includes a subclass of
   that kind base. Stateless per call (no stickiness, no weighting);
   each solve independent. The chosen adapter is visible in
-  `TaskResult.provider` and the `submitted` event — no new
+  `TaskResult.provider` and the `SUBMIT_ACCEPTED` event — no new
   observability surface. Billing caveat documented: any registered
   supporting account may be billed; pass `provider=` to control it.
 - **Kind-base challenge, `provider="capmonster"`**: that adapter.

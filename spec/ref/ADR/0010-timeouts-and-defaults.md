@@ -35,8 +35,8 @@ Granular submit/solve split is deferred (deferred.md item 10).
   total wall-clock of the operation" (submit + solve). The name
   `total_timeout` carries the semantics; `submit_timeout`/`solve_timeout`
   remain open for a later additive split in the same config object.
-- One budget = honest arithmetic: `elapsed` and the `failed` event reflect
-  exactly what the caller paid for.
+- One budget = honest arithmetic: `elapsed` and the terminal failure
+  event reflect exactly what the caller paid for.
 
 ## Alternatives considered
 

@@ -76,9 +76,9 @@ Tickets remain dumb, picklable, user-inspectable.
 - `solve()`: consumes `SubmitAccepted` as a local variable; short-circuits
   submit → `TaskResult[T]` without an intermediate ticket when the caller
   hasn't split the phases.
-- Events: `submitted` then `solved`; no poll phase (ADR-0067 invariant
-  intact). Cost from `instant_answer.cost`; `None` unless the submit response
-  reported one (ADR-0034 presence-check).
+- Events: `SUBMIT_ACCEPTED` then `RESULT_RECEIVED`; no poll phase
+  (ADR-0067 invariant intact). Cost from `instant_answer.cost`; `None`
+  unless the submit response reported one (ADR-0034 presence-check).
 - Persisted/reconstructed `TaskRef`s take the poll path — already correct
   under ADR-0030's stale-ticket rule.
 

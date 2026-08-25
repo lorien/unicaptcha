@@ -39,7 +39,7 @@ supersede.
 | [0015](ADR/0015-poll-only-no-webhooks.md) | Poll-only, no webhooks | |
 | [0016](ADR/0016-cancellation-semantics.md) | Cancellation semantics | amended: pure propagation |
 | [0017](ADR/0017-no-client-rate-limiting.md) | No client-side rate limiting | |
-| [0018](ADR/0018-logging-and-events.md) | Logging and events | amended: flat logger, failed phase; 0067 |
+| [0018](ADR/0018-logging-and-events.md) | Logging and events | amended: flat logger, terminal failure kinds; 0067 |
 | [0019](ADR/0019-toolchain.md) | Toolchain | uv, ruff, pytest, respx, slotscheck; amended: test-style commitments |
 | [0020](ADR/0020-mit-license.md) | MIT license | |
 | [0021](ADR/0021-static-semver-versioning.md) | Static SemVer versioning | 0.1.0 start |

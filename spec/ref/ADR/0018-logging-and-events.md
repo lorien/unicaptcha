@@ -1,6 +1,6 @@
 # ADR-0018: Logging and events
 
-**Status:** Accepted (amended: flat logger only; `failed` phase added; sync handler guard added; two-phase event semantics per ADR-0067 — invariant reworded to "every *waited* solve"; renamed 2026-08-24: `SolveEvent` → `TaskEvent`, `SolvePhase` → `TaskPhase` per the task-centric vocabulary)
+**Status:** Accepted (amended: flat logger only; `failed` phase added; sync handler guard added; two-phase event semantics per ADR-0067 — invariant reworded to "every *waited* solve"; renamed 2026-08-24: `SolveEvent` → `TaskEvent`, `SolvePhase` → `TaskPhase` per the task-centric vocabulary; amended 2026-08-24: field `phase` → `kind`, enum `TaskPhase` → `TaskEventKind` — the field names *what event just happened*, not a task stage; set becomes PRE_FLIGHT_FAILED / SUBMIT_REQUESTED / SUBMIT_ACCEPTED / SUBMIT_FAILED / RESULT_REQUESTED / RESULT_RECEIVED / RESULT_FAILED)
 **Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
@@ -11,18 +11,24 @@ async side, logger naming, whether terminal failures emit events.
 
 ## Decision
 
-**Events.** One typed event type, `TaskEvent` (frozen dataclass), phases:
-`submitted`, `poll`, `retry`, `solved`, `failed`. Fields: provider, task_id,
-elapsed, attempt, detail, and `error_kind: ErrorKind | None` (failure phase
-only). Invariants:
+**Events.** One typed event type, `TaskEvent` (frozen dataclass). The
+discriminating field is `kind: TaskEventKind` — what just happened:
+`PRE_FLIGHT_FAILED`, `SUBMIT_REQUESTED`, `SUBMIT_ACCEPTED`,
+`SUBMIT_FAILED`, `RESULT_REQUESTED`, `RESULT_RECEIVED`, `RESULT_FAILED`.
+Fields: provider, task_id, elapsed, attempt, detail, and
+`error_kind: ErrorKind | None` (set only on the terminal failure kinds).
+Invariants:
 
-- Every solve ends in exactly one of `solved` or `failed`; the `failed`
-  event fires immediately before the terminal raise, for every
-  library-raised exception (timeout, unsolvable, network, provider, ...).
-  (Amended by ADR-0067 for two-phase: `submitted` fires at submit,
-  `solved`/`failed` at wait's terminal state; never-waited tickets are
-  eventless — "every *waited* solve ends in exactly one of `solved` or
-  `failed`.")
+- Every solve invocation ends in exactly one terminal event:
+  `PRE_FLIGHT_FAILED`, `SUBMIT_FAILED`, `RESULT_FAILED`, or
+  `RESULT_RECEIVED`. The terminal failure kinds fire immediately before
+  the terminal raise, for every library-raised exception (timeout,
+  no-solution, network, provider, ...). `PRE_FLIGHT_FAILED` covers
+  caller-side faults before any submit attempt (invalid/unsupported
+  challenge, config, closed client, wrong-provider `TypeError`).
+  (Amended by ADR-0067 for two-phase: `SUBMIT_ACCEPTED` fires at
+  submit, `RESULT_RECEIVED`/`RESULT_FAILED` at wait's terminal state;
+  never-waited tickets are eventless.)
 - **Cancellation is eventless**: firing events while unwinding
   `CancelledError` repeats the ADR-0016 mistake; the abandoned-task
   registry is cancellation's observability story.
@@ -54,9 +60,9 @@ solution tokens never logged at any level.
   strict ordering and visible handler failures beat throughput.
 - Flat logger: zero leak, zero naming commitments; per-component filtering
   is speculative until requested.
-- `failed` phase: a monitoring handler attached at the constructor must see
-  the complete lifecycle; a blind spot at terminal failure defeats the
-  purpose.
+- Terminal failure kinds: a monitoring handler attached at the constructor
+  must see the complete lifecycle; a blind spot at terminal failure defeats
+  the purpose.
 
 ## Alternatives considered
 

@@ -201,18 +201,45 @@ closed -> ClientClosedError, transport -> NetworkError).
 
 ### TaskEvent
 
+`TaskEvent` describes **what just happened** in the task's life. The
+discriminating field is `kind: TaskEventKind` — a named enum, not an
+inline union:
+
+```python
+class TaskEventKind(Enum):
+    PRE_FLIGHT_FAILED   # caller-side fault before any submit attempt (ADR-0045, ADR-0057)
+    SUBMIT_REQUESTED    # each createTask attempt sent (#1, #2, #3...)
+    SUBMIT_ACCEPTED     # provider accepted; task_id received
+    SUBMIT_FAILED       # all submit attempts exhausted; task_id None
+    RESULT_REQUESTED    # each getTaskResult check
+    RESULT_RECEIVED     # terminal: result obtained
+    RESULT_FAILED       # terminal: result polling failed
+```
+
 | Field | Type |
 |---|---|
-| `phase` | `submitted \| poll \| retry \| solved \| failed` |
+| `kind` | `TaskEventKind` | what just happened |
 | `provider` | `str` |
-| `task_id` | `int \| None` | None only before submission completes |
-| `elapsed` | `timedelta` | since solve() start |
-| `attempt` | `int` | poll/retry count within phase |
-| `detail` | `str \| None` | e.g. "connection reset", "503"; never credentials |
-| `error_kind` | `ErrorKind \| None` | failure phase only |
+| `task_id` | `int \| None` | None on PRE_FLIGHT_FAILED / SUBMIT_REQUESTED / SUBMIT_FAILED; populated from SUBMIT_ACCEPTED onward |
+| `elapsed` | `timedelta` | since solve()/wait() start |
+| `attempt` | `int` | iteration count within a repeating kind (SUBMIT_REQUESTED #, RESULT_REQUESTED #) |
+| `detail` | `str \| None` | e.g. "connection reset", "503"; never credentials; names both parties on TypeError |
+| `error_kind` | `ErrorKind \| None` | set only on the terminal failure kinds; `None` on in-progress and success kinds; `None` on PRE_FLIGHT_FAILED caused by wrong-provider `TypeError` (a bare builtin, no ErrorKind) |
 
-Invariant: every solve ends in exactly one of `solved` or `failed`. Cancellation
-is eventless (ADR-0016, ADR-0018).
+`error_kind` possible values by kind:
+
+- `PRE_FLIGHT_FAILED`: `INVALID_CHALLENGE`, `UNSUPPORTED_CHALLENGE`,
+  `INVALID_CONFIG`, `CLIENT_CLOSED` (at validation), or `None`
+  (wrong-provider `TypeError`).
+- `SUBMIT_FAILED`: `NETWORK`, `RATE_LIMIT`, `SERVICE_BUSY`,
+  `AUTHENTICATION`, `INSUFFICIENT_BALANCE`, `PROVIDER`, `CLIENT_CLOSED`
+  (sync close-interrupt).
+- `RESULT_FAILED`: `NO_SOLUTION`, `EMPTY_SOLUTION`, `TASK_TIMEOUT`,
+  `PROVIDER`, `CLIENT_CLOSED` (sync close-interrupt).
+
+Invariant: every solve invocation ends in exactly one terminal event —
+`PRE_FLIGHT_FAILED`, `SUBMIT_FAILED`, `RESULT_FAILED`, or `RESULT_RECEIVED`.
+Cancellation is eventless (ADR-0016, ADR-0018).
 
 ### Proxy / ProxyKind
 
@@ -355,9 +382,9 @@ solve(challenge, provider=None, time=None, retry=None, on_event=None) -> TaskRes
            - UNKNOWN (task not found) -> ProviderError, fail fast (ADR-0058)
            - solved-but-empty payload -> EmptySolutionError (ADR-0040 amendment)
     terminal:
-        READY -> TaskResult[T] (emit "solved")
-        budget exhausted -> TaskTimeoutError (emit "failed")
-        any raised library error emits "failed" first, then raises
+        READY -> TaskResult[T] (emit RESULT_RECEIVED)
+        budget exhausted -> TaskTimeoutError (emit RESULT_FAILED)
+        any raised library error emits the matching *_FAILED first, then raises
 ```
 
 - `total_timeout` covers submit attempts + backoff + polling, starting at the
@@ -390,8 +417,8 @@ status = solver.wait_ref(TaskRef(...), timeout=120)            # -> TaskStatusRe
 - `wait_ref`: query semantics — polls until terminal or budget out
   (returns PENDING `TaskStatusResult` on exhaustion).
 - `get_task_status` unchanged: single-shot (ADR-0050).
-- Events: `submitted` at submit; `solved`/`failed` at wait's terminal
-  state; never-waited tickets eventless (ADR-0018 as amended).
+- Events: `SUBMIT_ACCEPTED` at submit; `RESULT_RECEIVED`/`RESULT_FAILED`
+  at wait's terminal state; never-waited tickets eventless (ADR-0018 as amended).
   Deferral is not abandonment (ADR-0038 as amended): the registry
   records only cancelled/orphaned waits. Billing caveat: solved but
   uncollected tasks are billed by the provider.
