@@ -24,7 +24,7 @@ engine itself submitted.
   state. Deterministic and consistent with ADR-0011's
   fail-fast-on-ambiguity ethos; the caller may query
   `get_task_status` later to re-examine. It is never silently retried
-  and never mislabeled as `SolveTimeoutError`.
+  and never mislabeled as `TaskTimeoutError`.
 - **`get_task_status` returns UNKNOWN as data** (ADR-0050) — the
   legitimate home of the state: reclaim loops after process restarts
   expect it.
@@ -41,7 +41,7 @@ engine itself submitted.
 ## Alternatives considered
 
 - **Tolerate UNKNOWN mid-poll, bounded by total_timeout**: rejected;
-  converts a provider anomaly into a misleading `SolveTimeoutError`
+  converts a provider anomaly into a misleading `TaskTimeoutError`
   after burning the whole budget.
 - **Raise `UnknownTaskError`**: rejected; removed from the hierarchy
   by ADR-0050 and impossible to hit on solve() by construction.

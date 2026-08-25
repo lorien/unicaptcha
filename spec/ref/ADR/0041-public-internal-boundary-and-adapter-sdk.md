@@ -15,8 +15,8 @@ from day one.
 
 **Public surface** (documented, root + provider packages):
 
-- Root `unicaptcha`: clients, errors + ErrorKind, SolveResult/TaskStatusResult/
-  SolveEvent/TaskRef, SecretStr, configs, Proxy/ProxyKind, challenge and
+- Root `unicaptcha`: clients, errors + ErrorKind, TaskResult/TaskStatusResult/
+  TaskEvent/TaskRef, SecretStr, configs, Proxy/ProxyKind, challenge and
   solution kind bases.
 - `unicaptcha.provider.<name>`: that provider's challenges, solutions,
   adapter class, facades.
@@ -25,12 +25,12 @@ from day one.
   Custom adapters implement the contract (`provider` identity,
   challenges frozenset,
   pure translation methods, error mapping, optional per-kind defaults)
-  and register via `CaptchaSolver(adapters=[...])`.
+  and register via `Solver(adapters=[...])`.
 - The injectable HTTP layer is exposed as a public **Protocol**
   (what may be injected); its implementation stays `_internal`.
 
 **Internal** (`unicaptcha._internal/`, underscore modules, no stability
-promise): SolveEngine, HTTP layer implementation, clock/sleep seam,
+promise): TaskEngine, HTTP layer implementation, clock/sleep seam,
 scrubbing, adapter base machinery internals. CI enforces isolation: public
 modules never import another provider's package; the reference third-party
 adapter (ADR-0046) never imports `_internal`.

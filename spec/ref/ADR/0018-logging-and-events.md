@@ -1,7 +1,7 @@
 # ADR-0018: Logging and events
 
-**Status:** Accepted (amended: flat logger only; `failed` phase added; sync handler guard added; two-phase event semantics per ADR-0067 — invariant reworded to "every *waited* solve")
-**Date:** 2026-08-22, amendments 2026-08-23
+**Status:** Accepted (amended: flat logger only; `failed` phase added; sync handler guard added; two-phase event semantics per ADR-0067 — invariant reworded to "every *waited* solve"; renamed 2026-08-24: `SolveEvent` → `TaskEvent`, `SolvePhase` → `TaskPhase` per the task-centric vocabulary)
+**Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
 
@@ -11,7 +11,7 @@ async side, logger naming, whether terminal failures emit events.
 
 ## Decision
 
-**Events.** One typed event type, `SolveEvent` (frozen dataclass), phases:
+**Events.** One typed event type, `TaskEvent` (frozen dataclass), phases:
 `submitted`, `poll`, `retry`, `solved`, `failed`. Fields: provider, task_id,
 elapsed, attempt, detail, and `error_kind: ErrorKind | None` (failure phase
 only). Invariants:

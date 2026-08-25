@@ -1,6 +1,6 @@
 # ADR-0067: Two-phase submit/wait with TaskTicket
 
-**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains an `instant_answer` field, wait fast-path for inline-answered submits; renamed 2026-08-24: `Result[T]` → `SolveResult[T]`, `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status`)
+**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains an `instant_answer` field, wait fast-path for inline-answered submits; renamed 2026-08-24: `Result[T]` → `SolveResult[T]` → `TaskResult[T]`, `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status` — task-centric vocabulary)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
@@ -46,7 +46,7 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
 
 | Method | Accepts | Returns | On terminal failure |
 |---|---|---|---|
-| `wait(ticket, timeout=None)` | `TaskTicket[T]` | `SolveResult[T]` | **raises** (`NoSolutionError`, `ProviderError` on UNKNOWN per ADR-0058, `SolveTimeoutError`) |
+| `wait(ticket, timeout=None)` | `TaskTicket[T]` | `TaskResult[T]` | **raises** (`NoSolutionError`, `ProviderError` on UNKNOWN per ADR-0058, `TaskTimeoutError`) |
 | `wait_ref(ref, timeout=...)` | `TaskRef` | `TaskStatusResult` | **answers**; budget exhaustion returns PENDING `TaskStatusResult` |
 | `get_task_status(ref)` | `TaskRef` | `TaskStatusResult` | answers — single-shot, unchanged (ADR-0050) |
 

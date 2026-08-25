@@ -16,8 +16,8 @@ bases (`ImageChallenge` ... are "kinds", `<Provider><Kind>Challenge`)
 and `ErrorKind` already own the word. ADR-0037 had to write "provider
 kind 'twocaptcha'" just to disambiguate.
 
-The spec already names the concept everywhere else: `SolveResult.provider`,
-`TaskRef.provider`, `SolveEvent.provider`, `get_balance(provider)`.
+The spec already names the concept everywhere else: `TaskResult.provider`,
+`TaskRef.provider`, `TaskEvent.provider`, `get_balance(provider)`.
 
 ## Decision
 
@@ -34,8 +34,8 @@ The spec already names the concept everywhere else: `SolveResult.provider`,
 ## Rationale
 
 - One word per concept, end to end:
-  `adapter.provider == SolveResult.provider == TaskRef.provider ==
-  SolveEvent.provider == "twocaptcha"`.
+  `adapter.provider == TaskResult.provider == TaskRef.provider ==
+  TaskEvent.provider == "twocaptcha"`.
 - Ends the triple collision inside the vocabulary; ADR-0037's
   "provider kind" contortion disappears.
 - The attribute returns a `str` while no `Provider` class exists

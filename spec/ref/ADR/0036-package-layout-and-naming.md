@@ -1,6 +1,6 @@
 # ADR-0036: Package layout and naming
 
-**Status:** Accepted (amended: `unicaptcha.types` module added; adapter classes named `<Provider>Adapter` per ADR-0052; universal tier renamed `CaptchaSolver`/`AsyncCaptchaSolver` per ADR-0062, Client suffix scoped to facades; amended 2026-08-24: singular/plural naming rule — root files plural, root directories singular, provider internals singular one-per-concern; `challenge/` kind-base package added per ADR-0048)
+**Status:** Accepted (amended: `unicaptcha.types` module added; adapter classes named `<Provider>Adapter` per ADR-0052; universal tier renamed `Solver`/`AsyncSolver` per ADR-0062, Client suffix scoped to facades; amended 2026-08-24: singular/plural naming rule — root files plural, root directories singular, provider internals singular one-per-concern; `challenge/` kind-base package added per ADR-0048)
 **Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
@@ -14,12 +14,12 @@ API obvious.
 ```
 unicaptcha/
     __init__.py        # curated re-exports: clients, errors, ErrorKind,
-                       # SolveResult, TaskStatusResult, SolveEvent, TaskRef, SecretStr,
+                       # TaskResult, TaskStatusResult, TaskEvent, TaskRef, SecretStr,
                        # configs, Proxy/ProxyKind, kind bases
     _version.py        # single version source
-    client.py          # CaptchaSolver / AsyncCaptchaSolver (ADR-0062)
+    client.py          # Solver / AsyncSolver (ADR-0062)
     errors.py          # hierarchy + ErrorKind
-    events.py          # SolveEvent
+    events.py          # TaskEvent
     types.py           # public model vocabulary; re-exported from root
     challenge/         # abstract challenge kind bases (ADR-0048)
     solution/          # abstract solution kind bases (ADR-0035)
@@ -43,7 +43,7 @@ unicaptcha/
   `recaptcha_v3.py`, `hcaptcha.py`, `funcaptcha.py`, `geetest.py`,
   `turnstile.py`).
 
-- **Class names**: `CaptchaSolver` / `AsyncCaptchaSolver`
+- **Class names**: `Solver` / `AsyncSolver`
   (ADR-0062, was `UnicaptchaClient` / `MultiClient` earlier);
   `TwoCaptchaClient` / `AsyncTwoCaptchaClient` etc. — every facade
   class ends in `Client` (owner refinement of the initial `Unicaptcha`

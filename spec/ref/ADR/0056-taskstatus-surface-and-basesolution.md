@@ -1,17 +1,17 @@
-# ADR-0056: TaskStatusResult surface — no SolveResult, no submission metadata; BaseSolution root
+# ADR-0056: TaskStatusResult surface — no TaskResult, no submission metadata; BaseSolution root
 
-**Status:** Accepted (amends ADR-0032, ADR-0035; supersedes the `result: SolveResult[T] | None` field of TaskStatusResult; complements ADR-0050; renamed 2026-08-24: object `TaskStatus` → `TaskStatusResult`, enum `TaskState` → `TaskStatus`, `get_task_result` → `get_task_status`)
+**Status:** Accepted (amends ADR-0032, ADR-0035; supersedes the `result: TaskResult[T] | None` field of TaskStatusResult; complements ADR-0050; renamed 2026-08-24: object `TaskStatus` → `TaskStatusResult`, enum `TaskState` → `TaskStatus`, `get_task_result` → `get_task_status`, `SolveResult` → `TaskResult` per the task-centric vocabulary)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
-ADR-0032 gave `TaskStatusResult` a `result: SolveResult[T] | None` field. Two flaws:
+ADR-0032 gave `TaskStatusResult` a `result: TaskResult[T] | None` field. Two flaws:
 
 1. **Unbindable generic.** `get_task_status(task: TaskRef)` carries no
    type parameter — the `T` in `TaskStatusResult.result` can never be bound
    by the signature. In a mypy/pyright-strict library (goal 3) this is
    a type that lies.
-2. **Dishonest metadata.** `SolveResult` requires non-optional `created_at`
+2. **Dishonest metadata.** `TaskResult` requires non-optional `created_at`
    and `elapsed` (ADR-0008, ADR-0034) — submission-time facts. But the
    primary `get_task_status` caller reclaims tasks with no submission
    context: post-close or post-restart, on a fresh client, via a
@@ -45,9 +45,9 @@ solution" on a status query.
 
 - **No `created_at`, no `elapsed`** on TaskStatusResult — deliberately, not
   as None-able fields. Submission metadata exists exactly where
-  submission context exists: `SolveResult[T]` from `solve()`. One honest
+  submission context exists: `TaskResult[T]` from `solve()`. One honest
   shape serves same-client and post-restart reclaim alike.
-- **`SolveResult[T]` is the solve()-only return**; `TaskStatusResult` never
+- **`TaskResult[T]` is the solve()-only return**; `TaskStatusResult` never
   embeds it.
 
 ## Rationale
@@ -63,13 +63,13 @@ solution" on a status query.
 
 ## Alternatives considered
 
-- **Keep `result: SolveResult[T] | None`, bind T via generic method
+- **Keep `result: TaskResult[T] | None`, bind T via generic method
   (`get_task_status(ref) -> TaskStatusResult[T]`)**: rejected; the caller
   cannot name T — the TaskRef carries no type information; any
   annotation would be cast-theater.
-- **SolveResult with None-able `created_at`/`elapsed`**: rejected; weakens
+- **TaskResult with None-able `created_at`/`elapsed`**: rejected; weakens
   the solve()-path guarantee (ADR-0032's whole point) or forks a
-  second SolveResult variant.
+  second TaskResult variant.
 - **TaskStatusResult keeps only status + ids, solution fetched separately**:
   rejected; READY would then cost two round trips, and the response
   already holds the solution.

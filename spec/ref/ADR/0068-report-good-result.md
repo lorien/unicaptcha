@@ -61,6 +61,6 @@ worker quality routing (2Captcha docs).
   adjective-first family (`report_bad_result`).
 - **Combined `report(result, good: bool)`**: rejected; boolean-mode
   flag selects two different provider operations behind one name.
-- **SolveResult-object method (`result.report_good()`)**: rejected; engine
+- **TaskResult-object method (`result.report_good()`)**: rejected; engine
   reference inside frozen data (same rejection as ADR-0067's handle
   methods).

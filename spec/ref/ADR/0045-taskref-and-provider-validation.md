@@ -5,9 +5,9 @@
 
 ## Context
 
-Aux task operations need routing. Typed `SolveResult` arguments worked for
-report-bad but made `get_task_status` circular (a SolveResult means the task is
-solved) and left abandoned-task reclaim impossible (no SolveResult exists).
+Aux task operations need routing. Typed `TaskResult` arguments worked for
+report-bad but made `get_task_status` circular (a TaskResult means the task is
+solved) and left abandoned-task reclaim impossible (no TaskResult exists).
 Bare ints are ambiguous on multi-provider clients.
 
 ## Decision
@@ -20,8 +20,8 @@ Bare ints are ambiguous on multi-provider clients.
   rides alongside.
 - Signatures (ADR-0013): universal `get_task_status(TaskRef)`,
   `report_bad_result(TaskRef)`; facades accept `int | TaskRef`.
-- `SolveResult.task_ref` convenience property (`TaskRef.of(result)`
-  equivalent) so reporting a held SolveResult is one expression.
+- `TaskResult.task_ref` convenience property (`TaskRef.of(result)`
+  equivalent) so reporting a held TaskResult is one expression.
 - **Pre-flight provider validation**: every task-addressing argument is
   checked before any network traffic. A `TaskRef` whose provider does
   not match the facade — or is absent from the universal client's
@@ -46,6 +46,6 @@ Bare ints are ambiguous on multi-provider clients.
 
 - **`(task_id, provider)` two-argument overload**: rejected; signature
   bloat, two loose values where one typed object carries both.
-- **SolveResult-accepting `get_task_status`**: superseded; circular.
+- **TaskResult-accepting `get_task_status`**: superseded; circular.
 - **Validation deferred to provider**: rejected; wrong-service queries
   surface as opaque provider errors.

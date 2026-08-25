@@ -1,6 +1,6 @@
 # ADR-0013: Auxiliary operations
 
-**Status:** Accepted (amended twice: routing via TaskRef instead of bare ids/SolveResult; four-state status semantics per ADR-0050; `report_good_result` added per ADR-0068; renamed 2026-08-24: `get_task_result` → `get_task_status`, `TaskStatus` → `TaskStatusResult`)
+**Status:** Accepted (amended twice: routing via TaskRef instead of bare ids/TaskResult; four-state status semantics per ADR-0050; `report_good_result` added per ADR-0068; renamed 2026-08-24: `get_task_result` → `get_task_status`, `TaskStatus` → `TaskStatusResult`)
 **Date:** 2026-08-22, amendment 2026-08-24
 
 ## Context
@@ -8,8 +8,8 @@
 Beyond solving, providers expose balance checks, bad-solution reports, and
 task-status queries. On a multi-provider client, "whose balance?" and "which
 provider's task 42?" must be answerable. An early design routed task ops via
-typed `SolveResult` arguments; that conflated operations and made abandoned-task
-reclaim (no SolveResult exists) impossible.
+typed `TaskResult` arguments; that conflated operations and made abandoned-task
+reclaim (no TaskResult exists) impossible.
 
 ## Decision
 
@@ -42,7 +42,7 @@ All three operations exist on both tiers:
 ## Rationale
 
 - `TaskRef` carries routing; ids alone are ambiguous on multi-provider
-  clients, and `SolveResult`-routed `get_task_status` was circular (you already
+  clients, and `TaskResult`-routed `get_task_status` was circular (you already
   had the result).
 - Facades may accept bare ints because their provider is implicit; the
   universal client cannot.
@@ -51,7 +51,7 @@ All three operations exist on both tiers:
 
 ## Alternatives considered
 
-- **`get_task_status(result: SolveResult)`**: superseded; circular semantics,
+- **`get_task_status(result: TaskResult)`**: superseded; circular semantics,
   blocked abandoned-task reclaim.
 - **`report_bad_result` + `report_bad_result_id` pair**: superseded by the
   single-name, typed-union signature (owner decision).

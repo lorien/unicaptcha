@@ -1,7 +1,7 @@
 # ADR-0043: Config shape and merge semantics
 
-**Status:** Accepted (amended: `poll_delay` added to SolveConfig per the ADR-0030 amendment)
-**Date:** 2026-08-23
+**Status:** Accepted (amended: `poll_delay` added to TimeConfig per the ADR-0030 amendment; renamed 2026-08-24: `SolveConfig` → `TimeConfig`, `solve=` per-call kwarg → `time=` per the task-centric vocabulary)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -19,11 +19,11 @@ scalars stay flat constructor kwargs (`name`, `user_agent`,
 
 ```python
 HttpClientConfig(timeout, max_connections, max_keepalive_connections)
-SolveConfig(total_timeout, poll_interval, poll_delay)
+TimeConfig(total_timeout, poll_interval, poll_delay)
 RetryConfig(max_attempts, backoff_base, backoff_cap)
 ```
 
-Accepted at client construction and per call (`solve(challenge, solve=...,
+Accepted at client construction and per call (`solve(challenge, time=...,
 retry=...)`), identical on facades (ADR-0051).
 
 **None-rule** — every field in all three types is `X | None = None`.

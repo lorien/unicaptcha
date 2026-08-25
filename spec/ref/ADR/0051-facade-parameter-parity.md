@@ -6,20 +6,20 @@
 ## Context
 
 Facade convenience methods were designed as mirrors of challenge fields.
-The universal `solve()` additionally accepts `solve=`, `retry=`,
+The universal `solve()` additionally accepts `time=`, `retry=`,
 `on_event=`. Do facades? The peers architecture (ADR-0007) makes this
 load-bearing: facades compose their own engine and have no underlying
 universal client to "drop down to" for tuning.
 
 ## Decision
 
-Full parity: every facade convenience method accepts `solve=SolveConfig`,
+Full parity: every facade convenience method accepts `time=TimeConfig`,
 `retry=RetryConfig`, and `on_event=handler` as keyword-only parameters
 alongside challenge fields, with the same merge/override semantics as the
 universal `solve()` (ADR-0043, ADR-0044).
 
 ```python
-tc.solve_image(body=b"...", solve=SolveConfig(total_timeout=60),
+tc.solve_image(body=b"...", time=TimeConfig(total_timeout=60),
               on_event=handler)
 ```
 

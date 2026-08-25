@@ -1,19 +1,19 @@
-# ADR-0032: TaskStatusResult split from SolveResult
+# ADR-0032: TaskStatusResult split from TaskResult
 
-**Status:** Accepted (amended by ADR-0050: four states, UNKNOWN as returned status; amended by ADR-0056: `result` field replaced by `solution`/`cost`/`raw`, no submission metadata; renamed 2026-08-24: query-answer object `TaskStatus` → `TaskStatusResult`, enum `TaskState` → `TaskStatus`, `get_task_result` → `get_task_status` — public method and adapter operation key — for one coherent status vocabulary)
+**Status:** Accepted (amended by ADR-0050: four states, UNKNOWN as returned status; amended by ADR-0056: `result` field replaced by `solution`/`cost`/`raw`, no submission metadata; renamed 2026-08-24: query-answer object `TaskStatus` → `TaskStatusResult`, enum `TaskState` → `TaskStatus`, `get_task_result` → `get_task_status` — public method and adapter operation key — for one coherent status vocabulary; `SolveResult` → `TaskResult` per the task-centric vocabulary)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
-The single-shot `get_task_status` originally returned the same `SolveResult[T]`
+The single-shot `get_task_status` originally returned the same `TaskResult[T]`
 with `status: PENDING | READY` and solution populated only when ready.
-This forces `solution: T | None` onto the entire generic SolveResult class —
+This forces `solution: T | None` onto the entire generic TaskResult class —
 an always-None-check weakening every `solve()` annotation for one cold-path
 method.
 
 ## Decision
 
-- `solve()` returns `SolveResult[T]` with **non-optional `solution`**.
+- `solve()` returns `TaskResult[T]` with **non-optional `solution`**.
 - The single-shot query returns a separate lightweight **`TaskStatusResult`**
   (non-generic, per ADR-0056): `task_id`, `provider`, `status`
   (four states), `solution: BaseSolution | None` populated only when
@@ -30,7 +30,7 @@ method.
 
 ## Alternatives considered
 
-- **One SolveResult with status field**: rejected; weakens the primary API's
+- **One TaskResult with status field**: rejected; weakens the primary API's
   typing guarantee.
 - **Pending queries returning None**: rejected; None-checking loses
   task_id/provider context and forces a second call for it.

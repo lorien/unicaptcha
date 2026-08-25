@@ -28,8 +28,8 @@ supersede.
 | [0004](ADR/0004-python-version-and-typing-policy.md) | Python 3.11+ and strict typing | mypy + pyright strict, py.typed |
 | [0005](ADR/0005-universal-multi-provider-client.md) | Universal multi-provider client | registry, dispatch by challenge class; amended: 0052, 0064 |
 | [0006](ADR/0006-provider-specific-challenge-classes.md) | Provider-specific challenge classes | frozen dataclasses; amended: 0048, 0066 |
-| [0007](ADR/0007-provider-facades-via-composition.md) | Provider facades | amended: peers over SolveEngine |
-| [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | SolveResult[T], Decimal cost |
+| [0007](ADR/0007-provider-facades-via-composition.md) | Provider facades | amended: peers over TaskEngine |
+| [0008](ADR/0008-rich-generic-result-objects.md) | Rich generic result objects | TaskResult[T], Decimal cost |
 | [0009](ADR/0009-unified-error-hierarchy.md) | Unified error hierarchy | amended: no SolveCancelledError, no UnknownTaskError; 0057; ServiceBusyError per 0059; EmptySolutionError per 0040 |
 | [0010](ADR/0010-timeouts-and-defaults.md) | Timeouts | amended: total_timeout semantics; scoped to solve() by 0067 |
 | [0011](ADR/0011-retry-and-polling-policy.md) | Retry and polling policy | amended: refined retry scope, full jitter; 0059 |
@@ -53,9 +53,9 @@ supersede.
 | [0029](ADR/0029-unsolvable-captcha-error.md) | NoSolutionError | dedicated exception, no auto-resubmit |
 | [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column; draft token-kind rows (2026-08-24) pending review — deferred item 15 |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
-| [0032](ADR/0032-taskstatus-split.md) | TaskStatusResult split from SolveResult | amended: 0050, 0056 |
+| [0032](ADR/0032-taskstatus-split.md) | TaskStatusResult split from TaskResult | amended: 0050, 0056 |
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |
-| [0034](ADR/0034-result-surface-and-metadata.md) | SolveResult surface and metadata | raw bytes, provider/created_at/elapsed; amended: cost presence-check |
+| [0034](ADR/0034-result-surface-and-metadata.md) | TaskResult surface and metadata | raw bytes, provider/created_at/elapsed; amended: cost presence-check |
 | [0035](ADR/0035-solution-bases-non-instantiable.md) | Solution bases non-instantiable | amended: 0056 |
 | [0036](ADR/0036-package-layout-and-naming.md) | Package layout and naming | *Client suffix everywhere; amended: 0052, 0054 |
 | [0037](ADR/0037-duplicate-provider-kinds.md) | Duplicate provider kinds forbidden | amended: 0055 |
@@ -77,13 +77,13 @@ supersede.
 | [0053](ADR/0053-adapter-contract-abc.md) | Adapter contract enforcement | `BaseAdapter` ABC; settles 0052 open question; amended: 0063, 0068, 0072, 0073, 0075 |
 | [0054](ADR/0054-multiclient-naming.md) | MultiClient naming | superseded by 0062 |
 | [0055](ADR/0055-adapter-provider-attribute.md) | Adapter `provider` attribute | amends 0037/0041/0052/0053: `kind` renamed `provider` |
-| [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatusResult surface + BaseSolution root | amends 0032/0035: no `SolveResult` embedding, `TaskStatus` enum |
+| [0056](ADR/0056-taskstatus-surface-and-basesolution.md) | TaskStatusResult surface + BaseSolution root | amends 0032/0035: no `TaskResult` embedding, `TaskStatus` enum |
 | [0057](ADR/0057-unsupported-captcha-error-scope.md) | UnsupportedChallengeError scope | amends 0009/0013/0053: client-side gaps included |
 | [0058](ADR/0058-unknown-state-and-solve-poll.md) | UNKNOWN state in adapter contract | 4-state parse_task_status; solve-poll fail-fast; ParsedTask typed per 0075 |
 | [0059](ADR/0059-rate-limit-retry.md) | Rate-limit retry | amends 0011: 429 + provider payloads retryable; ServiceBusyError amendment |
 | [0060](ADR/0060-registry-advisory-and-recovery.md) | Registry advisory + recovery | amends 0033/0038: per-client semantics, workflow |
 | [0061](ADR/0061-facade-constructor-parity.md) | Facade constructor parity | amends 0051: api_key/base_url + all client kwargs; amended: 0063, 0072 |
-| [0062](ADR/0062-captchasolver-naming.md) | CaptchaSolver naming | supersedes 0054 class names; amends 0036 |
+| [0062](ADR/0062-captchasolver-naming.md) | Solver naming | supersedes 0054 class names; amends 0036 |
 | [0063](ADR/0063-str-api-key.md) | Plain str api_key | amends 0014/0053/0061: union, boundary wrapping |
 | [0064](ADR/0064-kind-solve-and-provider-selection.md) | Kind-level solve + provider selection | amends 0005/0045/0048; random among supporting adapters |
 | [0065](ADR/0065-path-body.md) | Path accepted for image bodies | amends 0025: `bytes \| Path`, normalized to bytes |

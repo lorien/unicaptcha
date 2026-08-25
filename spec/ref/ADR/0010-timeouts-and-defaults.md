@@ -1,7 +1,7 @@
 # ADR-0010: Timeouts — total_timeout semantics
 
-**Status:** Accepted (amended 2026-08-23: budget semantics settled as total, name `total_timeout`; per-request timeout confirmed as separate knob; scoped to `solve()` by ADR-0067 — `wait()` carries its own call-start budget, closing the granular split as deferred item 10)
-**Date:** 2026-08-22
+**Status:** Accepted (amended 2026-08-23: budget semantics settled as total, name `total_timeout`; per-request timeout confirmed as separate knob; scoped to `solve()` by ADR-0067 — `wait()` carries its own call-start budget, closing the granular split as deferred item 10; amended 2026-08-24: `SolveConfig` → `TimeConfig`, `SolveTimeoutError` → `TaskTimeoutError` per the task-centric vocabulary)
+**Date:** 2026-08-22, amendments 2026-08-23, 2026-08-24
 
 ## Context
 
@@ -15,14 +15,14 @@ Granular submit/solve split is deferred (deferred.md item 10).
 
 - **`total_timeout`** (name ratified): the solve budget covers **submit
   attempts + backoff + polling**, starting at the `solve()` call. Exhaustion
-  at any phase raises `SolveTimeoutError`.
-- Configurable at client level (`SolveConfig`) and per call; resolution via
+  at any phase raises `TaskTimeoutError`.
+- Configurable at client level (`TimeConfig`) and per call; resolution via
   the None-merge chain (ADR-0043); concrete defaults per challenge kind in
   the engine's default table (ADR-0030).
 - **Per-request HTTP timeout**: separate `HttpClientConfig.timeout` (default
   20 s), independent of the solve budget.
 - Async enforcement: the engine runs the solve inside `asyncio.timeout()`;
-  the resulting `TimeoutError` is converted to `SolveTimeoutError` at our
+  the resulting `TimeoutError` is converted to `TaskTimeoutError` at our
   scope boundary only; external cancellations pass through untouched
   (ADR-0016).
 - Polling transient-failure tolerance is bounded by the same total budget:

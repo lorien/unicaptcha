@@ -26,7 +26,7 @@ our own `total_timeout` design depends on.
 - Billing caveat documented: abandoned tasks may still be billed; the
   library makes them reclaimable, not refundable.
 - Internal timeout: the solve runs inside `asyncio.timeout()`; the
-  resulting `TimeoutError` is converted to `SolveTimeoutError` at our scope
+  resulting `TimeoutError` is converted to `TaskTimeoutError` at our scope
   boundary only. External cancellations pass through the scope machinery
   untouched — exactly the discrimination the stdlib provides.
 - Sync side: `KeyboardInterrupt` propagates naturally; nothing to design.

@@ -25,7 +25,7 @@ exception messages, or the event stream. pydantic was initially to provide
   - log messages never contain key values at any level; scrubbing is
     targeted (we construct all payloads; keys occupy known positions);
   - `raw_response` on exceptions is scrubbed defensively before attach;
-  - `SolveEvent` contains no credentials by construction.
+  - `TaskEvent` contains no credentials by construction.
 - **Multiple keys / rotation**: out of scope for v1 (deferred.md item 6);
   one key per adapter instance; multi-account = multiple clients sharing
   an HTTP layer.

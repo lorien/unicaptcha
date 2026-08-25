@@ -5,7 +5,7 @@
 
 ## Context
 
-ADR-0051 settled per-call parameter parity (`solve=`, `retry=`,
+ADR-0051 settled per-call parameter parity (`time=`, `retry=`,
 `on_event=`) but was silent on facade **constructors**. Meanwhile the
 README promises that 2Captcha-protocol mirrors (RuCaptcha) work "by
 overriding the 2Captcha adapter's base URL", and ADR-0007 says facades
@@ -16,15 +16,15 @@ which of the universal client's many constructor kwargs facades accept.
 ## Decision
 
 A facade constructor accepts the **adapter set** plus **every client
-kwarg** of `CaptchaSolver` / `AsyncCaptchaSolver` except `adapters`:
+kwarg** of `Solver` / `AsyncSolver` except `adapters`:
 
 ```python
 TwoCaptchaClient(
     api_key: SecretStr | str,        # adapter credentials (positional-first); str wrapped (ADR-0063)
     base_url: str | None = None,    # overrides default_base_url (RuCaptcha mirrors)
     referral: bool | str = True,    # affiliate id: True=project's, False=off, str=own (ADR-0072)
-    # client kwargs, identical names/defaults/validation as CaptchaSolver:
-    name=..., solve=..., retry=..., http=..., http_client=...,
+    # client kwargs, identical names/defaults/validation as Solver:
+    name=..., time=..., retry=..., http=..., http_client=...,
     on_event=..., abandoned_registry_limit=...,
 )
 ```
@@ -44,7 +44,7 @@ TwoCaptchaClient(
   calls now holds for construction.
 - The README's mirror-provider story becomes a documented signature,
   not folklore.
-- Everything `CaptchaSolver` accepts describes the engine/HTTP layer the
+- Everything `Solver` accepts describes the engine/HTTP layer the
   facade also owns (peers) — refusing any of them would force the
   facade user into a universal client for no architectural reason.
 

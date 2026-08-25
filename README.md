@@ -44,10 +44,10 @@ The exact API is being finalized; the intended shape:
 ```python
 from pathlib import Path
 
-from unicaptcha import CaptchaSolver, ImageChallenge
+from unicaptcha import Solver, ImageChallenge
 from unicaptcha.providers.twocaptcha import TwoCaptchaAdapter
 
-client = CaptchaSolver(adapters=[TwoCaptchaAdapter("...")])
+client = Solver(adapters=[TwoCaptchaAdapter("...")])
 result = client.solve(ImageChallenge(Path("test.png")))
 print(result.solution.text)
 ```
@@ -63,11 +63,11 @@ Two-phase batch workflows split submit from collection (ADR-0067):
 ```python
 ticket = client.submit(ImageChallenge(Path("a.png")))   # collect later
 ...
-result = client.wait(ticket)                            # -> SolveResult, typed
+result = client.wait(ticket)                            # -> TaskResult, typed
 status = client.wait_ref(TaskRef("twocaptcha", 12345), timeout=120)  # from persisted ids
 ```
 
-An async-native `AsyncCaptchaSolver` and per-provider facade clients
+An async-native `AsyncSolver` and per-provider facade clients
 (`TwoCaptchaClient` and async counterpart) are part of the same design.
 See `spec/ref/architecture.md` for the complete specification.
 

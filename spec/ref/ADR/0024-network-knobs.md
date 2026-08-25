@@ -19,7 +19,7 @@ Exposed on the library (via `HttpClientConfig` or constructor):
    `httpx.Timeout(timeout)` — **each stage** (connect, read, write,
    pool) **independently** limited to it; not a shared budget across
    stages. The name matches httpx deliberately (the value maps
-   directly); distinction from `SolveConfig.total_timeout` is carried
+   directly); distinction from `TimeConfig.total_timeout` is carried
    by the configs being separate objects and "total" in that name.
 2. **Connection pool limits** (`max_connections`,
    `max_keepalive_connections`) — passthrough to httpx pool defaults when

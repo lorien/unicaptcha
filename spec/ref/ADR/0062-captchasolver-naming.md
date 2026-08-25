@@ -1,7 +1,7 @@
-# ADR-0062: Universal client naming — `CaptchaSolver` / `AsyncCaptchaSolver`
+# ADR-0062: Universal client naming — `Solver` / `AsyncSolver`
 
-**Status:** Accepted (supersedes the class-name decision of ADR-0054; amends ADR-0036)
-**Date:** 2026-08-23
+**Status:** Accepted (supersedes the class-name decision of ADR-0054; amends ADR-0036; amended 2026-08-24: `CaptchaSolver`/`AsyncCaptchaSolver` → `Solver`/`AsyncSolver` per the task-centric vocabulary — supersedes this ADR's own rejection of bare `Solver`)
+**Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context
 
@@ -27,9 +27,9 @@ collision risk) and `CaptchaSolver` (job + domain).
 
 ## Decision
 
-- The universal client classes are **`CaptchaSolver`** and
-  **`AsyncCaptchaSolver`**.
-- Tier naming becomes **lexical**: `CaptchaSolver` (universal,
+- The universal client classes are **`Solver`** and
+  **`AsyncSolver`**.
+- Tier naming becomes **lexical**: `Solver` (universal,
   holds many providers, dispatches by challenge class) vs
   `<Provider>Client` (facade, static provider, convenience methods).
 - The `Client` suffix rule (ADR-0036) is **scoped to facades**; the
@@ -43,9 +43,9 @@ collision risk) and `CaptchaSolver` (job + domain).
 
 - Job + domain in one self-contained name: what it does (solves) and
   over what (captchas). At import and annotation sites
-  (`def get_past(solver: CaptchaSolver, ...)`) it teaches role and
+  (`def get_past(solver: Solver, ...)`) it teaches role and
   domain without requiring the README.
-- The domain echo (`unicaptcha.CaptchaSolver`) is redundant-true, not
+- The domain echo (`unicaptcha.Solver`) is redundant-true, not
   false: the package is universal-captcha, the class is the captcha
   solver. Unlike `UnicaptchaClient`'s vendor stutter, it asserts
   nothing false.
@@ -63,9 +63,12 @@ collision risk) and `CaptchaSolver` (job + domain).
 - **`MultiClient` / `AsyncMultiClient`**: superseded by this ADR;
   prefix-only tier distinction, inventory-not-job naming, residual
   generic-`Client` collision.
-- **`Solver` / `AsyncSolver`**: rejected as unqualified — "solver of
-  what?"; mild ecosystem collision risk; everything else it does,
-  `CaptchaSolver` does with the domain attached.
+- **`Solver` / `AsyncSolver`**: rejected at the time as unqualified —
+  "solver of what?"; mild ecosystem collision risk; everything else it
+  does, `CaptchaSolver` does with the domain attached. **(2026-08-24
+  amendment: this rejection is superseded — the task-centric vocabulary
+  change renamed `CaptchaSolver` → `Solver`; the accepted mild `solver.solve()`
+  stutter and the domain-echo are now tolerated.)**
 - **The full 0054 candidate set** (`Client`, `UnicaptchaClient`,
   `Unicaptcha`, `Hub`, `UniversalClient`, `Gate`, `Master`, `Worker`,
   `Composer`, `Dispatcher`, ...): see ADR-0054; their rejection

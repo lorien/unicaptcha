@@ -1,6 +1,6 @@
 # ADR-0054: Universal client naming — `MultiClient` / `AsyncMultiClient`
 
-**Status:** Accepted (class names superseded by ADR-0062: `CaptchaSolver`/`AsyncCaptchaSolver`) (amends ADR-0036 and every document naming the universal client class)
+**Status:** Accepted (class names superseded by ADR-0062: `Solver`/`AsyncSolver`) (amends ADR-0036 and every document naming the universal client class)
 **Date:** 2026-08-23
 
 ## Context

@@ -9,7 +9,7 @@ Constructing a solver requires wrapping every key in `SecretStr(...)`
 by hand:
 
 ```python
-CaptchaSolver(adapters=[TwoCaptchaAdapter(api_key=SecretStr("..."))])
+Solver(adapters=[TwoCaptchaAdapter(api_key=SecretStr("..."))])
 ```
 
 Compact-API review (session 2026-08-23) found the wrap to be the
@@ -29,13 +29,13 @@ effect was weighed as a cost of this ADR and judged insufficient.)
 - The stored type and any public attribute remain `SecretStr`; all
   ADR-0014 no-leak guarantees are unchanged (repr/str masking, log
   scrubbing, defensive raw_response scrubbing, credential-free
-  SolveEvent).
+  TaskEvent).
 - Facade constructors accept the same union via parity (ADR-0061).
 - `api_key` stays the first positional parameter:
   `TwoCaptchaAdapter("...")`.
 
 ```python
-CaptchaSolver(adapters=[TwoCaptchaAdapter("..."), CapMonsterAdapter("...")])
+Solver(adapters=[TwoCaptchaAdapter("..."), CapMonsterAdapter("...")])
 ```
 
 ## Rationale
@@ -53,6 +53,6 @@ CaptchaSolver(adapters=[TwoCaptchaAdapter("..."), CapMonsterAdapter("...")])
 - **`from_env()` helpers**: already rejected by owner (ADR-0014);
   unchanged.
 - **Magic provider-selection kwargs on the solver** (option D of the
-  review, `CaptchaSolver(twocaptcha=key, ...)`): rejected; stringly
+  review, `Solver(twocaptcha=key, ...)`): rejected; stringly
   provider selection breaks the adapter registry's uniformity
   (ADR-0005, ADR-0052).

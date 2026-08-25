@@ -18,7 +18,7 @@ bare base — always the provider subclass. Should users be able to?
 - Adapters always construct provider subclasses (e.g.,
   `AntiCaptchaRecaptchaV2Solution`).
 - Facade methods return the narrower static type
-  (`SolveResult[TwoCaptchaImageSolution]`); challenges link to their solution
+  (`TaskResult[TwoCaptchaImageSolution]`); challenges link to their solution
   type so even the universal `solve()` can be statically precise while
   remaining generic.
 

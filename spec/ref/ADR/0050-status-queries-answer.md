@@ -24,7 +24,7 @@ outcomes that, from a query's perspective, are perfectly good answers.
 - **`UnknownTaskError` is removed** from the hierarchy; `ErrorKind` loses
   `UNKNOWN_TASK` (11 values remain, ADR-0009).
 - The engine maps provider responses to states exactly once; `solve()`
-  translates terminal states into exceptions (it must return a `SolveResult`),
+  translates terminal states into exceptions (it must return a `TaskResult`),
   `get_task_status()` exposes the same states raw. Single truth, two
   honest presentations.
 

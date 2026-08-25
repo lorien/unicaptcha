@@ -13,12 +13,12 @@ exist precisely to give per-provider ergonomics.
 
 ## Decision
 
-The universal client (`CaptchaSolver` / `AsyncCaptchaSolver`, naming per
+The universal client (`Solver` / `AsyncSolver`, naming per
 ADR-0062) accepts a
 **list of adapters**, each with its own credentials:
 
 ```python
-client = CaptchaSolver(adapters=[two_captcha, anti_captcha])
+client = Solver(adapters=[two_captcha, anti_captcha])
 client.solve(TwoCaptchaImageChallenge(body=b"..."))   # routes to 2Captcha
 client.solve(AntiCaptchaRecaptchaV2Challenge(...))    # routes to Anti-Captcha
 ```

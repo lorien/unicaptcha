@@ -36,17 +36,17 @@ rule survives for solutions (ADR-0035, ADR-0056).
 ### solve() signature
 
 ```python
-solve(challenge, provider: str | None = None, solve=..., retry=..., on_event=...)
+solve(challenge, provider: str | None = None, time=..., retry=..., on_event=...)
 ```
 
-on `CaptchaSolver` / `AsyncCaptchaSolver` (facades unchanged,
+on `Solver` / `AsyncSolver` (facades unchanged,
 ADR-0051/0061):
 
 - **Kind-base challenge, `provider=None`**: uniform random choice
   among registered adapters whose `challenges` includes a subclass of
   that kind base. Stateless per call (no stickiness, no weighting);
   each solve independent. The chosen adapter is visible in
-  `SolveResult.provider` and the `submitted` event — no new
+  `TaskResult.provider` and the `submitted` event — no new
   observability surface. Billing caveat documented: any registered
   supporting account may be billed; pass `provider=` to control it.
 - **Kind-base challenge, `provider="capmonster"`**: that adapter.
@@ -76,7 +76,7 @@ their bases stay abstract (nothing universal to instantiate).
 
 ### Typing
 
-`solve(ImageChallenge(...))` returns `SolveResult[ImageSolution]` via the
+`solve(ImageChallenge(...))` returns `TaskResult[ImageSolution]` via the
 existing challenge->solution link (ADR-0048); the returned solution
 is a provider subclass at runtime, the kind base statically — same
 as today.
@@ -94,7 +94,7 @@ deterministic assertions. Internal detail, not public API.
   `solver.solve(ImageChallenge(body=data))`.
 - Random is honest zero-config: no false optimization claims (not
   cheapest, not fastest — just fair distribution over time), and the
-  outcome is always visible in `SolveResult.provider`.
+  outcome is always visible in `TaskResult.provider`.
 - The engine upcast keeps adapters pure and the SDK stable; the
   registry already holds everything needed to derive the concrete
   class.

@@ -17,7 +17,7 @@ differ, instead of a lossy lowest-common-denominator abstraction.
 2. Provider fidelity: per-provider challenge classes and solution types expose
    exactly what each service supports; no union-polluted parameter bags.
 3. First-class typing: full annotations, py.typed, mypy strict + pyright strict,
-   generic SolveResult types with non-optional solutions.
+   generic TaskResult types with non-optional solutions.
 4. Dual execution models: async-native implementation plus a blocking sync
    implementation as peers (no wrapper magic in either direction).
 5. Predictable failure semantics: one exception hierarchy with normalized

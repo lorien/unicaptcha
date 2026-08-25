@@ -1,6 +1,6 @@
 # ADR-0075: Submit-phase ready fast-path with SubmitAccepted
 
-**Status:** Accepted (amends ADR-0053, ADR-0067; formalizes `ParsedTask` from ADR-0058; renamed 2026-08-24: `Result[T]` → `SolveResult[T]`, enum `TaskState` → `TaskStatus`, `parse_task_result` → `parse_task_status` for a single status vocabulary; field `ready` → `instant_answer` on both `SubmitAccepted` and `TaskTicket[T]`)
+**Status:** Accepted (amends ADR-0053, ADR-0067; formalizes `ParsedTask` from ADR-0058; renamed 2026-08-24: `Result[T]` → `TaskResult[T]`, enum `TaskState` → `TaskStatus`, `parse_task_result` → `parse_task_status` for a single status vocabulary; field `ready` → `instant_answer` on both `SubmitAccepted` and `TaskTicket[T]`)
 **Date:** 2026-08-24, amendment 2026-08-24
 
 ## Context
@@ -65,7 +65,7 @@ Tickets remain dumb, picklable, user-inspectable.
 
 ### Behavior
 
-- `wait(ticket)`: `ticket.instant_answer is not None` → return `SolveResult[T]`
+- `wait(ticket)`: `ticket.instant_answer is not None` → return `TaskResult[T]`
   immediately — no poll, no `poll_delay` (the fresh-ticket delay question
   is moot; there is no poll). Otherwise the unchanged poll path.
 - `wait_ref(ref)` / `get_task_status(ref)`: **unchanged**. They take
@@ -74,7 +74,7 @@ Tickets remain dumb, picklable, user-inspectable.
   genuinely finished there. The provider is the source of truth; the
   ticket is a shortcut. One truth, two presentations (ADR-0050 ethos).
 - `solve()`: consumes `SubmitAccepted` as a local variable; short-circuits
-  submit → `SolveResult[T]` without an intermediate ticket when the caller
+  submit → `TaskResult[T]` without an intermediate ticket when the caller
   hasn't split the phases.
 - Events: `submitted` then `solved`; no poll phase (ADR-0067 invariant
   intact). Cost from `instant_answer.cost`; `None` unless the submit response
