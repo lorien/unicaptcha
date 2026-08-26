@@ -10,7 +10,7 @@ v1 implementation plan. Details in `spec/task/task-{N}.md`.
 - [done] 6: Solution kind bases
  - [done] 7: Adapter SDK contract
  - [done] 8: HTTP layer
- - [new] 9: TaskEngine
+ - [done] 9: TaskEngine
  - [new] 10: Solver / AsyncSolver universal client
  - [new] 11: 2Captcha adapter + facade
  - [new] 12: Anti-Captcha adapter + facade
