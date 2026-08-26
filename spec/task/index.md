@@ -12,7 +12,7 @@ v1 implementation plan. Details in `spec/task/task-{N}.md`.
  - [done] 8: HTTP layer
  - [done] 9: TaskEngine
  - [done] 10: Solver / AsyncSolver universal client
- - [new] 11: 2Captcha adapter + facade
+ - [done] 11: 2Captcha adapter + facade
  - [new] 12: Anti-Captcha adapter + facade
  - [new] 13: CapMonster adapter + facade
  - [new] 14: Capsolver adapter + facade
