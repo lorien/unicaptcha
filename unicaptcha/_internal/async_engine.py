@@ -6,12 +6,15 @@ passes through untouched (ADR-0016)."""
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from datetime import timedelta
+from decimal import Decimal
 from typing import Any, Generic, TypeVar, cast
 
 from unicaptcha._internal.backoff import backoff_sleep
 from unicaptcha._internal.clock import Clock, RealClock
 from unicaptcha._internal.defaults import (
+    GENERIC_TIMING,
     ResolvedRetry,
     ResolvedTime,
     resolve_retry,
@@ -38,15 +41,16 @@ from unicaptcha.solution.base import BaseSolution
 from unicaptcha.types import (
     ParsedTask,
     RetryConfig,
-    SubmitAccepted,
     TaskRef,
     TaskResult,
     TaskStatus,
+    TaskStatusResult,
     TaskTicket,
     TimeConfig,
 )
 
 _T = TypeVar("_T", bound=BaseSolution)
+_R = TypeVar("_R")
 
 
 class AsyncTaskEngine(Generic[_T]):
@@ -119,8 +123,14 @@ class AsyncTaskEngine(Generic[_T]):
         start = self._clock.monotonic()
         url = join_url(adapter.base_url, adapter.endpoints.submit)
         payload = adapter.build_payload(challenge)
-        accepted = await self._submit_attempts(
-            adapter, url, payload, retry_cfg, handler, start
+        accepted = await self._post_retried(
+            adapter,
+            url,
+            payload,
+            retry_cfg,
+            handler,
+            start,
+            adapter.parse_submit_response,
         )
         await emit_async(
             handler,
@@ -139,7 +149,7 @@ class AsyncTaskEngine(Generic[_T]):
             time=timing.to_config(),
         )
 
-    async def _submit_attempts(
+    async def _post_retried(
         self,
         adapter: BaseAdapter,
         url: str,
@@ -147,7 +157,13 @@ class AsyncTaskEngine(Generic[_T]):
         retry: ResolvedRetry,
         handler: AsyncEventHandler | None,
         start: float,
-    ) -> SubmitAccepted:
+        parse: Callable[[bytes], _R],
+    ) -> _R:
+        """POST with the submit-phase retry policy (ADR-0011), then parse.
+
+        Events are emitted only when a handler is given; aux operations
+        pass ``None`` (eventless, ADR-0018).
+        """
         attempt = 0
         while True:
             await emit_async(
@@ -202,7 +218,7 @@ class AsyncTaskEngine(Generic[_T]):
                 )
                 raise error_from_kind(err_kind, message, response.body)
             try:
-                return adapter.parse_submit_response(response.body)
+                return parse(response.body)
             except (RateLimitError, ServiceBusyError) as exc:
                 if attempt < retry.max_attempts - 1:
                     await self._retry_pause(attempt, retry)
@@ -401,6 +417,99 @@ class AsyncTaskEngine(Generic[_T]):
                     raw_response=parsed.raw,
                 )
             await self._sleep(timing.poll_interval)
+
+    # -- aux operations (ADR-0013, ADR-0050, ADR-0067) -------------------
+
+    async def wait_ref(
+        self,
+        adapter: BaseAdapter,
+        ref: TaskRef,
+        *,
+        timeout: float | None = None,
+    ) -> TaskStatusResult:
+        """Poll until a terminal state or budget out; answers, never raises
+        on provider outcomes (PENDING result on exhaustion, ADR-0067).
+        Never applies a poll delay (ADR-0030)."""
+        self._check_open()
+        total = timeout if timeout is not None else GENERIC_TIMING.total_timeout
+        try:
+            async with asyncio.timeout(total):
+                return await self._poll_ref(adapter, ref)
+        except TimeoutError:
+            return TaskStatusResult(
+                task_id=ref.task_id,
+                provider=ref.provider,
+                status=TaskStatus.PENDING,
+                solution=None,
+                cost=None,
+                raw=b"",
+            )
+
+    async def _poll_ref(self, adapter: BaseAdapter, ref: TaskRef) -> TaskStatusResult:
+        interval = GENERIC_TIMING.poll_interval
+        url = join_url(adapter.base_url, adapter.endpoints.get_task_status)
+        while True:
+            payload = adapter.build_task_status(ref.task_id)
+            try:
+                response = await self._transport.post(url, payload)
+            except NetworkError:
+                await self._sleep(interval)
+                continue
+            parsed = adapter.parse_task_status(response.body)
+            if parsed.state is not TaskStatus.PENDING:
+                return self._status_result(ref, parsed)
+            await self._sleep(interval)
+
+    async def get_task_status(
+        self, adapter: BaseAdapter, ref: TaskRef
+    ) -> TaskStatusResult:
+        """Single-shot status query; answers (ADR-0050)."""
+        self._check_open()
+        retry_cfg = resolve_retry(self._client_retry, None)
+        url = join_url(adapter.base_url, adapter.endpoints.get_task_status)
+        payload = adapter.build_task_status(ref.task_id)
+        parsed = await self._post_retried(
+            adapter, url, payload, retry_cfg, None, 0.0, adapter.parse_task_status
+        )
+        return self._status_result(ref, parsed)
+
+    async def get_balance(self, adapter: BaseAdapter) -> Decimal:
+        self._check_open()
+        retry_cfg = resolve_retry(self._client_retry, None)
+        url = join_url(adapter.base_url, adapter.endpoints.get_balance)
+        payload = adapter.build_balance()
+        return await self._post_retried(
+            adapter, url, payload, retry_cfg, None, 0.0, adapter.parse_balance
+        )
+
+    async def report_bad_result(self, adapter: BaseAdapter, ref: TaskRef) -> bool:
+        self._check_open()
+        retry_cfg = resolve_retry(self._client_retry, None)
+        url = join_url(adapter.base_url, adapter.endpoints.report_bad_result)
+        payload = adapter.build_report_bad(ref)
+        return await self._post_retried(
+            adapter, url, payload, retry_cfg, None, 0.0, adapter.parse_report_bad
+        )
+
+    async def report_good_result(self, adapter: BaseAdapter, ref: TaskRef) -> bool:
+        self._check_open()
+        retry_cfg = resolve_retry(self._client_retry, None)
+        url = join_url(adapter.base_url, adapter.endpoints.report_good_result)
+        payload = adapter.build_report_good(ref)
+        return await self._post_retried(
+            adapter, url, payload, retry_cfg, None, 0.0, adapter.parse_report_good
+        )
+
+    @staticmethod
+    def _status_result(ref: TaskRef, parsed: ParsedTask) -> TaskStatusResult:
+        return TaskStatusResult(
+            task_id=ref.task_id,
+            provider=ref.provider,
+            status=parsed.state,
+            solution=parsed.solution,
+            cost=parsed.cost,
+            raw=parsed.raw,
+        )
 
     def _build_result(
         self,

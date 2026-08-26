@@ -27,6 +27,7 @@ from unicaptcha import (
     TaskStatus,
     TaskTimeoutError,
     TimeConfig,
+    UnsupportedChallengeError,
 )
 from unicaptcha._internal.async_engine import AsyncTaskEngine
 from unicaptcha._internal.engine import TaskEngine
@@ -35,7 +36,7 @@ from unicaptcha._internal.http import AsyncHttpTransport, HttpTransport
 from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import ErrorKind
-from unicaptcha.types import ParsedTask, SubmitAccepted
+from unicaptcha.types import ParsedTask, SubmitAccepted, TaskRef
 
 BASE = "https://myservice.example"
 CREATE = f"{BASE}/createTask"
@@ -95,7 +96,16 @@ class ScriptedAdapter(BaseAdapter):
         return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)
 
     def parse_balance(self, raw: bytes) -> Decimal:
-        return Decimal(json.loads(raw)["balance"])
+        return Decimal(str(json.loads(raw)["balance"]))
+
+    def report_bad_supported(self, challenge_type: type[BaseChallenge]) -> bool:
+        return True
+
+    def build_report_bad(self, task: TaskRef) -> dict[str, object]:
+        return {"clientKey": "test-key", "taskId": task.task_id}
+
+    def parse_report_bad(self, raw: bytes) -> bool:
+        return json.loads(raw)["status"] == "success"
 
     def map_provider_error(self, raw: bytes) -> tuple[ErrorKind, str]:
         code = json.loads(raw).get("errorCode", "")
@@ -358,6 +368,68 @@ class TestSyncCore:
                 engine.solve(adapter, challenge)
 
 
+class TestSyncAux:
+    def test_wait_ref_terminal_ready(self, adapter: ScriptedAdapter) -> None:
+        ref = TaskRef("myservice", 21)
+        with respx.mock:
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("ready"))
+            )
+            result = make_engine().wait_ref(adapter, ref, timeout=0.5)
+        assert result.status is TaskStatus.READY
+        assert result.task_id == 21
+        assert isinstance(result.solution, FakeSolution)
+
+    def test_wait_ref_budget_out_answers_pending(
+        self, adapter: ScriptedAdapter
+    ) -> None:
+        ref = TaskRef("myservice", 22)
+        with respx.mock:
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("processing"))
+            )
+            result = make_engine().wait_ref(adapter, ref, timeout=0.2)
+        assert result.status is TaskStatus.PENDING
+
+    def test_wait_ref_never_raises_on_unknown(self, adapter: ScriptedAdapter) -> None:
+        ref = TaskRef("myservice", 23)
+        with respx.mock:
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("notfound"))
+            )
+            result = make_engine().wait_ref(adapter, ref, timeout=0.5)
+        assert result.status is TaskStatus.UNKNOWN
+
+    def test_get_task_status_single_shot(self, adapter: ScriptedAdapter) -> None:
+        ref = TaskRef("myservice", 24)
+        with respx.mock:
+            status = respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("ready"))
+            )
+            result = make_engine().get_task_status(adapter, ref)
+        assert result.status is TaskStatus.READY
+        assert status.call_count == 1
+
+    def test_get_balance(self, adapter: ScriptedAdapter) -> None:
+        with respx.mock:
+            respx.post(f"{BASE}/getBalance").mock(
+                return_value=httpx.Response(200, content=b'{"balance": 1.23}')
+            )
+            assert make_engine().get_balance(adapter) == Decimal("1.23")
+
+    def test_report_bad_result(self, adapter: ScriptedAdapter) -> None:
+        ref = TaskRef("myservice", 25)
+        with respx.mock:
+            respx.post(f"{BASE}/reportIncorrect").mock(
+                return_value=httpx.Response(200, content=b'{"status": "success"}')
+            )
+            assert make_engine().report_bad_result(adapter, ref) is True
+
+    def test_report_good_default_unsupported(self, adapter: ScriptedAdapter) -> None:
+        with pytest.raises(UnsupportedChallengeError):
+            make_engine().report_good_result(adapter, TaskRef("myservice", 26))
+
+
 class TestAsyncCore:
     @pytest.mark.asyncio
     async def test_solve_happy_path(
@@ -418,6 +490,34 @@ class TestAsyncCore:
             engine = make_async_engine()
             with pytest.raises(TaskTimeoutError):
                 await engine.solve(adapter, challenge)
+
+    @pytest.mark.asyncio
+    async def test_wait_ref_and_aux(self, adapter: ScriptedAdapter) -> None:
+        ref = TaskRef("myservice", 31)
+        with respx.mock:
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("ready"))
+            )
+            result = await make_async_engine().wait_ref(adapter, ref, timeout=0.5)
+        assert result.status is TaskStatus.READY
+
+    @pytest.mark.asyncio
+    async def test_wait_ref_budget_out(self, adapter: ScriptedAdapter) -> None:
+        ref = TaskRef("myservice", 32)
+        with respx.mock:
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("processing"))
+            )
+            result = await make_async_engine().wait_ref(adapter, ref, timeout=0.2)
+        assert result.status is TaskStatus.PENDING
+
+    @pytest.mark.asyncio
+    async def test_get_balance(self, adapter: ScriptedAdapter) -> None:
+        with respx.mock:
+            respx.post(f"{BASE}/getBalance").mock(
+                return_value=httpx.Response(200, content=b'{"balance": 2.5}')
+            )
+            assert await make_async_engine().get_balance(adapter) == Decimal("2.5")
 
     @pytest.mark.asyncio
     async def test_external_cancellation_passes_through(
