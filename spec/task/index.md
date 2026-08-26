@@ -1,7 +1,6 @@
 # Task Index
 
-v1 implementation plan. Statuses: `new` / `failed` / `done`. Details in
-`spec/task/task-{N}.md`; conventions in `spec/skill/task_tracking.md`.
+v1 implementation plan. Details in `spec/task/task-{N}.md`.
 
  - [done] 1: Toolchain + package scaffold
  - [done] 2: Core models and public types
