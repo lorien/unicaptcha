@@ -8,26 +8,25 @@ the JSON-family `createTask` / `getTaskResult` protocol.
 Kind: twocaptcha
 Website: https://2captcha.com
 Repo: https://github.com/2captcha/2captcha-python
+Docs: https://2captcha.com/api-docs
 
 ## Anti-Captcha
 
 Kind: anti-captcha
 Website: https://anti-captcha.com
 Repo: https://github.com/anti-captcha/anticaptcha-python
+Docs: https://anti-captcha.com/apidoc
 
 ## CapMonster Cloud
 
 Kind: capmonster
 Website: https://capmonster.cloud
 Repo: https://github.com/CapMonsterCloud/capmonster-python-captcha-solver
+Docs: https://docs.capmonster.cloud/
 
 ## Capsolver
 
 Kind: capsolver
 Website: https://www.capsolver.com
 Repo: https://github.com/capsolver/capsolver-python
-
-## Mirrors
-
-RuCaptcha and other 2Captcha-protocol mirrors are not shipped providers.
-They work by overriding the 2Captcha adapter's base_url (ADR-0071).
+Docs: https://docs.capsolver.com/

@@ -3,9 +3,11 @@
 ### Spec/ADR amendments
 
 - [acted] Added `spec/ref/providers.md` — the four v1 providers
-  (ADR-0001/0071) with kind, official website, and official Python repo,
-  listed one property per line as plain prose (no tables, no markdown
-  links per owner). Linked from the `spec/ref/index.md` documents table.
+  (ADR-0001/0071) with kind, official website, official Python repo, and
+  API documentation URL, listed one property per line as plain prose (no
+  tables, no markdown links per owner; mirrors section removed on owner
+  request — RuCaptcha stays documented in ADR-0071 only). Linked from the
+  `spec/ref/index.md` documents table.
 - [open] `providers.md` records the official repo per provider. CapMonster
   Cloud's SDK moved from `ZennoLab/capmonstercloud-client-python` to
   `CapMonsterCloud/capmonster-python-captcha-solver` (verified via git
