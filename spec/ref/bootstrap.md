@@ -45,6 +45,16 @@ All checks (lint, formatting, type checking, tests, slotscheck) run through
 `uv run`; the commands and acceptance criteria live in
 [testing.md](testing.md).
 
+## Known toolchain notes
+
+- **Slots dataclass `super()` bug**: `super().__post_init__()` inside a
+  `slots=True` dataclass `__post_init__` raises `TypeError`. Never chain a
+  base-class `__post_init__` via `super()` in a slots dataclass; call
+  shared helpers directly (e.g. `guard_abstract` in `_internal/taxonomy.py`).
+- **ruff format ignores `.md`**: `[tool.ruff.format] exclude = ["*.md",
+  "*.markdown"]` — ruff 0.11+ would otherwise reformat the code blocks
+  inside ADR/README markdown, destroying their alignment.
+
 ## Scope
 
 The library code does not exist yet. This guide targets the scaffold and
