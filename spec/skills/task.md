@@ -1,7 +1,8 @@
 # Initial steps
 
 Study documents inside `spec/ref/` directory.
-Read `spec/skill/task_tracking.md`.
+Read `spec/skills/task_tracking.md`.
+Read `spec/skills/report_tracking.md`.
 I am going to describe some new features.
 Ask any questions to fully clarify what should be done.
 Do not ask more than 3 question per message!

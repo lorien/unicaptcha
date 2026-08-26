@@ -15,7 +15,7 @@ case "$ACTION" in
                 echo "[!] Remove the file $FILE_TASK_FAILED when you fix the issue."
                 exit 1
             fi
-            if $CMD_OPENCODE run "$(cat spec/skill/work.md)" \
+            if $CMD_OPENCODE run "$(cat spec/skills/work.md)" \
                 --auto --print-logs --log-level DEBUG 2>&1 \
                 | sed -E 's/^timestamp=([^ ]+) /\1: /; s/level=[^ ]+ //; s/run=[^ ]+ //;' \
             ; then
@@ -26,10 +26,10 @@ case "$ACTION" in
         done
         ;;
     "task")
-        $CMD_OPENCODE --agent plan --prompt "$(cat spec/skill/task.md)"
+        $CMD_OPENCODE --agent plan --prompt "$(cat spec/skills/task.md)"
         ;;
     "shell")
-        $CMD_OPENCODE --agent plan --prompt "$(cat spec/skill/shell.md)"
+        $CMD_OPENCODE --agent plan --prompt "$(cat spec/skills/shell.md)"
         ;;
     *)
         echo "Usage: $0 <work|task|shell>"
