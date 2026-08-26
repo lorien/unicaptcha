@@ -42,7 +42,7 @@ class TwoCaptchaImageChallenge(ImageChallenge):
     math: bool = field(kw_only=True, default=False)
     min_len: int | None = field(kw_only=True, default=None)
     max_len: int | None = field(kw_only=True, default=None)
-    lang: str | None = field(kw_only=True, default=None)
+    language_pool: str | None = field(kw_only=True, default=None)
     comment: str | None = field(kw_only=True, default=None)
     proxy: Proxy | None = field(kw_only=True, default=None)
     solution_type: ClassVar[type[BaseSolution]] = ImageSolution
@@ -67,9 +67,10 @@ class TwoCaptchaImageChallenge(ImageChallenge):
 
 @dataclass(frozen=True, slots=True)
 class TwoCaptchaTextChallenge(TextChallenge):
-    """Question captcha; 2Captcha maps ``lang`` onto its text task."""
+    """Question captcha; carries the worker-pool hint (``languagePool``
+    envelope field in the wire payload)."""
 
-    lang: str | None = field(kw_only=True, default=None)
+    language_pool: str | None = field(kw_only=True, default=None)
     solution_type: ClassVar[type[BaseSolution]] = TextSolution
 
 

@@ -265,7 +265,7 @@ class TwoCaptchaClient:
         math: bool = False,
         min_len: int | None = None,
         max_len: int | None = None,
-        lang: str | None = None,
+        language_pool: str | None = None,
         comment: str | None = None,
         proxy: Proxy | None = None,
         time: TimeConfig | None = None,
@@ -283,7 +283,7 @@ class TwoCaptchaClient:
                 math=math,
                 min_len=min_len,
                 max_len=max_len,
-                lang=lang,
+                language_pool=language_pool,
                 comment=comment,
                 proxy=chosen_proxy,
             )
@@ -300,13 +300,13 @@ class TwoCaptchaClient:
         self,
         text: str,
         *,
-        lang: str | None = None,
+        language_pool: str | None = None,
         time: TimeConfig | None = None,
         retry: RetryConfig | None = None,
         on_event: SyncEventHandler | None = None,
     ) -> TaskResult[TwoCaptchaTextSolution]:
         def build() -> BaseChallenge:
-            return TwoCaptchaTextChallenge(text, lang=lang)
+            return TwoCaptchaTextChallenge(text, language_pool=language_pool)
 
         return self._solve(
             build,
@@ -724,7 +724,7 @@ class AsyncTwoCaptchaClient:
         math: bool = False,
         min_len: int | None = None,
         max_len: int | None = None,
-        lang: str | None = None,
+        language_pool: str | None = None,
         comment: str | None = None,
         proxy: Proxy | None = None,
         time: TimeConfig | None = None,
@@ -742,7 +742,7 @@ class AsyncTwoCaptchaClient:
                 math=math,
                 min_len=min_len,
                 max_len=max_len,
-                lang=lang,
+                language_pool=language_pool,
                 comment=comment,
                 proxy=chosen_proxy,
             )
@@ -759,13 +759,13 @@ class AsyncTwoCaptchaClient:
         self,
         text: str,
         *,
-        lang: str | None = None,
+        language_pool: str | None = None,
         time: TimeConfig | None = None,
         retry: RetryConfig | None = None,
         on_event: AsyncEventHandler | None = None,
     ) -> TaskResult[TwoCaptchaTextSolution]:
         def build() -> BaseChallenge:
-            return TwoCaptchaTextChallenge(text, lang=lang)
+            return TwoCaptchaTextChallenge(text, language_pool=language_pool)
 
         return await self._solve(
             build,

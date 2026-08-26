@@ -135,15 +135,21 @@ field (proxyless, ADR-0012).
 
 | Kind | Concrete class | Provider extras → wire | Proxy / worker |
 |---|---|---|---|
-| image | `TwoCaptchaImageChallenge` | `phrase→phrase`, `case→case`, `numeric→numeric` (0-4), `math→math`, `min_len→min_len`, `max_len→max_len`, `lang→lang`, `comment→comment` | proxy opt. |
-| text | `TwoCaptchaTextChallenge` | `lang→lang` | — |
+| image | `TwoCaptchaImageChallenge` | `phrase→phrase`, `case→case`, `numeric→numeric` (0-4), `math→math`, `min_len→minLength`, `max_len→maxLength`, `language_pool→languagePool` (envelope), `comment→comment` | proxy opt. |
+| text | `TwoCaptchaTextChallenge` | text→`comment`; `language_pool→languagePool` (envelope) | — |
 | reCAPTCHA v2 | `TwoCaptchaRecaptchaV2Challenge` | `is_enterprise→RecaptchaV2EnterpriseTask` (+`enterprisePayload`), `data_s→recaptchaDataSValue`, `api_domain→apiDomain` | proxy opt.; UA + cookies |
-| reCAPTCHA v3 | `TwoCaptchaRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore`, `is_enterprise→RecaptchaV3EnterpriseTask` (+`enterprisePayload`), `api_domain→apiDomain` | proxy opt.; UA + cookies |
+| reCAPTCHA v3 | `TwoCaptchaRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore`, `is_enterprise→isEnterprise:true` (no separate task type on 2Captcha), `api_domain→apiDomain` | proxy opt.; UA + cookies |
 | hCaptcha | `TwoCaptchaHCaptchaChallenge` | `rqdata→enterprisePayload` | proxy opt.; UA + cookies |
 | FunCaptcha | `TwoCaptchaFunCaptchaChallenge` | `public_key→websitePublicKey`, `data→data` (blob), `service_url→funcaptchaApiJSSubdomain` | proxy opt.; UA |
 | GeeTest v3 | `TwoCaptchaGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge`, `api_server→geetestApiServerSubdomain` | proxy opt.; UA |
 | GeeTest v4 | `TwoCaptchaGeeTestV4Challenge` | `captcha_id→initParameters.captcha_id` (+`version:4`), `risk_type→risk_type` | proxy opt.; UA |
 | Turnstile | `TwoCaptchaTurnstileChallenge` | `action→action`, `c_data→cData`, `chl_page_data→chlPageData` | proxy opt.; UA |
+
+2026-08-27 implementation verification (task 11): rows above corrected
+against the live 2Captcha JSON API — `minLength`/`maxLength` camelCase,
+no task-level `lang` (worker pool rides envelope-level `languagePool`,
+values `en`/`rn`), and reCAPTCHA v3 enterprise is the `isEnterprise`
+flag inside the normal v3 task.
 
 #### Anti-Captcha (`anti-captcha`; nine kinds — text via API's `TextCaptchaTask`, absent from the official SDK)
 

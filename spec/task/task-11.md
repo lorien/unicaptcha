@@ -54,4 +54,6 @@ Done:
 - Owner decisions during session: report pairs stay modern-API-only after
   competitor research (`python-rucaptcha` precedent verified; legacy-only
   SDKs mislead); `referral=True` embeds nothing until an affiliate id is
-  registered.
+  registered. Follow-up commit: `lang` replaced by `language_pool`
+  (envelope `languagePool`) on image/text challenges per owner decision;
+  architecture §2 rows corrected to live-API mapping.

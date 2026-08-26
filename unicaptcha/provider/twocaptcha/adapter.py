@@ -161,6 +161,10 @@ class TwoCaptchaAdapter(BaseAdapter):
         soft_id = _soft_id(self._referral)
         if soft_id is not None:
             payload["softId"] = soft_id
+        language_pool = getattr(challenge, "language_pool", None)
+        if language_pool is not None:
+            # Envelope-level worker-pool hint (2Captcha-only field).
+            payload["languagePool"] = language_pool
         return payload
 
     def _build_task(self, challenge: BaseChallenge) -> dict[str, Any]:
@@ -206,17 +210,12 @@ class TwoCaptchaAdapter(BaseAdapter):
             task["minLength"] = ch.min_len
         if ch.max_len is not None:
             task["maxLength"] = ch.max_len
-        if ch.lang is not None:
-            task["lang"] = ch.lang
         if ch.comment is not None:
             task["comment"] = ch.comment
         return task
 
     def _text_task(self, ch: TwoCaptchaTextChallenge) -> dict[str, Any]:
-        task: dict[str, Any] = {"type": "TextCaptchaTask", "comment": ch.text}
-        if ch.lang is not None:
-            task["lang"] = ch.lang
-        return task
+        return {"type": "TextCaptchaTask", "comment": ch.text}
 
     def _recaptcha_v2_task(self, ch: TwoCaptchaRecaptchaV2Challenge) -> dict[str, Any]:
         base = "RecaptchaV2EnterpriseTask" if ch.is_enterprise else "RecaptchaV2Task"

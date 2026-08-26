@@ -70,6 +70,19 @@ def test_image_challenge_rejects_bad_numeric() -> None:
         TwoCaptchaImageChallenge(b"x", numeric=9)
 
 
+def test_language_pool_rides_envelope_never_task() -> None:
+    a = adapter()
+    payload = a.build_payload(TwoCaptchaTextChallenge("q", language_pool="rn"))
+    assert payload["languagePool"] == "rn"
+    assert "languagePool" not in payload["task"]
+    image_payload = a.build_payload(
+        TwoCaptchaImageChallenge(b"png", language_pool="en")
+    )
+    assert image_payload["languagePool"] == "en"
+    bare = a.build_payload(TwoCaptchaTextChallenge("q"))
+    assert "languagePool" not in bare
+
+
 def test_all_challenges_construct() -> None:
     proxy = Proxy(host="1.2.3.4", port=8080)
     TwoCaptchaImageChallenge(b"png", numeric=2)
