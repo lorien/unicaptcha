@@ -1,6 +1,18 @@
 """Universal async/sync interface to multiple anti-captcha services."""
 
 from unicaptcha._version import __version__
+from unicaptcha.challenge import (
+    BaseChallenge,
+    FunCaptchaChallenge,
+    GeeTestV3Challenge,
+    GeeTestV4Challenge,
+    HCaptchaChallenge,
+    ImageChallenge,
+    RecaptchaV2Challenge,
+    RecaptchaV3Challenge,
+    TextChallenge,
+    TurnstileChallenge,
+)
 from unicaptcha.errors import (
     AuthenticationError,
     ClientClosedError,
@@ -19,7 +31,18 @@ from unicaptcha.errors import (
     UnsupportedChallengeError,
 )
 from unicaptcha.events import TaskEvent, TaskEventKind
-from unicaptcha.solution.base import BaseSolution
+from unicaptcha.solution import (
+    BaseSolution,
+    FunCaptchaSolution,
+    GeeTestV3Solution,
+    GeeTestV4Solution,
+    HCaptchaSolution,
+    ImageSolution,
+    RecaptchaV2Solution,
+    RecaptchaV3Solution,
+    TextSolution,
+    TurnstileSolution,
+)
 from unicaptcha.types import (
     NetworkConfig,
     ParsedTask,
@@ -38,10 +61,21 @@ from unicaptcha.types import (
 
 __all__ = [
     "AuthenticationError",
+    "BaseChallenge",
     "BaseSolution",
     "ClientClosedError",
     "EmptySolutionError",
     "ErrorKind",
+    "FunCaptchaChallenge",
+    "FunCaptchaSolution",
+    "GeeTestV3Challenge",
+    "GeeTestV3Solution",
+    "GeeTestV4Challenge",
+    "GeeTestV4Solution",
+    "HCaptchaChallenge",
+    "HCaptchaSolution",
+    "ImageChallenge",
+    "ImageSolution",
     "InsufficientBalanceError",
     "InvalidChallengeError",
     "InvalidConfigError",
@@ -53,6 +87,10 @@ __all__ = [
     "Proxy",
     "ProxyKind",
     "RateLimitError",
+    "RecaptchaV2Challenge",
+    "RecaptchaV2Solution",
+    "RecaptchaV3Challenge",
+    "RecaptchaV3Solution",
     "RetryConfig",
     "SecretStr",
     "ServiceBusyError",
@@ -65,7 +103,11 @@ __all__ = [
     "TaskStatusResult",
     "TaskTicket",
     "TaskTimeoutError",
+    "TextChallenge",
+    "TextSolution",
     "TimeConfig",
+    "TurnstileChallenge",
+    "TurnstileSolution",
     "UnicaptchaError",
     "UnsupportedChallengeError",
     "__version__",
