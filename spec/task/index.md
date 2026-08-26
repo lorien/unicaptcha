@@ -9,7 +9,7 @@ v1 implementation plan. Details in `spec/task/task-{N}.md`.
 - [done] 5: Challenge kind bases
 - [done] 6: Solution kind bases
  - [done] 7: Adapter SDK contract
- - [new] 8: HTTP layer
+ - [done] 8: HTTP layer
  - [new] 9: TaskEngine
  - [new] 10: Solver / AsyncSolver universal client
  - [new] 11: 2Captcha adapter + facade
