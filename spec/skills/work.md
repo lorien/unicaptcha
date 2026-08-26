@@ -6,6 +6,8 @@ Read `spec/skills/task_tracking.md`.
 Read `spec/skills/report_tracking.md`.
 If user has not instructed you on what task to work, then
 select one task yourself and work on it.
+Before implementing a task, present your implementation plan and wait
+for the owner's approval.
 After task is done do these aciton (in this very order):
 - perform final checks (see below)
 - create new report file
