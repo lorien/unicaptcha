@@ -13,6 +13,7 @@ what the project is, how it is designed, and why each decision was made.
 | [testing.md](testing.md) | How to run tests and checks |
 | [deferred.md](deferred.md) | Canonical list of explicitly deferred decisions |
 | [competitors.md](competitors.md) | Competitor survey: Go and Python universal libraries (2026-08-24) |
+| [providers.md](providers.md) | Supported provider directory: websites and official Python repos |
 | [ADR/](ADR/) | Architecture Decision Records, one per settled decision |
 
 ## ADR directory
