@@ -45,7 +45,7 @@ Four facts decide it:
 | Member | Kind |
 |---|---|
 | `provider`, `challenges` | abstract declarations (`provider` per ADR-0055) |
-| `__init__(api_key: SecretStr \| str, base_url: str \| None = None, referral: bool \| str = True)` | concrete: wrap plain str into SecretStr (ADR-0063), store key; resolve `base_url or default_base_url`; store referral flag — the base embeds nothing, shipped adapters serialize their provider's affiliate field (ADR-0072) |
+| `__init__(api_key: SecretStr \| str, base_url: str \| None = None, *, referral: bool \| str = True)` | concrete: wrap plain str into SecretStr (ADR-0063), store key; resolve `base_url or default_base_url`; store referral flag — the base embeds nothing, shipped adapters serialize their provider's affiliate field (ADR-0072); `referral` keyword-only per the ADR-0066/0043 discipline (owner decision 2026-08-26) |
 | `default_base_url: ClassVar[str]` | declared per provider (README table) |
 | `endpoints: ClassVar[Endpoints]` | concrete JSON-family default; complete-set override only (ADR-0073) |
 | `__repr__` / `__str__` | concrete, key masked (ADR-0014) |

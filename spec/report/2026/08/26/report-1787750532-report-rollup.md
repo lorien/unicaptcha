@@ -8,9 +8,10 @@
 
 ### Future-task notes
 
-- [open] When adapting the report workflow in the future, prefer derived
+- [acted] When adapting the report workflow in the future, prefer derived
   queries (`grep` over the markers) over maintained copies — a copy is a
-  drift surface, not an index.
+  drift surface, not an index (encoded in report_tracking.md, spec sweep
+  2026-08-26).
 
 ### Tooling/process
 

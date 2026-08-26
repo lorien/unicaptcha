@@ -1,6 +1,6 @@
 # ADR-0014: API key hygiene
 
-**Status:** Accepted (amended: no env-var helpers; own SecretStr after pydantic was dropped; `SecretStr | str` accepted and normalized at construction per ADR-0063; surface pinned 2026-08-24: accessor `get_secret_value()`, full-mask repr/str, value equality, picklable)
+**Status:** Accepted (amended: no env-var helpers; own SecretStr after pydantic was dropped; `SecretStr | str` accepted and normalized at construction per ADR-0063; surface pinned 2026-08-24: accessor `get_secret_value()`, full-mask repr/str, value equality, picklable; equality semantics pinned 2026-08-26: `__eq__` raises `TypeError` on non-SecretStr (`None` compares `False`), `hash` = hash of the wrapped value — probing a `SecretStr`-keyed dict with a plain `str` hits the same hash bucket and raises `TypeError`, not a silent `KeyError`)
 **Date:** 2026-08-22, amendment 2026-08-24
 
 ## Context

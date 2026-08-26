@@ -28,7 +28,7 @@ uv run pytest                    # tests; integration tests deselected by defaul
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy unicaptcha           # strict ([tool.mypy] strict = true)
-uv run pyright                   # strict ([tool.pyright] typeCheckingMode = "strict")
+uv run pyright unicaptcha        # strict ([tool.pyright] typeCheckingMode = "strict")
 uv run slotscheck unicaptcha
 ```
 

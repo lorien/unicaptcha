@@ -22,6 +22,10 @@ Implement the `challenge/` package:
 References: ADR-0006, ADR-0025, ADR-0031, ADR-0048, ADR-0064, ADR-0065,
 ADR-0066, ADR-0069, ADR-0070, ADR-0074, ADR-0076, ADR-0012.
 
+Note: task 5 and task 6 (solution kind bases) are one unit — the
+challenge->solution type link and the symmetric taxonomy are inseparable;
+executed folded (see Done below).
+
 ## Done
 
 - Implemented `unicaptcha/challenge/`: `BaseChallenge` (abstract,

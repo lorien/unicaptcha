@@ -20,6 +20,11 @@ chosen before implementation begins so configuration is written once.
 | Extras audit | slotscheck |
 | Dependency groups | PEP 735 `[dependency-groups]` dev group holding all dev tools |
 
+- `ruff format` excludes `*.md` / `*.markdown` (ruff 0.11+ would
+  reformat the Python code blocks inside ADR/README markdown, destroying
+  their alignment); both type checkers are scoped to the `unicaptcha`
+  package only (pyright via `[tool.pyright] include`).
+
 - Integration suite (real APIs, keys via environment) marked `integration`,
   deselected by default (`addopts = "-m 'not integration'"`).
 - No optional dependency extras in v1 (no optional features).

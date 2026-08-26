@@ -39,7 +39,10 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
   challenge->solution link (ADR-0048) at submit time.
 - **Not user-constructible** (enforcement at implementation, same
   spirit as solution bases): its value is provenance — a self-built
-  ticket would lie about `T`.
+  ticket would lie about `T`. (Owner amendment 2026-08-26: enforced by
+  **documentation and provenance**, not a runtime guard — Python cannot
+  prevent construction of a concrete public dataclass, and ADR-0035's
+  base-guard pattern does not apply to a concrete leaf.)
 - Bridges to persistence via `.task_ref` (ADR-0045 unchanged:
   TaskRef remains the constructible identity object).
 

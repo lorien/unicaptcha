@@ -37,6 +37,10 @@ unicaptcha/
   `_internal/`); everything inside a provider package is singular, one
   file per concern (`challenge.py`, `solution.py`, `adapter.py`,
   `client.py`).
+- **Singular-file exception** (owner decision 2026-08-26): `adapter.py`
+  is singular despite the root-files-plural rule — it is a single-concern
+  file holding the adapter SDK contract (one base class + `Endpoints`),
+  not a multi-name collection.
 - **`challenge/`** (2026-08-24 amendment): abstract challenge kind bases
   (ADR-0048) live in a root package symmetric with `solution/`, one file
   per kind (`base.py`, `image.py`, `text.py`, `recaptcha_v2.py`,

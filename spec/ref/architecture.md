@@ -297,6 +297,10 @@ class TaskEventKind(Enum):
 | `detail` | `str \| None` | e.g. "connection reset", "503"; never credentials; names both parties on TypeError |
 | `error_kind` | `ErrorKind \| None` | set only on the terminal failure kinds; `None` on in-progress and success kinds; `None` on PRE_FLIGHT_FAILED caused by wrong-provider `TypeError` (a bare builtin, no ErrorKind) |
 
+Field defaults (settled at implementation): `kind`/`provider`/`elapsed`/
+`attempt` are required; `task_id`, `detail`, and `error_kind` default to
+`None`.
+
 `error_kind` possible values by kind:
 
 - `PRE_FLIGHT_FAILED`: `INVALID_CHALLENGE`, `UNSUPPORTED_CHALLENGE`,
@@ -332,7 +336,9 @@ ADR-0028). Construction validates the fail-fast basics — `host` non-empty,
 configuration value; the same rule applies whether it lands on a challenge
 or as the client default). `kind` is enum-enforced; SOCKS4/SOCKS5 support is
 provider-side, values sent verbatim. `password` stays plain `str` (masking
-contracts are scoped to API keys, ADR-0014).
+contracts are scoped to API keys, ADR-0014). (The sketch above shows
+`kind` first; dataclass default-ordering requires the required `host`/
+`port` to precede the defaulted `kind` — keyword usage is unaffected.)
 
 Placement: optional `proxy` field on proxy-capable challenges; client-level
 default proxy passed as a flat `proxy=` constructor kwarg, applied only to
@@ -696,7 +702,8 @@ unicaptcha/
         anticaptcha/
         capmonster/
         capsolver/     # ADR-0071
-    _internal/         # engine, http layer implementation, clock, scrubbing
+    _internal/         # engine, http layer implementation, clock, scrubbing,
+                       # config resolution (_internal/config.py)
 ```
 
 - Import model: **eager**. `import unicaptcha` pre-loads provider packages;
@@ -751,7 +758,7 @@ class MyServiceAdapter(BaseAdapter):
     def report_good_supported(self, challenge_type) -> bool: ...   # ADR-0068
     def build_report_good(self, task: TaskRef) -> dict[str, Any]: ...
     def parse_report_good(self, raw: bytes) -> bool: ...
-    def map_provider_error(self, raw: bytes) -> ErrorKind and message: ...
+    def map_provider_error(self, raw: bytes) -> tuple[ErrorKind, str]: ...
 ```
 
 - Registration: `Solver(adapters=[MyServiceAdapter(...)])`.

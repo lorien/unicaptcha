@@ -16,6 +16,9 @@ Implement the `solution/` package:
 
 References: ADR-0034, ADR-0035, ADR-0056, ADR-0070, ADR-0074.
 
+Note: task 6 is folded with task 5 (challenge kind bases) — the taxonomy
+is one unit; see task-5.md.
+
 ## Done
 
 - Implemented `unicaptcha/solution/` alongside task 5 (folded execution,

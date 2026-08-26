@@ -33,7 +33,10 @@ from day one.
 promise): TaskEngine, HTTP layer implementation, clock/sleep seam,
 scrubbing, adapter base machinery internals. CI enforces isolation: public
 modules never import another provider's package; the reference third-party
-adapter (ADR-0046) never imports `_internal`.
+adapter (ADR-0046) never imports `_internal`. Public modules *may*
+consume `_internal` helpers (e.g. `_internal.repr`, `_internal.taxonomy`);
+the no-`_internal` rule applies only to third-party adapter code, which
+must build against the public surface alone.
 
 **Models are frozen dataclasses** (supersedes pydantic): `__post_init__`
 validation raises `InvalidChallengeError`/`InvalidConfigError` directly —
