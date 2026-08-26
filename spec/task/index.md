@@ -8,7 +8,7 @@ v1 implementation plan. Details in `spec/task/task-{N}.md`.
  - [done] 4: Events
 - [done] 5: Challenge kind bases
 - [done] 6: Solution kind bases
- - [new] 7: Adapter SDK contract
+ - [done] 7: Adapter SDK contract
  - [new] 8: HTTP layer
  - [new] 9: TaskEngine
  - [new] 10: Solver / AsyncSolver universal client

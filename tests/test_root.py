@@ -5,10 +5,12 @@ class TestRootExports:
     def test_core_vocabulary_exported(self) -> None:
         expected = {
             "AuthenticationError",
+            "BaseAdapter",
             "BaseChallenge",
             "BaseSolution",
             "ClientClosedError",
             "EmptySolutionError",
+            "Endpoints",
             "ErrorKind",
             "FunCaptchaChallenge",
             "FunCaptchaSolution",

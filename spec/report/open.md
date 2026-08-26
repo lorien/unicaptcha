@@ -6,6 +6,17 @@ Links point at the source reports under `spec/report/2026/08/26/`.
 
 ## Spec/ADR amendments
 
+- [task 7] ADR-0053: align `__init__` signature with the keyword-only
+  `referral` decision. —
+  [report](2026/08/26/report-1787748333-task-7.md)
+- [task 7] ADR-0036: note a single-concern-file exception (or accept)
+  for the singular `adapter.py`. —
+  [report](2026/08/26/report-1787748333-task-7.md)
+- [task 7] architecture.md: pin `map_provider_error` -> `tuple[ErrorKind,
+  str]`. — [report](2026/08/26/report-1787748333-task-7.md)
+- [task 7] ADR-0041: note that public modules may consume `_internal`
+  helpers (only third-party adapter code may not). —
+  [report](2026/08/26/report-1787748333-task-7.md)
 - [report-process] Consider recording the commit hash on report items (or
   in open.md) so a suggestion is traceable to the commit that addressed
   it. — [report](2026/08/26/report-1787734704-report-process.md)
@@ -35,6 +46,17 @@ Links point at the source reports under `spec/report/2026/08/26/`.
 
 ## Future-task notes
 
+- [task 7] Registration check (non-adapter in `adapters=` -> `TypeError`)
+  lands with the universal clients (9/10). —
+  [report](2026/08/26/report-1787748333-task-7.md)
+- [task 7] Shipped adapters (11-14) must declare `__slots__` (BaseAdapter
+  has them; slotscheck scans `unicaptcha`). —
+  [report](2026/08/26/report-1787748333-task-7.md)
+- [task 7] Reference-adapter never-imports-`_internal` CI check belongs to
+  task 15. — [report](2026/08/26/report-1787748333-task-7.md)
+- [task 7] Engine (task 9) defines how `default_task_config` feeds the
+  per-kind timing table. —
+  [report](2026/08/26/report-1787748333-task-7.md)
 - [task 1] CI 3.14t informational job depends on setup-uv `t`-suffix
   support; `continue-on-error` keeps it non-blocking. —
   [report](2026/08/26/report-1787697485-task-1.md)

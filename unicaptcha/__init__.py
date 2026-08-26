@@ -1,6 +1,7 @@
 """Universal async/sync interface to multiple anti-captcha services."""
 
 from unicaptcha._version import __version__
+from unicaptcha.adapter import BaseAdapter, Endpoints
 from unicaptcha.challenge import (
     BaseChallenge,
     FunCaptchaChallenge,
@@ -61,10 +62,12 @@ from unicaptcha.types import (
 
 __all__ = [
     "AuthenticationError",
+    "BaseAdapter",
     "BaseChallenge",
     "BaseSolution",
     "ClientClosedError",
     "EmptySolutionError",
+    "Endpoints",
     "ErrorKind",
     "FunCaptchaChallenge",
     "FunCaptchaSolution",
