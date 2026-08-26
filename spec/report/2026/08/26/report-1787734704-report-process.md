@@ -2,9 +2,10 @@
 
 ### Spec/ADR amendments
 
-- [open] Consider recording the commit hash on each report item so a
-  suggestion can be traced to the commit that addressed it — currently
-  requires git archaeology to map suggestion -> commit.
+- [acted] Commit-hash traceability — resolved without stored hashes: the
+  resolution commit of an item is found via `git blame` on the marker
+  line or `git log -S "<phrase>" -- <report>`; documented in
+  report_tracking.md.
 
 ### Future-task notes
 
