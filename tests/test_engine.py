@@ -7,6 +7,8 @@ intervals/budgets/backoff); the full deterministic timing suite is task 16.
 import asyncio
 import json
 import threading
+import time
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import httpx
@@ -16,6 +18,7 @@ from _fake import FakeSolution
 
 from unicaptcha import (
     AuthenticationError,
+    ClientClosedError,
     ImageChallenge,
     NetworkError,
     NoSolutionError,
@@ -33,6 +36,7 @@ from unicaptcha._internal.async_engine import AsyncTaskEngine
 from unicaptcha._internal.engine import TaskEngine
 from unicaptcha._internal.errors import error_from_kind
 from unicaptcha._internal.http import AsyncHttpTransport, HttpTransport
+from unicaptcha._internal.registry import AbandonedTaskRegistry
 from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import ErrorKind
@@ -143,6 +147,10 @@ def make_async_engine() -> AsyncTaskEngine:
         time=FAST_TIME,
         retry=FAST_RETRY,
     )
+
+
+def challenge_ref() -> ImageChallenge:
+    return ImageChallenge(b"png")
 
 
 @pytest.fixture
@@ -428,6 +436,162 @@ class TestSyncAux:
     def test_report_good_default_unsupported(self, adapter: ScriptedAdapter) -> None:
         with pytest.raises(UnsupportedChallengeError):
             make_engine().report_good_result(adapter, TaskRef("myservice", 26))
+
+
+class TestRegistry:
+    def test_add_remove_snapshot(self) -> None:
+        reg = AbandonedTaskRegistry()
+        a, b = TaskRef("p", 1), TaskRef("p", 2)
+        reg.add(a, datetime.now(UTC))
+        reg.add(b, datetime.now(UTC))
+        assert reg.snapshot() == (a, b)
+        reg.remove(a)
+        assert reg.snapshot() == (b,)
+        assert len(reg) == 1
+
+    def test_eviction_with_warning(self, caplog: pytest.LogCaptureFixture) -> None:
+        reg = AbandonedTaskRegistry(limit=2)
+        for i in range(3):
+            reg.add(TaskRef("p", i), datetime.now(UTC))
+        assert reg.snapshot() == (TaskRef("p", 1), TaskRef("p", 2))
+        assert "evicted" in caplog.text
+
+    def test_unbounded_when_none(self) -> None:
+        reg = AbandonedTaskRegistry(limit=None)
+        for i in range(50):
+            reg.add(TaskRef("p", i), datetime.now(UTC))
+        assert len(reg) == 50
+
+    def test_abandoned_at_metadata(self) -> None:
+        reg = AbandonedTaskRegistry()
+        at = datetime(2026, 8, 26, 12, 0, 0, tzinfo=UTC)
+        reg.add(TaskRef("p", 9), at)
+        assert reg.abandoned_at(TaskRef("p", 9)) == at
+
+
+class TestSyncLifecycle:
+    def test_delivery_removes_registry_entry(
+        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+    ) -> None:
+        with respx.mock:
+            respx.post(CREATE).mock(
+                return_value=httpx.Response(200, content=_submit_body(51))
+            )
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("ready"))
+            )
+            engine = make_engine()
+            engine.solve(adapter, challenge)
+        assert engine.get_abandoned_tasks() == ()
+
+    def test_wait_ref_terminal_cleans_registry(self, adapter: ScriptedAdapter) -> None:
+        ref = TaskRef("myservice", 52)
+        with respx.mock:
+            respx.post(CREATE).mock(
+                return_value=httpx.Response(200, content=_submit_body(52))
+            )
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("unsolvable"))
+            )
+            engine = make_engine()
+            engine.submit(adapter, challenge_ref())
+            assert TaskRef("myservice", 52) in engine.get_abandoned_tasks()
+            engine.wait_ref(adapter, ref, timeout=0.5)
+        assert engine.get_abandoned_tasks() == ()
+
+    def test_close_idempotent_and_use_after_close(
+        self, adapter: ScriptedAdapter
+    ) -> None:
+        engine = make_engine()
+        engine.close()
+        engine.close()
+        with pytest.raises(ClientClosedError):
+            engine.solve(adapter, challenge_ref())
+        with pytest.raises(ClientClosedError):
+            engine.get_balance(adapter)
+
+    def test_close_wakes_blocked_solve_and_registry_keeps_ref(
+        self, adapter: ScriptedAdapter
+    ) -> None:
+        slow_time = TimeConfig(poll_delay=0.0, poll_interval=0.2, total_timeout=30.0)
+        errors: list[BaseException] = []
+        with respx.mock:
+            respx.post(CREATE).mock(
+                return_value=httpx.Response(200, content=_submit_body(53))
+            )
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("processing"))
+            )
+            engine = TaskEngine(
+                HttpTransport(),
+                shutdown=threading.Event(),
+                time=slow_time,
+                retry=FAST_RETRY,
+            )
+
+            def run() -> None:
+                try:
+                    engine.solve(adapter, challenge_ref())
+                except BaseException as exc:
+                    errors.append(exc)
+
+            thread = threading.Thread(target=run)
+            thread.start()
+            time.sleep(0.05)
+            engine.close()
+            thread.join(timeout=2.0)
+        assert not thread.is_alive()
+        assert isinstance(errors[0], ClientClosedError)
+        assert TaskRef("myservice", 53) in engine.get_abandoned_tasks()
+
+
+class TestAsyncLifecycle:
+    @pytest.mark.asyncio
+    async def test_delivery_removes_registry_entry(
+        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+    ) -> None:
+        with respx.mock:
+            respx.post(CREATE).mock(
+                return_value=httpx.Response(200, content=_submit_body(61))
+            )
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("ready"))
+            )
+            engine = make_async_engine()
+            await engine.solve(adapter, challenge)
+        assert engine.get_abandoned_tasks() == ()
+
+    @pytest.mark.asyncio
+    async def test_aclose_then_use_raises(self, adapter: ScriptedAdapter) -> None:
+        engine = make_async_engine()
+        await engine.aclose()
+        await engine.aclose()
+        with pytest.raises(ClientClosedError):
+            await engine.get_balance(adapter)
+
+    @pytest.mark.asyncio
+    async def test_cancellation_keeps_registry_entry(
+        self, adapter: ScriptedAdapter
+    ) -> None:
+        slow_time = TimeConfig(poll_delay=0.0, poll_interval=0.05, total_timeout=30.0)
+        with respx.mock:
+            respx.post(CREATE).mock(
+                return_value=httpx.Response(200, content=_submit_body(62))
+            )
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status_body("processing"))
+            )
+            engine = AsyncTaskEngine(
+                AsyncHttpTransport(), time=slow_time, retry=FAST_RETRY
+            )
+            task = asyncio.get_running_loop().create_task(
+                engine.solve(adapter, challenge_ref())
+            )
+            await asyncio.sleep(0.05)
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+        assert TaskRef("myservice", 62) in engine.get_abandoned_tasks()
 
 
 class TestAsyncCore:

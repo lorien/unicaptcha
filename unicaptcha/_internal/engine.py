@@ -22,6 +22,7 @@ from unicaptcha._internal.defaults import (
 from unicaptcha._internal.errors import error_from_kind
 from unicaptcha._internal.handlers import emit_sync
 from unicaptcha._internal.http import HttpTransport, join_url
+from unicaptcha._internal.registry import AbandonedTaskRegistry
 from unicaptcha._internal.retry import classify_submit_status, is_presend
 from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
@@ -65,6 +66,7 @@ class TaskEngine(Generic[_T]):
         retry: RetryConfig | None = None,
         on_event: SyncEventHandler | None = None,
         clock: Clock | None = None,
+        abandoned_registry_limit: int | None = 1000,
     ) -> None:
         self._transport = transport
         self._shutdown = shutdown
@@ -72,6 +74,16 @@ class TaskEngine(Generic[_T]):
         self._client_retry = retry
         self._handler = on_event
         self._clock = clock or RealClock()
+        self._registry = AbandonedTaskRegistry(limit=abandoned_registry_limit)
+
+    def close(self) -> None:
+        """Idempotent: wake blocked solves at their next checkpoint, close
+        the transport if library-owned. The registry survives (ADR-0033)."""
+        self._shutdown.set()
+        self._transport.close()
+
+    def get_abandoned_tasks(self) -> tuple[TaskRef, ...]:
+        return self._registry.snapshot()
 
     def _sleep(self, seconds: float) -> None:
         self._shutdown.wait(timeout=seconds)
@@ -139,8 +151,10 @@ class TaskEngine(Generic[_T]):
             ),
         )
         timing = resolve_time(challenge, adapter, self._client_time, None)
+        ref = TaskRef(provider=adapter.provider, task_id=accepted.task_id)
+        self._registry.add(ref, self._clock.wallclock())
         return TaskTicket(
-            task_ref=TaskRef(provider=adapter.provider, task_id=accepted.task_id),
+            task_ref=ref,
             submitted_at=self._clock.wallclock(),
             instant_answer=accepted.instant_answer,
             time=timing.to_config(),
@@ -165,6 +179,7 @@ class TaskEngine(Generic[_T]):
         """
         attempt = 0
         while True:
+            self._check_open()
             emit_sync(
                 handler,
                 self._event(
@@ -283,6 +298,7 @@ class TaskEngine(Generic[_T]):
         start = self._clock.monotonic()
         if ticket.instant_answer is not None:
             result = self._build_result(adapter, ticket, ticket.instant_answer, start)
+            self._registry.remove(ticket.task_ref)
             emit_sync(
                 handler,
                 self._event(
@@ -302,6 +318,7 @@ class TaskEngine(Generic[_T]):
                 min(timing.poll_delay, max(0.0, deadline - self._clock.monotonic()))
             )
         while True:
+            self._check_open()
             if self._clock.monotonic() >= deadline:
                 emit_sync(
                     handler,
@@ -340,6 +357,7 @@ class TaskEngine(Generic[_T]):
             parsed = adapter.parse_task_status(response.body)
             if parsed.state is TaskStatus.READY:
                 result = self._build_result(adapter, ticket, parsed, start)
+                self._registry.remove(ticket.task_ref)
                 emit_sync(
                     handler,
                     self._event(
@@ -403,6 +421,7 @@ class TaskEngine(Generic[_T]):
         interval = GENERIC_TIMING.poll_interval
         url = join_url(adapter.base_url, adapter.endpoints.get_task_status)
         while True:
+            self._check_open()
             if self._clock.monotonic() >= deadline:
                 return TaskStatusResult(
                     task_id=ref.task_id,
@@ -420,6 +439,7 @@ class TaskEngine(Generic[_T]):
                 continue
             parsed = adapter.parse_task_status(response.body)
             if parsed.state is not TaskStatus.PENDING:
+                self._registry.remove(ref)
                 return self._status_result(ref, parsed)
             self._sleep(min(interval, max(0.0, deadline - self._clock.monotonic())))
 
@@ -432,6 +452,8 @@ class TaskEngine(Generic[_T]):
         parsed = self._post_retried(
             adapter, url, payload, retry_cfg, None, 0.0, adapter.parse_task_status
         )
+        if parsed.state is not TaskStatus.PENDING:
+            self._registry.remove(ref)
         return self._status_result(ref, parsed)
 
     def get_balance(self, adapter: BaseAdapter) -> Decimal:

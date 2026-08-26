@@ -23,6 +23,7 @@ from unicaptcha._internal.defaults import (
 from unicaptcha._internal.errors import error_from_kind
 from unicaptcha._internal.handlers import emit_async
 from unicaptcha._internal.http import AsyncHttpTransport, join_url
+from unicaptcha._internal.registry import AbandonedTaskRegistry
 from unicaptcha._internal.retry import classify_submit_status, is_presend
 from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
@@ -66,6 +67,7 @@ class AsyncTaskEngine(Generic[_T]):
         retry: RetryConfig | None = None,
         on_event: AsyncEventHandler | None = None,
         clock: Clock | None = None,
+        abandoned_registry_limit: int | None = 1000,
     ) -> None:
         self._transport = transport
         self._client_time = time
@@ -73,6 +75,16 @@ class AsyncTaskEngine(Generic[_T]):
         self._handler = on_event
         self._clock = clock or RealClock()
         self._closed = False
+        self._registry = AbandonedTaskRegistry(limit=abandoned_registry_limit)
+
+    async def aclose(self) -> None:
+        """Idempotent. In-flight tasks are cancelled by the client
+        (ADR-0033); the registry survives and remains readable."""
+        self._closed = True
+        await self._transport.aclose()
+
+    def get_abandoned_tasks(self) -> tuple[TaskRef, ...]:
+        return self._registry.snapshot()
 
     async def _sleep(self, seconds: float) -> None:
         await asyncio.sleep(seconds)
@@ -142,8 +154,10 @@ class AsyncTaskEngine(Generic[_T]):
             ),
         )
         timing = resolve_time(challenge, adapter, self._client_time, None)
+        ref = TaskRef(provider=adapter.provider, task_id=accepted.task_id)
+        self._registry.add(ref, self._clock.wallclock())
         return TaskTicket(
-            task_ref=TaskRef(provider=adapter.provider, task_id=accepted.task_id),
+            task_ref=ref,
             submitted_at=self._clock.wallclock(),
             instant_answer=accepted.instant_answer,
             time=timing.to_config(),
@@ -166,6 +180,7 @@ class AsyncTaskEngine(Generic[_T]):
         """
         attempt = 0
         while True:
+            self._check_open()
             await emit_async(
                 handler,
                 self._event(
@@ -308,6 +323,7 @@ class AsyncTaskEngine(Generic[_T]):
         start = self._clock.monotonic()
         if ticket.instant_answer is not None:
             result = self._build_result(adapter, ticket, ticket.instant_answer, start)
+            self._registry.remove(ticket.task_ref)
             await emit_async(
                 handler,
                 self._event(
@@ -352,6 +368,7 @@ class AsyncTaskEngine(Generic[_T]):
         url = join_url(adapter.base_url, adapter.endpoints.get_task_status)
         attempt = 0
         while True:
+            self._check_open()
             attempt += 1
             await emit_async(
                 handler,
@@ -372,6 +389,7 @@ class AsyncTaskEngine(Generic[_T]):
             parsed = adapter.parse_task_status(response.body)
             if parsed.state is TaskStatus.READY:
                 result = self._build_result(adapter, ticket, parsed, start)
+                self._registry.remove(ticket.task_ref)
                 await emit_async(
                     handler,
                     self._event(
@@ -449,6 +467,7 @@ class AsyncTaskEngine(Generic[_T]):
         interval = GENERIC_TIMING.poll_interval
         url = join_url(adapter.base_url, adapter.endpoints.get_task_status)
         while True:
+            self._check_open()
             payload = adapter.build_task_status(ref.task_id)
             try:
                 response = await self._transport.post(url, payload)
@@ -457,6 +476,7 @@ class AsyncTaskEngine(Generic[_T]):
                 continue
             parsed = adapter.parse_task_status(response.body)
             if parsed.state is not TaskStatus.PENDING:
+                self._registry.remove(ref)
                 return self._status_result(ref, parsed)
             await self._sleep(interval)
 
@@ -471,6 +491,8 @@ class AsyncTaskEngine(Generic[_T]):
         parsed = await self._post_retried(
             adapter, url, payload, retry_cfg, None, 0.0, adapter.parse_task_status
         )
+        if parsed.state is not TaskStatus.PENDING:
+            self._registry.remove(ref)
         return self._status_result(ref, parsed)
 
     async def get_balance(self, adapter: BaseAdapter) -> Decimal:
