@@ -18,6 +18,7 @@ from unicaptcha.errors import (
     UnicaptchaError,
     UnsupportedChallengeError,
 )
+from unicaptcha.events import TaskEvent, TaskEventKind
 from unicaptcha.solution.base import BaseSolution
 from unicaptcha.types import (
     NetworkConfig,
@@ -56,6 +57,8 @@ __all__ = [
     "SecretStr",
     "ServiceBusyError",
     "SubmitAccepted",
+    "TaskEvent",
+    "TaskEventKind",
     "TaskRef",
     "TaskResult",
     "TaskStatus",

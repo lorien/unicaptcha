@@ -14,6 +14,8 @@ class TestRootExports:
             "RetryConfig",
             "SecretStr",
             "SubmitAccepted",
+            "TaskEvent",
+            "TaskEventKind",
             "TaskRef",
             "TaskResult",
             "TaskStatus",

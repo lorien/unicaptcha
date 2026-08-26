@@ -6,7 +6,7 @@ v1 implementation plan. Statuses: `new` / `failed` / `done`. Details in
  - [done] 1: Toolchain + package scaffold
  - [done] 2: Core models and public types
  - [done] 3: Error hierarchy
- - [new] 4: Events
+ - [done] 4: Events
  - [new] 5: Challenge kind bases
  - [new] 6: Solution kind bases
  - [new] 7: Adapter SDK contract
