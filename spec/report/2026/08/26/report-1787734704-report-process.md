@@ -1,5 +1,4 @@
 ## Report on task: Report-process improvement
-State: new
 
 ### Spec/ADR amendments
 

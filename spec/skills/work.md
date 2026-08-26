@@ -29,8 +29,7 @@ Filename: `report-<epoch>-task-<N>.md` for an indexed implementation task,
 
 First line of report must be `## Report on task <task number>: <task title>`.
 For ad-hoc work (not an indexed task), use
-`## Report on task: <descriptive title>` instead. The second line must be
-`State: new`.
+`## Report on task: <descriptive title>` instead.
 
 Structure the suggestions under these categories, each item prefixed with
 a status marker:

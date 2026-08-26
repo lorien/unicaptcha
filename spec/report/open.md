@@ -35,9 +35,6 @@ Links point at the source reports under `spec/report/2026/08/26/`.
 
 ## Future-task notes
 
-- [report-process] Decide whether the `State:` line (mandated literal
-  `new`) should carry a report-level lifecycle alongside the per-item
-  markers. — [report](2026/08/26/report-1787734704-report-process.md)
 - [task 1] CI 3.14t informational job depends on setup-uv `t`-suffix
   support; `continue-on-error` keeps it non-blocking. —
   [report](2026/08/26/report-1787697485-task-1.md)
