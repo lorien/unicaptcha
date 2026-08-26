@@ -21,10 +21,9 @@ Item markers: `[open]` not yet addressed, `[acted]` already handled
 (append a one-line note), `[needs-decision]` requires an owner decision.
 
 When an `[open]` item is addressed or a `[needs-decision]` item is
-decided, update the source report's marker (append a one-line note) *and*
-refresh `spec/report/open.md` — the roll-up is never the only place a
-status lives.
+decided, update the source report's marker (append a one-line note) — the
+report file is the only place a status lives.
 
-After writing the report, refresh `spec/report/open.md`: the roll-up of
-every still-`[open]` / `[needs-decision]` item across all reports (one
-line per item: category, task ref, one-liner, link to the source report).
+There is no roll-up file: the set of still-open items is derived from the
+reports themselves, e.g.
+`grep -rn "\[open\]|\[needs-decision\]" spec/report/`.

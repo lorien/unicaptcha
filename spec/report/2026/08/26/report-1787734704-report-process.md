@@ -2,9 +2,9 @@
 
 ### Spec/ADR amendments
 
-- [open] Consider recording the commit hash on each report item (or in
-  `open.md`) so a suggestion can be traced to the commit that addressed
-  it — currently requires git archaeology to map suggestion -> commit.
+- [open] Consider recording the commit hash on each report item so a
+  suggestion can be traced to the commit that addressed it — currently
+  requires git archaeology to map suggestion -> commit.
 
 ### Future-task notes
 
