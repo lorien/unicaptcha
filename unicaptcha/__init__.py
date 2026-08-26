@@ -14,6 +14,7 @@ from unicaptcha.challenge import (
     TextChallenge,
     TurnstileChallenge,
 )
+from unicaptcha.client import AsyncSolver, Solver
 from unicaptcha.errors import (
     AuthenticationError,
     ClientClosedError,
@@ -61,6 +62,7 @@ from unicaptcha.types import (
 )
 
 __all__ = [
+    "AsyncSolver",
     "AuthenticationError",
     "BaseAdapter",
     "BaseChallenge",
@@ -97,6 +99,7 @@ __all__ = [
     "RetryConfig",
     "SecretStr",
     "ServiceBusyError",
+    "Solver",
     "SubmitAccepted",
     "TaskEvent",
     "TaskEventKind",
