@@ -8,9 +8,9 @@
 
 ### Future-task notes
 
-- [needs-decision] Whether the `State:` line (mandated literal `new` by
-  work.md) should evolve to carry a report-level lifecycle (e.g.
-  `new`/`open`/`closed`) in addition to per-item markers.
+- [acted] The `State:` line question (whether it should carry a
+  report-level lifecycle) — owner decided to drop the `State:` line
+  entirely; status is tracked per clause only (commit `dfd9106`).
 
 ### Tooling/process
 
