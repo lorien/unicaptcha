@@ -107,17 +107,21 @@ class TaskTicket(Generic[T]):
     engine really submitted. Obtain one from ``Solver.submit()`` /
     ``AsyncSolver.submit()``. ``instant_answer`` is set iff the provider
     answered the submit itself (instant tasks); ``wait()`` fast-paths on it.
+    ``time`` is the resolved solve-timeline config carried from submit
+    (ADR-0030); ``wait()`` derives its default budget and poll cadence from
+    it.
     """
 
     task_ref: TaskRef
     submitted_at: datetime
     instant_answer: ParsedTask | None = None
+    time: TimeConfig | None = None
 
     def __repr__(self) -> str:
         return (
             f"{type(self).__name__}(task_ref={self.task_ref!r}, "
             f"submitted_at={self.submitted_at!r}, "
-            f"instant_answer={self.instant_answer!r})"
+            f"instant_answer={self.instant_answer!r}, time={self.time!r})"
         )
 
     __str__ = __repr__

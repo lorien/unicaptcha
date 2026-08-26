@@ -70,7 +70,7 @@ class BaseAdapter(ABC):
         None
     )
 
-    __slots__ = ("_api_key", "_base_url", "_referral")
+    __slots__ = ("_api_key", "_referral", "base_url")
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -91,7 +91,7 @@ class BaseAdapter(ABC):
         self._api_key = (
             api_key if isinstance(api_key, SecretStr) else SecretStr(api_key)
         )
-        self._base_url = base_url or self.default_base_url
+        self.base_url = base_url or self.default_base_url
         self._referral = referral
 
     def __repr__(self) -> str:
@@ -119,6 +119,19 @@ class BaseAdapter(ABC):
     def parse_balance(self, raw: bytes) -> Decimal:
         """Parse a balance response into an exact ``Decimal`` (USD)."""
         ...
+
+    def build_task_status(self, task_id: int) -> dict[str, Any]:
+        """Build a ``getTaskResult`` request body (JSON-family default,
+        ADR-0001). Overridable by adapters for divergent protocols."""
+        return {
+            "clientKey": self._api_key.get_secret_value(),
+            "taskId": task_id,
+        }
+
+    def build_balance(self) -> dict[str, Any]:
+        """Build a ``getBalance`` request body (JSON-family default,
+        ADR-0001). Overridable by adapters for divergent protocols."""
+        return {"clientKey": self._api_key.get_secret_value()}
 
     @abstractmethod
     def map_provider_error(self, raw: bytes) -> tuple[ErrorKind, str]:

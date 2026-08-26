@@ -95,11 +95,11 @@ class TestConstructor:
         assert a._api_key is key
 
     def test_base_url_defaults(self) -> None:
-        assert FakeAdapter("key")._base_url == "https://myservice.example"
+        assert FakeAdapter("key").base_url == "https://myservice.example"
 
     def test_base_url_override(self) -> None:
         a = FakeAdapter("key", base_url="https://mirror.example")
-        assert a._base_url == "https://mirror.example"
+        assert a.base_url == "https://mirror.example"
 
     def test_referral_default_true(self) -> None:
         assert FakeAdapter("key")._referral is True
@@ -138,6 +138,17 @@ class TestReportDefaults:
             a.build_report_good(ref)
         with pytest.raises(UnsupportedChallengeError):
             a.parse_report_good(b"{}")
+
+
+class TestRequestBuilders:
+    def test_build_task_status_default(self) -> None:
+        assert FakeAdapter("key").build_task_status(5) == {
+            "clientKey": "key",
+            "taskId": 5,
+        }
+
+    def test_build_balance_default(self) -> None:
+        assert FakeAdapter("key").build_balance() == {"clientKey": "key"}
 
 
 class TestAdapterSdkIsolation:

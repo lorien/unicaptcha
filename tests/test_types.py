@@ -108,6 +108,7 @@ class TestTaskTicket:
         )
         assert t.task_ref == ref
         assert t.instant_answer is None
+        assert t.time is None
 
     def test_instant_answer(self) -> None:
         parsed = ParsedTask(
