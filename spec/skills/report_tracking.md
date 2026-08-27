@@ -5,20 +5,22 @@ how to change project environment, spec, tools, etc to help you build
 things more effectively. Save this suggestions into new file in
 `spec/report/<year>/<month>/<day>/` directory.
 
-A report is also the archive of the task it worked on: when a task is
-done, its record is removed from `spec/docs/plan.md` and stored here.
+A report is written only when a task's work is complete and committed. It
+is also the archive of the task it worked on: when a task from
+`spec/docs/plan.md` is done, its record is removed from the plan and
+stored here. Ad-hoc work (not in the plan) has no record to archive; its
+report documents the work and suggestions directly. Blocked or unfinished
+work does not produce a report.
 
-Filename: `report-<epoch>-task-<N>.md` for an indexed task,
-`report-<epoch>-<slug>.md` for ad-hoc work requested directly by the user.
+Filename: `report-<epoch>-<slug>.md`, where `<slug>` is a short
+hyphenated identifier of the task (plan task or ad-hoc work).
 
-First line of report must be `## Report on task <task number>: <task title>`.
-For ad-hoc work (not an indexed task), use
-`## Report on task: <descriptive title>` instead.
+First line of report must be `## Report on task: <title>`.
 
 ## Structure
 
-For an indexed task, the report opens with the archived task record, then
-what was done, then the suggestions:
+For a task from plan.md, the report opens with the archived task record,
+then what was done, then the suggestions:
 
 - `### Task (archived from plan.md)` — the original task header and body
   with `Status: done`, moved here verbatim when the task finished.
@@ -27,8 +29,8 @@ what was done, then the suggestions:
 - `### Future-task notes` — reminders for work that later tasks must do.
 - `### Tooling/process` — environment, toolchain, or workflow learnings.
 
-For ad-hoc work, start directly with the suggestion categories (no
-archived-task or Done sections).
+For ad-hoc work, open with a brief `### Done` (what was done), then the
+suggestion categories (no archived-record section).
 
 Item markers: `[open]` not yet addressed, `[acted]` already handled
 (append a one-line note), `[needs-decision]` requires an owner decision.

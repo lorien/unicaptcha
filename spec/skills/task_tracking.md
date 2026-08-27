@@ -1,44 +1,45 @@
 # Task Tracking
 
 Open tasks are stored in the `spec/docs/plan.md` document. A task is a
-record with a `##` header (task number + name), a `Status:` line, the task
-body, and an optional `References:` line.
+record with a `##` header (task name), a `Status:` line, the task body,
+and an optional `References:` line.
 
-A task has exactly one of two statuses:
+A task is `new` until it is done:
 
 - `new` — not started (the default for a newly added task).
-- `failed` — could not be completed as described; the record carries a
-  `Reason:` line explaining why.
 
 `done` is not a status in plan.md: a finished task's record is removed
 from plan.md and archived into the report of the session that worked on it
-(see `report_tracking.md`).
+(see `report_tracking.md`). A task leaves plan.md only when its work is
+complete and committed.
+
+Ad-hoc tasks requested directly by the user are not added to plan.md; they
+are one-off work handled outside the plan and reported via
+`report_tracking.md`.
 
 ## Adding a Task
 
-- Add a `## Task {N}: {title}` record to plan.md. For `{N}` use the first
-  free number, starting from 1.
-- Follow the header with `Status: new`, then the task body, then an
-  optional `References:` line naming relevant ADRs.
-- Failed tasks sort first, then new tasks; within a status, by task
-  number — keep plan.md ordered accordingly.
+- Add a `## {title}` record to plan.md, followed by `Status: new`, the task
+  body, and an optional `References:` line naming relevant ADRs.
+- Append it at the end of plan.md; the owner reorders records to set
+  priority.
 
 ## Choosing a Task
 
-- Prefer a `failed` task over a `new` one.
-- Among tasks in the same state, choose the lower task number.
+- Pick the topmost `new` record in plan.md.
 
 ## Finishing a Task
 
 When a task is done:
 
 1. Remove its record from plan.md.
-2. Archive the record (header + body, with `Status: done`) into the
-   report file for the session — see `report_tracking.md`.
+2. Archive the record (header + body, with `Status: done`) into the report
+   file for the session — see `report_tracking.md`.
 
-## When a Task Fails
+## When Work Is Blocked
 
-- In plan.md, change the record's status line to `Status: failed` and add
-  a `Reason:` line with a short explanation of what failed and why.
-- The record stays in plan.md until the task is re-opened (flip back to
-  `new`, clear the reason) or dropped by the owner.
+If work on a task cannot proceed (missing prerequisite, the task's
+assumption is wrong, an owner decision is needed), present the situation
+to the user and continue per their direction. Do not write failure files
+and do not change the task's status: the task stays `new`. The user may
+re-scope or drop the record.

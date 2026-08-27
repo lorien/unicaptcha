@@ -1,21 +1,24 @@
 # Plan
 
-Open tasks. A task is a record with a `##` header (task number + name), a
-`Status:` line, the task body, and an optional `References:` line.
+Open tasks. A task is a record with a `##` header (task name), a `Status:`
+line, the task body, and an optional `References:` line.
 
 Statuses:
 
 - `new` — not started; ready to pick up.
-- `failed` — could not be completed as described; a `Reason:` line records
-  why. Re-open by flipping back to `new` and clearing the reason.
 
 A `done` task does not live here: when a task is finished, its record is
 removed and archived into the report of the session that worked on it
-(`spec/report/`).
+(`spec/report/`). A task leaves plan.md only when its work is complete and
+committed.
 
-Ordering: failed tasks first, then new; within a status, by task number.
+Order in the file expresses priority: the topmost `new` task is picked
+first. The owner reorders records to reprioritize.
 
-## Task 17: Adapter golden-payload tests
+Ad-hoc tasks requested directly by the user are not tracked here; their
+reports live in `spec/report/`.
+
+## Adapter golden-payload tests
 
 Status: new
 
@@ -36,7 +39,7 @@ reference "myservice"):
 References: ADR-0019, ADR-0040, ADR-0058, ADR-0068, ADR-0072, ADR-0075,
 ADR-0076.
 
-## Task 18: README + CHANGELOG
+## README + CHANGELOG
 
 Status: new
 
