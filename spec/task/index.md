@@ -13,7 +13,7 @@ v1 implementation plan. Details in `spec/task/task-{N}.md`.
  - [done] 9: TaskEngine
  - [done] 10: Solver / AsyncSolver universal client
  - [done] 11: 2Captcha adapter + facade
- - [new] 12: Anti-Captcha adapter + facade
+ - [done] 12: Anti-Captcha adapter + facade
  - [new] 13: CapMonster adapter + facade
  - [new] 14: Capsolver adapter + facade
  - [new] 15: Test scaffold + reference third-party adapter
