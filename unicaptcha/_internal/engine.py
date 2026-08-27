@@ -86,7 +86,18 @@ class TaskEngine(Generic[_T]):
         return self._registry.snapshot()
 
     def _sleep(self, seconds: float) -> None:
-        self._shutdown.wait(timeout=seconds)
+        """Sleep via the injectable clock, in bounded slices so ``close()``
+        wakes a blocked solve at its next checkpoint (ADR-0033)."""
+        if seconds <= 0:
+            return
+        deadline = self._clock.monotonic() + seconds
+        while True:
+            if self._shutdown.is_set():
+                return
+            remaining = deadline - self._clock.monotonic()
+            if remaining <= 0:
+                return
+            self._clock.sleep(min(remaining, 0.05))
 
     def _check_open(self) -> None:
         if self._shutdown.is_set():

@@ -17,6 +17,6 @@ v1 implementation plan. Details in `spec/task/task-{N}.md`.
  - [done] 13: CapMonster adapter + facade
  - [done] 14: Capsolver adapter + facade
  - [done] 15: Test scaffold + reference third-party adapter
- - [new] 16: Engine tests (injectable clock)
+ - [done] 16: Engine tests (injectable clock)
  - [new] 17: Adapter golden-payload tests
  - [new] 18: README + CHANGELOG

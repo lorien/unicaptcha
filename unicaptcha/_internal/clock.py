@@ -10,21 +10,33 @@ from typing import Protocol
 
 
 class Clock(Protocol):
-    """The time-reading half of the seam (sleeps are per-tier)."""
+    """The injectable clock/sleep seam (ADR-0033, architecture.md §10).
+
+    ``monotonic``/``wallclock`` drive budgets/elapsed/timestamps for both
+    engines; ``sleep`` is the blocking wait used by the sync engine for
+    backoff/poll pauses (the async engine awaits ``asyncio.sleep`` instead).
+    A fake clock advances time instantly, giving deterministic timing tests.
+    """
 
     def monotonic(self) -> float: ...
 
     def wallclock(self) -> datetime: ...
 
+    def sleep(self, seconds: float) -> None: ...
+
 
 class RealClock:
-    """Production clock: ``time.monotonic`` and UTC ``datetime.now``."""
+    """Production clock: ``time.monotonic``, UTC ``datetime.now`` and real
+    ``time.sleep``."""
 
     def monotonic(self) -> float:
         return time.monotonic()
 
     def wallclock(self) -> datetime:
         return datetime.now(UTC)
+
+    def sleep(self, seconds: float) -> None:
+        time.sleep(seconds)
 
 
 __all__ = ["Clock", "RealClock"]
