@@ -365,15 +365,10 @@ class TwoCaptchaClient:
         is_enterprise: bool = False,
         data_s: Mapping[str, str] | None = None,
         api_domain: str | None = None,
-        proxy: Proxy | None = None,
-        user_agent: str | None = None,
-        cookies: Mapping[str, str] | None = None,
         time: TimeConfig | None = None,
         retry: RetryConfig | None = None,
         on_event: SyncEventHandler | None = None,
     ) -> TaskResult[TwoCaptchaRecaptchaV3Solution]:
-        chosen_proxy = self._proxy_for(proxy)
-
         def build() -> BaseChallenge:
             return TwoCaptchaRecaptchaV3Challenge(
                 sitekey=sitekey,
@@ -383,9 +378,6 @@ class TwoCaptchaClient:
                 is_enterprise=is_enterprise,
                 data_s=data_s,
                 api_domain=api_domain,
-                proxy=chosen_proxy,
-                user_agent=user_agent,
-                cookies=cookies,
             )
 
         return self._solve(
@@ -824,15 +816,10 @@ class AsyncTwoCaptchaClient:
         is_enterprise: bool = False,
         data_s: Mapping[str, str] | None = None,
         api_domain: str | None = None,
-        proxy: Proxy | None = None,
-        user_agent: str | None = None,
-        cookies: Mapping[str, str] | None = None,
         time: TimeConfig | None = None,
         retry: RetryConfig | None = None,
         on_event: AsyncEventHandler | None = None,
     ) -> TaskResult[TwoCaptchaRecaptchaV3Solution]:
-        chosen_proxy = self._proxy_for(proxy)
-
         def build() -> BaseChallenge:
             return TwoCaptchaRecaptchaV3Challenge(
                 sitekey=sitekey,
@@ -842,9 +829,6 @@ class AsyncTwoCaptchaClient:
                 is_enterprise=is_enterprise,
                 data_s=data_s,
                 api_domain=api_domain,
-                proxy=chosen_proxy,
-                user_agent=user_agent,
-                cookies=cookies,
             )
 
         return await self._solve(

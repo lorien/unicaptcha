@@ -20,13 +20,13 @@ from unicaptcha.challenge.recaptcha_v3 import RecaptchaV3Challenge
 from unicaptcha.challenge.text import TextChallenge
 from unicaptcha.challenge.turnstile import TurnstileChallenge
 from unicaptcha.errors import InvalidChallengeError
+from unicaptcha.provider.twocaptcha.solution import TwoCaptchaRecaptchaV3Solution
 from unicaptcha.solution.base import BaseSolution
 from unicaptcha.solution.funcaptcha import FunCaptchaSolution
 from unicaptcha.solution.geetest import GeeTestV3Solution, GeeTestV4Solution
 from unicaptcha.solution.hcaptcha import HCaptchaSolution
 from unicaptcha.solution.image import ImageSolution
 from unicaptcha.solution.recaptcha_v2 import RecaptchaV2Solution
-from unicaptcha.solution.recaptcha_v3 import RecaptchaV3Solution
 from unicaptcha.solution.text import TextSolution
 from unicaptcha.solution.turnstile import TurnstileSolution
 from unicaptcha.types import Proxy
@@ -86,12 +86,11 @@ class TwoCaptchaRecaptchaV2Challenge(RecaptchaV2Challenge):
 
 @dataclass(frozen=True, slots=True)
 class TwoCaptchaRecaptchaV3Challenge(RecaptchaV3Challenge):
-    """reCAPTCHA v3 (proxy variant available on 2Captcha)."""
+    """reCAPTCHA v3. Proxyless-only on 2Captcha (no documented proxy
+    variant), and the wire task carries no userAgent/cookies fields, so
+    this subclass adds no extras."""
 
-    proxy: Proxy | None = field(kw_only=True, default=None)
-    user_agent: str | None = field(kw_only=True, default=None)
-    cookies: Mapping[str, str] | None = field(kw_only=True, default=None)
-    solution_type: ClassVar[type[BaseSolution]] = RecaptchaV3Solution
+    solution_type: ClassVar[type[BaseSolution]] = TwoCaptchaRecaptchaV3Solution
 
 
 @dataclass(frozen=True, slots=True)

@@ -243,8 +243,10 @@ class TwoCaptchaAdapter(BaseAdapter):
         return task
 
     def _recaptcha_v3_task(self, ch: TwoCaptchaRecaptchaV3Challenge) -> dict[str, Any]:
+        # 2Captcha documents RecaptchaV3TaskProxyless only — v3 is
+        # proxyless-only, and carries no userAgent/cookies fields.
         task: dict[str, Any] = {
-            "type": "RecaptchaV3Task",
+            "type": "RecaptchaV3TaskProxyless",
             "websiteURL": ch.pageurl,
             "websiteKey": ch.sitekey,
         }
@@ -256,12 +258,6 @@ class TwoCaptchaAdapter(BaseAdapter):
             task["isEnterprise"] = True
         if ch.api_domain is not None:
             task["apiDomain"] = ch.api_domain
-        if ch.user_agent is not None:
-            task["userAgent"] = ch.user_agent
-        cookie_header = _cookies(ch.cookies)
-        if cookie_header is not None:
-            task["cookies"] = cookie_header
-        task.update(_proxy_fields(ch.proxy))
         return task
 
     def _hcaptcha_task(self, ch: TwoCaptchaHCaptchaChallenge) -> dict[str, Any]:
@@ -284,7 +280,9 @@ class TwoCaptchaAdapter(BaseAdapter):
 
     def _funcaptcha_task(self, ch: TwoCaptchaFunCaptchaChallenge) -> dict[str, Any]:
         task: dict[str, Any] = {
-            "type": "FunCaptchaTask",
+            "type": (
+                "FunCaptchaTask" if ch.proxy is not None else "FunCaptchaTaskProxyless"
+            ),
             "websiteURL": ch.pageurl,
             "websitePublicKey": ch.public_key,
         }
@@ -299,7 +297,7 @@ class TwoCaptchaAdapter(BaseAdapter):
 
     def _geetest_v3_task(self, ch: TwoCaptchaGeeTestV3Challenge) -> dict[str, Any]:
         task: dict[str, Any] = {
-            "type": "GeeTestTask",
+            "type": "GeeTestTask" if ch.proxy is not None else "GeeTestTaskProxyless",
             "websiteURL": ch.pageurl,
             "gt": ch.gt_key,
             "challenge": ch.challenge,
@@ -313,7 +311,7 @@ class TwoCaptchaAdapter(BaseAdapter):
 
     def _geetest_v4_task(self, ch: TwoCaptchaGeeTestV4Challenge) -> dict[str, Any]:
         task: dict[str, Any] = {
-            "type": "GeeTestTask",
+            "type": "GeeTestTask" if ch.proxy is not None else "GeeTestTaskProxyless",
             "websiteURL": ch.pageurl,
             "version": 4,
             "initParameters": {"captcha_id": ch.captcha_id},
@@ -326,17 +324,21 @@ class TwoCaptchaAdapter(BaseAdapter):
         return task
 
     def _turnstile_task(self, ch: TwoCaptchaTurnstileChallenge) -> dict[str, Any]:
+        # Wire names are lowercase per the live docs: `data` (cData value)
+        # and `pagedata` (chlPageData value).
         task: dict[str, Any] = {
-            "type": "TurnstileTask",
+            "type": (
+                "TurnstileTask" if ch.proxy is not None else "TurnstileTaskProxyless"
+            ),
             "websiteURL": ch.pageurl,
             "websiteKey": ch.sitekey,
         }
         if ch.action is not None:
             task["action"] = ch.action
         if ch.c_data is not None:
-            task["cData"] = ch.c_data
+            task["data"] = ch.c_data
         if ch.chl_page_data is not None:
-            task["chlPageData"] = ch.chl_page_data
+            task["pagedata"] = ch.chl_page_data
         if ch.user_agent is not None:
             task["userAgent"] = ch.user_agent
         task.update(_proxy_fields(ch.proxy))

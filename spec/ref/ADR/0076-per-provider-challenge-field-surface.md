@@ -42,8 +42,10 @@ field surface") — one table per provider. Boundary rules settled here:
 - **Capsolver GeeTest v4 excluded**: the official Capsolver SDK ships
   GeeTest v3 only (no `captchaId` params). Thin coverage is acceptable
   (ADR-0070); the adapter registers GeeTest v3 only.
-- **reCAPTCHA v3 proxyless-only** on Anti-Captcha/CapMonster/Capsolver;
-  2Captcha additionally exposes a proxy variant (`RecaptchaV3Task`).
+- **reCAPTCHA v3 is proxyless-only on all four providers** (amended
+  2026-08-27 after live-docs verification: 2Captcha documents
+  `RecaptchaV3TaskProxyless` only — the earlier "2Captcha additionally
+  exposes a proxy variant" claim was unverified and wrong).
 
 ### Field rules
 

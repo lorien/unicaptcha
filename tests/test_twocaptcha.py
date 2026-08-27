@@ -185,6 +185,11 @@ def test_recaptcha_v3_fields() -> None:
             api_domain="google.com",
         )
     )["task"]
+    # 2Captcha documents the Proxyless type only — v3 carries no proxy,
+    # userAgent, or cookies fields.
+    assert task["type"] == "RecaptchaV3TaskProxyless"
+    for absent in ("proxyType", "userAgent", "cookies"):
+        assert absent not in task
     assert task["pageAction"] == "verify"
     assert task["minScore"] == 0.7
     assert task["isEnterprise"] is True
@@ -207,20 +212,31 @@ def test_hcaptcha_funcaptcha_geetest_turnstile_payloads() -> None:
             public_key="PK", pageurl="u", data="blob", service_url="https://s"
         )
     )["task"]
+    assert fun["type"] == "FunCaptchaTaskProxyless"
     assert fun["websitePublicKey"] == "PK"
     assert fun["funcaptchaApiJSSubdomain"] == "https://s"
     assert fun["data"] == "blob"
+    proxied_fun = a.build_payload(
+        TwoCaptchaFunCaptchaChallenge(
+            public_key="PK",
+            pageurl="u",
+            proxy=Proxy(host="1.2.3.4", port=8080),
+        )
+    )["task"]
+    assert proxied_fun["type"] == "FunCaptchaTask"
 
     gv3 = a.build_payload(
         TwoCaptchaGeeTestV3Challenge(
             gt_key="gt", challenge="ch", pageurl="u", api_server="api.gt"
         )
     )["task"]
+    assert gv3["type"] == "GeeTestTaskProxyless"
     assert gv3["geetestApiServerSubdomain"] == "api.gt"
 
     gv4 = a.build_payload(
         TwoCaptchaGeeTestV4Challenge(captcha_id="cid", pageurl="u", risk_type="slide")
     )["task"]
+    assert gv4["type"] == "GeeTestTaskProxyless"
     assert gv4["version"] == 4
     assert gv4["initParameters"] == {"captcha_id": "cid"}
     assert gv4["risk_type"] == "slide"
@@ -230,8 +246,21 @@ def test_hcaptcha_funcaptcha_geetest_turnstile_payloads() -> None:
             sitekey="ts", pageurl="u", action="act", c_data="cd"
         )
     )["task"]
+    assert ts["type"] == "TurnstileTaskProxyless"
     assert ts["action"] == "act"
-    assert ts["cData"] == "cd"
+    # Wire names are lowercase per the live docs.
+    assert ts["data"] == "cd"
+    assert "cData" not in ts
+    proxied_ts = a.build_payload(
+        TwoCaptchaTurnstileChallenge(
+            sitekey="ts",
+            pageurl="u",
+            chl_page_data="pd",
+            proxy=Proxy(host="1.2.3.4", port=8080),
+        )
+    )["task"]
+    assert proxied_ts["type"] == "TurnstileTask"
+    assert proxied_ts["pagedata"] == "pd"
 
 
 def test_unsupported_challenge_type() -> None:
