@@ -120,7 +120,7 @@ class BaseAdapter(ABC):
         """Parse a balance response into an exact ``Decimal`` (USD)."""
         ...
 
-    def build_task_status(self, task_id: int) -> dict[str, Any]:
+    def build_task_status(self, task_id: int | str) -> dict[str, Any]:
         """Build a ``getTaskResult`` request body (JSON-family default,
         ADR-0001). Overridable by adapters for divergent protocols."""
         return {

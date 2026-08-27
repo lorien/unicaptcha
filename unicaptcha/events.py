@@ -43,7 +43,7 @@ class TaskEvent:
     provider: str
     elapsed: timedelta
     attempt: int
-    task_id: int | None = None
+    task_id: int | str | None = None
     detail: str | None = None
     error_kind: ErrorKind | None = None
 

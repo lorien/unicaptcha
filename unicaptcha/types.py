@@ -34,10 +34,13 @@ class TaskRef:
 
     Survives process restarts (persist the pair); routing vehicle for all
     task-addressing operations (ADR-0045).
+
+    ``task_id`` is ``int | str``: most providers use integer ids, but
+    Capsolver addresses tasks by UUID string (task-14 verification).
     """
 
     provider: str
-    task_id: int
+    task_id: int | str
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,7 +52,7 @@ class TaskResult(Generic[T]):
     """
 
     solution: T
-    task_id: int
+    task_id: int | str
     cost: Decimal | None
     raw: bytes
     provider: str
@@ -80,7 +83,7 @@ class TaskStatusResult:
     ``BaseSolution | None``, populated only when ``status`` is ``READY``.
     """
 
-    task_id: int
+    task_id: int | str
     provider: str
     status: TaskStatus
     solution: BaseSolution | None
@@ -150,10 +153,11 @@ class ParsedTask:
 @dataclass(frozen=True, slots=True)
 class SubmitAccepted:
     """Public adapter-SDK vocabulary: parsed ``createTask`` response
-    (ADR-0075). ``task_id`` is always present; ``instant_answer`` is set iff
-    the provider answered inline."""
+    (ADR-0075). ``task_id`` is always present (``int | str`` — Capsolver
+    uses UUID strings); ``instant_answer`` is set iff the provider answered
+    inline."""
 
-    task_id: int
+    task_id: int | str
     instant_answer: ParsedTask | None = None
 
     def __repr__(self) -> str:

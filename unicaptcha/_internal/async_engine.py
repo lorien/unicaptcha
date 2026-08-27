@@ -104,7 +104,7 @@ class AsyncTaskEngine(Generic[_T]):
         provider: str,
         start: float,
         *,
-        task_id: int | None = None,
+        task_id: int | str | None = None,
         attempt: int = 1,
         detail: str | None = None,
         error_kind: ErrorKind | None = None,

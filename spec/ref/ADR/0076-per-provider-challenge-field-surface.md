@@ -34,18 +34,28 @@ field surface") — one table per provider. Boundary rules settled here:
 | hCaptcha | ✓ | ✓ | ✓ | ✓ |
 | FunCaptcha | ✓ | ✓ | ✓ | ✓ |
 | GeeTest v3 | ✓ | ✓ | ✓ | ✓ |
-| GeeTest v4 | ✓ | ✓ | ✓ | ✗ |
+| GeeTest v4 | ✓ | ✓ | ✓ | ✓ (amended 2026-08-27: live docs document `captchaId`/`riskType`; the SDK-only exclusion was stale) |
 | Turnstile | ✓ | ✓ | ✓ | ✓ (`AntiCloudflareTask`) |
 
 - **Text is 2-provider**: CapMonster and Capsolver ship no text task in
   their APIs; the kind stays universal but only two adapters register it.
-- **Capsolver GeeTest v4 excluded**: the official Capsolver SDK ships
+- **Capsolver GeeTest v4 excluded**: ~~the official Capsolver SDK ships
   GeeTest v3 only (no `captchaId` params). Thin coverage is acceptable
-  (ADR-0070); the adapter registers GeeTest v3 only.
+  (ADR-0070); the adapter registers GeeTest v3 only~~ **amended
+  2026-08-27 (task 14)**: current Capsolver docs document GeeTest v4
+  (`captchaId` + `riskType` on `GeeTestTask[ProxyLess]`); the exclusion
+  was SDK-stale (2024 clone). Capsolver now ships GeeTest v3 **and** v4.
 - **reCAPTCHA v3 is proxyless-only on all four providers** (amended
   2026-08-27 after live-docs verification: 2Captcha documents
   `RecaptchaV3TaskProxyless` only — the earlier "2Captcha additionally
-  exposes a proxy variant" claim was unverified and wrong).
+  exposes a proxy variant" claim was unverified and wrong). Capsolver
+  additionally exposes **no v3-enterprise task type**; its v3 challenge
+  rejects `is_enterprise` (task-14).
+- **Capsolver Turnstile** (amended 2026-08-27, task 14): the task type is
+  **`AntiTurnstileTaskProxyLess`**, proxyless-only, and the provider
+  ignores `userAgent`; `AntiCloudflareTask` is the separate
+  Cloudflare-challenge task, not Turnstile. `chl_page_data` is not
+  supported (only `metadata.action`/`metadata.cdata`).
 
 ### Field rules
 

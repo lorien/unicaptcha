@@ -183,18 +183,25 @@ serialize lowercase (`data`/`pagedata`).
 
 | Kind | Concrete class | Provider extras → wire | Proxy / worker |
 |---|---|---|---|
-| image | `CapsolverImageChallenge` | — (unchecked pass-through) | proxy opt. |
-| reCAPTCHA v2 | `CapsolverRecaptchaV2Challenge` | — | proxy opt. (`ReCaptchaV2Task`); UA + cookies pass-through |
-| reCAPTCHA v3 | `CapsolverRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore` | proxyless only |
+| image | `CapsolverImageChallenge` | `module→module` (recognition) | proxyless (instant task) |
+| reCAPTCHA v2 | `CapsolverRecaptchaV2Challenge` | `action→pageAction` (the `sa` value), `data_s→recaptchaDataSValue` / `enterprisePayload {'s':…}`; enterprise = `ReCaptchaV2EnterpriseTask[ProxyLess]` | proxy opt.; UA + cookies pass-through |
+| reCAPTCHA v3 | `CapsolverRecaptchaV3Challenge` | `action→pageAction`, `min_score→minScore`; no v3-enterprise type (rejected) | proxyless only |
 | hCaptcha | `CapsolverHCaptchaChallenge` | `rqdata→rqdata` | proxy opt.; UA pass-through |
 | FunCaptcha | `CapsolverFunCaptchaChallenge` | `public_key→websitePublicKey` | proxy opt. |
-| GeeTest v3 | `CapsolverGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge` | proxy opt. |
-| Turnstile | `CapsolverTurnstileChallenge` | `action→metadata.action`, `c_data→metadata.cdata` | proxy opt. (`AntiCloudflareTask`) |
+| GeeTest v3 | `CapsolverGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge`, `api_server→geetestApiServerSubdomain` | proxy opt. |
+| GeeTest v4 | `CapsolverGeeTestV4Challenge` | `captcha_id→captchaId`, `risk_type→riskType` (top-level), `api_server` | proxy opt. |
+| Turnstile | `CapsolverTurnstileChallenge` | `action→metadata.action`, `c_data→metadata.cdata` | proxyless only (`AntiTurnstileTaskProxyLess`; userAgent ignored; no chl_page_data) |
+
+2026-08-27 Capsolver verification (task 14): table corrected against live
+docs — Turnstile type is `AntiTurnstileTaskProxyLess` (not
+`AntiCloudflareTask`, which is the Cloudflare-challenge task), and GeeTest
+v4 IS supported (`captchaId`/`riskType`), superseding the ADR-0076
+exclusion; hCaptcha/FunCaptcha have no docs pages (SDK-only).
 
 - **Coverage boundary** (ADR-0076): text = 2Captcha + Anti-Captcha only;
-  CapMonster/Capsolver have no text task. GeeTest v4 = 2Captcha +
-  Anti-Captcha + CapMonster; **Capsolver excluded** (its official SDK
-  ships GeeTest v3 only — thin coverage is fine, ADR-0070). reCAPTCHA
+  CapMonster/Capsolver have no text task. GeeTest v4 = all four providers
+  (Capsolver's exclusion was SDK-stale — live docs document
+  `captchaId`/`riskType`, corrected 2026-08-27). reCAPTCHA
   v3 is proxyless-only on all four providers (2Captcha's proxy-variant
   claim corrected 2026-08-27 against live docs).
 
@@ -234,7 +241,7 @@ living in `unicaptcha.types` and re-exported from the root (ADR-0036).
 | Field | Type | Notes |
 |---|---|---|
 | `solution` | `T` | non-optional; always populated on solve() returns (ADR-0008) |
-| `task_id` | `int` | provider task id |
+| `task_id` | `int \| str` | provider task id (Capsolver uses UUID strings, task-14) |
 | `cost` | `Decimal \| None` | provider-reported cost, `Decimal(str(raw))`; None when unreported |
 | `raw` | `bytes` | untouched HTTP response body; uniform with `error.raw_response` |
 | `provider` | `str` | adapter provider string |
@@ -244,7 +251,7 @@ living in `unicaptcha.types` and re-exported from the root (ADR-0036).
 
 ### TaskRef
 
-Public, constructible: `TaskRef(provider: str, task_id: int)`. Registry
+Public, constructible: `TaskRef(provider: str, task_id: int | str)` (Capsolver UUIDs). Registry
 entries are TaskRefs (with abandoned-at metadata available from the registry
 API). Routing vehicle for all task-addressing operations (ADR-0045).
 
@@ -264,7 +271,7 @@ ADR-0056 — non-generic, no submission metadata):
 
 | Field | Type |
 |---|---|
-| `task_id` | `int` |
+| `task_id` | `int \| str` |
 | `provider` | `str` |
 | `status` | `TaskStatus` — enum: `PENDING \| READY \| NO_SOLUTION \| UNKNOWN` |
 | `solution` | `BaseSolution \| None` | populated only when READY; narrow via isinstance |
@@ -298,7 +305,7 @@ class TaskEventKind(Enum):
 |---|---|
 | `kind` | `TaskEventKind` | what just happened |
 | `provider` | `str` |
-| `task_id` | `int \| None` | None on PRE_FLIGHT_FAILED / SUBMIT_REQUESTED / SUBMIT_FAILED; populated from SUBMIT_ACCEPTED onward |
+| `task_id` | `int \| str \| None` | None on PRE_FLIGHT_FAILED / SUBMIT_REQUESTED / SUBMIT_FAILED; populated from SUBMIT_ACCEPTED onward |
 | `elapsed` | `timedelta` | since solve()/wait() start |
 | `attempt` | `int` | iteration count within a repeating kind (SUBMIT_REQUESTED #, RESULT_REQUESTED #) |
 | `detail` | `str \| None` | e.g. "connection reset", "503"; never credentials; names both parties on TypeError |
@@ -753,7 +760,7 @@ class MyServiceAdapter(BaseAdapter):
                  referral: bool | str = True): ...   # referral per ADR-0072
     def build_payload(self, challenge) -> dict[str, Any]: ...
     def parse_submit_response(self, raw: bytes) -> SubmitAccepted: ...
-                                           # SubmitAccepted{task_id: int, instant_answer: ParsedTask | None}
+                                           # SubmitAccepted{task_id: int | str, instant_answer: ParsedTask | None}
                                            # (ADR-0075); instant_answer set iff createTask answered inline
     def parse_task_status(self, raw: bytes) -> ParsedTask: ...   # pending|ready|unsolvable|unknown (ADR-0058):
                                            # ParsedTask{state, solution, cost, raw, detail} — public

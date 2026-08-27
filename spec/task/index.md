@@ -15,7 +15,7 @@ v1 implementation plan. Details in `spec/task/task-{N}.md`.
  - [done] 11: 2Captcha adapter + facade
  - [done] 12: Anti-Captcha adapter + facade
  - [done] 13: CapMonster adapter + facade
- - [new] 14: Capsolver adapter + facade
+ - [done] 14: Capsolver adapter + facade
  - [new] 15: Test scaffold + reference third-party adapter
  - [new] 16: Engine tests (injectable clock)
  - [new] 17: Adapter golden-payload tests
