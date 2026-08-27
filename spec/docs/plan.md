@@ -18,18 +18,6 @@ first. The owner reorders records to reprioritize.
 Ad-hoc tasks requested directly by the user are not tracked here; their
 reports live in `spec/report/`.
 
-## CHANGELOG: v1 Unreleased summary
-
-Status: new
-
-Fill CHANGELOG.md `[Unreleased]` with the v1 implementation summary
-(universal + facade clients, four providers, nine-kind taxonomy, unified
-errors, configs, two-phase submit/wait, aux operations, adapter SDK,
-events/logging, abandoned-task registry, strict-typing toolchain); static
-version stays 0.1.0.
-
-References: ADR-0021, ADR-0022.
-
 ## Release-consistency CI guards
 
 Status: new

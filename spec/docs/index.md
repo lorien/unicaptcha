@@ -108,3 +108,9 @@ supersede.
 - "Superseded by" links point forward; later ADRs link back to what they amend.
 - The project is experimental: pre-1.0, no public API stability obligations. The
   public/internal boundary communicates intent, not commitment.
+- User-facing docs (`README.md`, `CHANGELOG.md`) never cite ADRs: they are for
+  early adopters on GitHub/PyPI; design references live in `spec/docs/` only.
+- Every task that changes user-facing behavior (API surface, kinds, providers,
+  errors, config, defaults, semantics, user-facing docs) adds an entry under
+  `CHANGELOG.md` `[Unreleased]`; purely internal tasks (tests, refactors,
+  internals, spec-only docs) skip it with a one-line note in their report.

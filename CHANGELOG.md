@@ -9,4 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Project knowledge base under `spec/docs/` (goals, architecture, ADRs, deferred list).
+- Universal multi-provider clients: `Solver` (blocking) and `AsyncSolver`
+  (asyncio-native), with an adapter registry, kind dispatch, and provider
+  selection (pin a provider or pick uniformly among supporting adapters).
+- Per-provider facades (`TwoCaptchaClient`, `AntiCaptchaClient`,
+  `CapMonsterClient`, `CapsolverClient`, and their async counterparts) with
+  one convenience method per kind and full constructor and per-call
+  parameter parity.
+- Four provider adapters speaking the modern JSON
+  `createTask`/`getTaskResult` protocol: 2Captcha, Anti-Captcha, CapMonster
+  Cloud (proxyless), and Capsolver.
+- Nine captcha kinds with symmetric challenge/solution class trees: image,
+  text, reCAPTCHA v2, reCAPTCHA v3, hCaptcha, FunCaptcha, GeeTest v3,
+  GeeTest v4, and Cloudflare Turnstile — including enterprise flags,
+  proxy/worker-context fields, and strict field validation.
+- A unified exception hierarchy rooted at `UnicaptchaError` with an
+  `ErrorKind` enum and the verbatim provider response preserved on
+  `raw_response`.
+- Strictly-typed configuration objects: `NetworkConfig`, `TimeConfig`,
+  `RetryConfig`, `Proxy`/`ProxyKind`, and `SecretStr` for API keys.
+- A two-phase submit/await workflow: `submit()` returns a `TaskTicket`,
+  `wait()` collects it, and `wait_ref()` polls a persisted `TaskRef`; the
+  submit-ready fast path returns instant tasks without polling.
+- Auxiliary operations: `get_balance`, `get_task_status`,
+  `report_bad_result`, `report_good_result`, and `get_abandoned_tasks`.
+- A public adapter SDK (`BaseAdapter`, `Endpoints`) for authoring third-party
+  providers, with a reference implementation included in the test suite.
+- Task lifecycle events (`on_event=`) and flat logging that never includes
+  API keys or solution tokens.
+- An abandoned-task registry that survives client close, with advisory
+  per-client recovery.
+- Strict typing and tooling: Python 3.11+, fully annotated, mypy and pyright
+  strict, ruff, and slotscheck.
+- Base-URL mirror support (e.g. RuCaptcha via `base_url=`) and referral
+  embedding for the built-in adapters.

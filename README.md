@@ -16,7 +16,7 @@ Universal Python interface to multiple anti-captcha services.
 2Captcha-protocol mirrors such as RuCaptcha work by overriding the base URL
 (RuCaptcha's JSON API v2 is verified complete): `TwoCaptchaClient(api_key=...,
 base_url="https://rucaptcha.com")`. Smaller mirrors need per-service
-verification of their JSON API (ADR-0071).
+verification of their JSON API.
 
 ## Supported CAPTCHA kinds (v1)
 
@@ -68,11 +68,11 @@ every provider shares; the concrete provider classes
 
 - A kind-base challenge routes to any registered adapter supporting the
   kind — pass `provider="twocaptcha"` to pin one, or omit it for a uniform
-  random pick among the supporting adapters (ADR-0064).
+  random pick among the supporting adapters.
 - Provider extras use the concrete class, e.g.
   `TwoCaptchaImageChallenge(body, numeric=True, min_len=4)`.
 - Image bodies accept `bytes` or a `Path`; the value is normalized to bytes
-  at construction (ADR-0065).
+  at construction.
 
 ### Provider facades
 
@@ -157,8 +157,8 @@ follow. See `spec/docs/architecture.md` ("Adapter SDK") for the contract.
 The built-in adapters embed unicaptcha's referral ID in every request by
 default; the provider pays the project a small commission per solve at no
 change to your pricing. Pass `referral=False` to disable it, or
-`referral="your-own-id"` to credit your own software registration
-(ADR-0072). Third-party adapters embed nothing by default.
+`referral="your-own-id"` to credit your own software registration.
+Third-party adapters embed nothing by default.
 
 ## License
 
