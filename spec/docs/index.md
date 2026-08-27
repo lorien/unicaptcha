@@ -11,6 +11,7 @@ what the project is, how it is designed, and why each decision was made.
 | [architecture.md](architecture.md) | Complete technical design: components, models, flows, defaults, toolchain |
 | [bootstrap.md](bootstrap.md) | Local environment setup: uv, venv, dev-loop commands |
 | [testing.md](testing.md) | How to run tests and checks |
+| [plan.md](plan.md) | Open tasks and their statuses |
 | [deferred.md](deferred.md) | Canonical list of explicitly deferred decisions |
 | [competitors.md](competitors.md) | Competitor survey: Go and Python universal libraries (2026-08-24) |
 | [providers.md](providers.md) | Supported provider directory: websites and official Python repos |

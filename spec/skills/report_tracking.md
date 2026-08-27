@@ -1,21 +1,34 @@
 # Report Tracking
 
-Based on result of working session, compile a list of suggestions about how to change project environment, spec, tools, etc to help you build
-things more effectively. Save this suggestions into new file in `spec/report/<year>/<month>/<day>/` directory.
+Based on result of a working session, compile a list of suggestions about
+how to change project environment, spec, tools, etc to help you build
+things more effectively. Save this suggestions into new file in
+`spec/report/<year>/<month>/<day>/` directory.
 
-Filename: `report-<epoch>-task-<N>.md` for an indexed implementation task,
+A report is also the archive of the task it worked on: when a task is
+done, its record is removed from `spec/docs/plan.md` and stored here.
+
+Filename: `report-<epoch>-task-<N>.md` for an indexed task,
 `report-<epoch>-<slug>.md` for ad-hoc work requested directly by the user.
 
 First line of report must be `## Report on task <task number>: <task title>`.
 For ad-hoc work (not an indexed task), use
 `## Report on task: <descriptive title>` instead.
 
-Structure the suggestions under these categories, each item prefixed with
-a status marker:
+## Structure
 
+For an indexed task, the report opens with the archived task record, then
+what was done, then the suggestions:
+
+- `### Task (archived from plan.md)` — the original task header and body
+  with `Status: done`, moved here verbatim when the task finished.
+- `### Done` — a brief list of things done during the work on the task.
 - `### Spec/ADR amendments` — spec/doc/ADR changes suggested.
 - `### Future-task notes` — reminders for work that later tasks must do.
 - `### Tooling/process` — environment, toolchain, or workflow learnings.
+
+For ad-hoc work, start directly with the suggestion categories (no
+archived-task or Done sections).
 
 Item markers: `[open]` not yet addressed, `[acted]` already handled
 (append a one-line note), `[needs-decision]` requires an owner decision.

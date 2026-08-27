@@ -1,42 +1,44 @@
 # Task Tracking
 
-The `spec/task/index.md` document contains list of all tasks and their states.
-After you have done the task, update `spec/task/index.md`, change status of corresponding task to "done".
-Also save brief list of things, you have done, into task file.
+Open tasks are stored in the `spec/docs/plan.md` document. A task is a
+record with a `##` header (task number + name), a `Status:` line, the task
+body, and an optional `References:` line.
 
-## Statuses
+A task has exactly one of two statuses:
 
-A task has exactly one of three statuses:
+- `new` — not started (the default for a newly added task).
+- `failed` — could not be completed as described; the record carries a
+  `Reason:` line explaining why.
 
-- `new` — not started (the default for a newly created task).
-- `done` — completed; terminal. Set when the task's work is finished.
-- `failed` — could not be completed as described (missing prerequisite,
-  reality contradicts the task, etc.); terminal.
+`done` is not a status in plan.md: a finished task's record is removed
+from plan.md and archived into the report of the session that worked on it
+(see `report_tracking.md`).
 
-Transitions: `new` -> `done`, `new` -> `failed`.
+## Adding a Task
 
-## Task Priority
+- Add a `## Task {N}: {title}` record to plan.md. For `{N}` use the first
+  free number, starting from 1.
+- Follow the header with `Status: new`, then the task body, then an
+  optional `References:` line naming relevant ADRs.
+- Failed tasks sort first, then new tasks; within a status, by task
+  number — keep plan.md ordered accordingly.
 
-When you decide which task to work next, consider these things:
+## Choosing a Task
 
-- The "failed" tasks have priority higher than "new" tasks.
-- Always choose "failed" task if there is such one.
-- Among tasks of same state, chose the task with lower number.
+- Prefer a `failed` task over a `new` one.
+- Among tasks in the same state, choose the lower task number.
 
-## Task File
+## Finishing a Task
 
-Details of the task are stored in `spec/task/task-{task number}.md` file. For `{task number}` use first free number, starting from 1.
-Each task file starts with markdown header (title of the task), then description of the task.
-Right after tasks's header there must be line with task's status in the form `Status: <new|failed|done>`.
-Later, when task is done, its file might be appended with "Done:" section with a brief list of things have
-been done durong the work on task.
-After you created task file, add its reference to `spec/task/index.md` file, that must be new line in
-form of ` - [<new|failed|done>] {task number}: {task title}`.
-So, for any task in `spec/task/index.md` you can get details from task file using the task number, specified in task index.
-When status of task is changed, the "Status:" line in the task's file must be updated according to the new status of the task.
+When a task is done:
 
+1. Remove its record from plan.md.
+2. Archive the record (header + body, with `Status: done`) into the
+   report file for the session — see `report_tracking.md`.
 
-## When task is impossible to do
+## When a Task Fails
 
-- If a task cannot be completed as described (missing prerequisite, reality contradicts the task, etc.),
-    in task index, mark task state as "failed".
+- In plan.md, change the record's status line to `Status: failed` and add
+  a `Reason:` line with a short explanation of what failed and why.
+- The record stays in plan.md until the task is re-opened (flip back to
+  `new`, clear the reason) or dropped by the owner.

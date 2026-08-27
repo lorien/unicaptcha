@@ -5,12 +5,13 @@ describing the current project.
 Read `spec/skills/task_tracking.md`.
 Read `spec/skills/report_tracking.md`.
 If user has not instructed you on what task to work, then
-select one task yourself and work on it.
+select one task yourself from `spec/docs/plan.md` and work on it.
 Before implementing a task, present your implementation plan and wait
 for the owner's approval.
 After task is done do these aciton (in this very order):
 - perform final checks (see below)
-- create new report file
+- create new report file (archiving the task record, see `report_tracking.md`)
+- remove the task's record from `spec/docs/plan.md`
 - make a new github commit, in commit message describe what you have done
 
 Do not do github commit and do not create report file if you have not worked on any task
@@ -25,8 +26,9 @@ Do not do github commit and do not create report file if you have not worked on 
 
 ## When task failed
 
-If in process of working on the task, you have decied it can not be done, write short explanation
-    of what failed and why to the file `var/task.failed`.
+If in process of working on the task, you have decied it can not be done,
+update the task's record in `spec/docs/plan.md`: set `Status: failed` and
+add a `Reason:` line with a short explanation of what failed and why.
 
 ## When no more tasks to do
 
