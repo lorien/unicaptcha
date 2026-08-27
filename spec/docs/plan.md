@@ -18,16 +18,24 @@ first. The owner reorders records to reprioritize.
 Ad-hoc tasks requested directly by the user are not tracked here; their
 reports live in `spec/report/`.
 
-## README + CHANGELOG
+## CHANGELOG: v1 Unreleased summary
 
 Status: new
 
-- README: finalized usage per the implemented API (universal + facade
-  clients, kind list, two-phase batch, custom providers / adapter SDK,
-  referral note, base-URL mirrors such as RuCaptcha).
-- CHANGELOG: Keep-a-Changelog with an "Unreleased" section summarizing
-  the v1 implementation; static version stays 0.1.0.
-- Release-consistency CI guards: tag == pyproject version == matching
-  CHANGELOG section.
+Fill CHANGELOG.md `[Unreleased]` with the v1 implementation summary
+(universal + facade clients, four providers, nine-kind taxonomy, unified
+errors, configs, two-phase submit/wait, aux operations, adapter SDK,
+events/logging, abandoned-task registry, strict-typing toolchain); static
+version stays 0.1.0.
 
-References: ADR-0021, ADR-0022, ADR-0023, ADR-0072.
+References: ADR-0021, ADR-0022.
+
+## Release-consistency CI guards
+
+Status: new
+
+Add a `release-check` job to `.github/workflows/ci.yml` running on `v*`
+tag pushes: tag == `unicaptcha/_version.py` version == matching
+`## [{version}]` CHANGELOG section.
+
+References: ADR-0021, ADR-0022.

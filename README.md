@@ -20,14 +20,20 @@ verification of their JSON API (ADR-0071).
 
 ## Supported CAPTCHA kinds (v1)
 
-- Image CAPTCHA (`bytes` or `Path`)
-- Text CAPTCHA (plain-text question)
-- reCAPTCHA v2 (checkbox and invisible; Enterprise via flags)
-- reCAPTCHA v3 (Enterprise via flags)
-- hCaptcha (invisible via flag)
-- FunCaptcha / Arkose
-- GeeTest v3
-- GeeTest v4
+| Kind | Challenge base | Solution base |
+|---|---|---|
+| Image CAPTCHA | `ImageChallenge` | `ImageSolution` |
+| Text CAPTCHA | `TextChallenge` | `TextSolution` |
+| reCAPTCHA v2 | `RecaptchaV2Challenge` | `RecaptchaV2Solution` |
+| reCAPTCHA v3 | `RecaptchaV3Challenge` | `RecaptchaV3Solution` |
+| hCaptcha | `HCaptchaChallenge` | `HCaptchaSolution` |
+| FunCaptcha / Arkose | `FunCaptchaChallenge` | `FunCaptchaSolution` |
+| GeeTest v3 | `GeeTestV3Challenge` | `GeeTestV3Solution` |
+| GeeTest v4 | `GeeTestV4Challenge` | `GeeTestV4Solution` |
+| Cloudflare Turnstile | `TurnstileChallenge` | `TurnstileSolution` |
+
+Kind coverage varies by provider (e.g. text is 2Captcha + Anti-Captcha
+only); unsupported kinds raise `UnsupportedChallengeError`.
 
 ## Install
 
@@ -37,45 +43,114 @@ uv add unicaptcha
 
 Requires Python 3.11+. Single runtime dependency: `httpx`.
 
-## Usage sketch
+## Usage
 
-The exact API is being finalized; the intended shape:
+### Universal client
+
+The universal client registers one or more provider adapters and dispatches
+each challenge to the adapter that supports it.
 
 ```python
 from pathlib import Path
 
 from unicaptcha import Solver, ImageChallenge
-from unicaptcha.providers.twocaptcha import TwoCaptchaAdapter
+from unicaptcha.provider.twocaptcha import TwoCaptchaAdapter
 
-client = Solver(adapters=[TwoCaptchaAdapter("...")])
-result = client.solve(ImageChallenge(Path("test.png")))
-print(result.solution.text)
+client = Solver(adapters=[TwoCaptchaAdapter("YOUR_API_KEY")])
+result = client.solve(ImageChallenge(Path("captcha.png")))
+print(result.solution.text)   # the solved captcha text
 ```
 
-Kind-base challenges carry universal fields only and route to any
-registered adapter supporting the kind (`provider="capmonster"` to pin
-one, uniform random choice when omitted); provider-specific options
-use the concrete class, e.g. `TwoCaptchaImageChallenge(body=..., numeric=True)`
-(ADR-0064). Image `body` accepts `bytes` or `Path` (ADR-0065).
+A challenge is a frozen dataclass describing what to solve. The kind-base
+classes (`ImageChallenge`, `RecaptchaV2Challenge`, …) carry only the fields
+every provider shares; the concrete provider classes
+(`TwoCaptchaImageChallenge`, …) add provider-specific options.
 
-Two-phase batch workflows split submit from collection (ADR-0067):
+- A kind-base challenge routes to any registered adapter supporting the
+  kind — pass `provider="twocaptcha"` to pin one, or omit it for a uniform
+  random pick among the supporting adapters (ADR-0064).
+- Provider extras use the concrete class, e.g.
+  `TwoCaptchaImageChallenge(body, numeric=True, min_len=4)`.
+- Image bodies accept `bytes` or a `Path`; the value is normalized to bytes
+  at construction (ADR-0065).
+
+### Provider facades
+
+For a single provider, a facade client offers one convenience method per
+kind with full parameter parity:
 
 ```python
-ticket = client.submit(ImageChallenge(Path("a.png")))   # collect later
-...
-result = client.wait(ticket)                            # -> TaskResult, typed
-status = client.wait_ref(TaskRef("twocaptcha", 12345), timeout=120)  # from persisted ids
+import asyncio
+
+from unicaptcha.provider.twocaptcha import AsyncTwoCaptchaClient, TwoCaptchaClient
+
+with TwoCaptchaClient("YOUR_API_KEY") as client:
+    result = client.solve_image(b"captcha.png", numeric=1)
+
+
+async def main() -> None:
+    async with AsyncTwoCaptchaClient("YOUR_API_KEY") as client:
+        result = await client.solve_recaptcha_v2(
+            sitekey="SITEKEY", pageurl="https://example.com"
+        )
+        print(result.solution.token)
+
+
+asyncio.run(main())
 ```
 
-An async-native `AsyncSolver` and per-provider facade clients
-(`TwoCaptchaClient` and async counterpart) are part of the same design.
-See `spec/docs/architecture.md` for the complete specification.
+Each provider package exports `<Provider>Client` and `Async<Provider>Client`
+(`TwoCaptchaClient`, `AntiCaptchaClient`, `CapMonsterClient`,
+`CapsolverClient`, and their async counterparts). Facade constructors take
+`api_key` positionally and otherwise mirror `Solver` minus `adapters`
+(`base_url`, `referral`, `proxy`, `time`, `retry`, `network`, `on_event`).
+
+### Two-phase batch
+
+`submit()` splits solving from collecting: it returns a `TaskTicket`, which
+you can persist (via its `task_ref`) and collect later.
+
+```python
+from unicaptcha import ImageChallenge, TaskRef
+
+ticket = client.submit(ImageChallenge(Path("a.png")))   # collect later
+# ... later ...
+result = client.wait(ticket)                            # -> TaskResult, typed
+status = client.wait_ref(TaskRef("twocaptcha", 12345), timeout=120)  # from a persisted id
+```
+
+### Auxiliary operations
+
+The universal client and the facades share the same aux names:
+
+- `get_balance(provider)` → `Decimal` balance in USD (facades take no argument)
+- `get_task_status(task)` → one-shot status (`TaskRef`, or `int` on facades)
+- `report_bad_result(task)` / `report_good_result(task)` → `bool`
+  (coverage varies by provider)
+- `get_abandoned_tasks()` → tasks cancelled while solving
+
+### Errors
+
+Every library exception derives from `UnicaptchaError` and carries a
+`kind: ErrorKind` plus the verbatim provider response in `raw_response`:
+`NoSolutionError`, `TaskTimeoutError`, `RateLimitError`, `ServiceBusyError`,
+`InsufficientBalanceError`, `AuthenticationError`, `NetworkError`,
+`ProviderError`, `InvalidConfigError`, `InvalidChallengeError`,
+`UnsupportedChallengeError`, `ClientClosedError`.
+
+### Events
+
+Pass `on_event=` at construction or per call to observe the task lifecycle
+(`SUBMIT_REQUESTED`, `SUBMIT_ACCEPTED`, `RESULT_RECEIVED`, …) as typed
+`TaskEvent`s.
 
 ## Custom providers
 
 unicaptcha ships a public adapter SDK: third parties can implement their own
-provider adapters and register them in the universal client. See
-`spec/docs/architecture.md` ("Adapter SDK") for the contract.
+provider adapters (`BaseAdapter`) and register them in the universal client.
+The test suite includes a reference third-party adapter, `MyServiceAdapter`
+(`tests/_myservice.py`), written against the public API only — the pattern to
+follow. See `spec/docs/architecture.md` ("Adapter SDK") for the contract.
 
 ## Funding
 
