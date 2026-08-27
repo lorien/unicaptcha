@@ -38,7 +38,7 @@ differ, instead of a lossy lowest-common-denominator abstraction.
 - A fake/test double module for downstream users (unicaptcha.testing).
 - Per-provider billing dashboards or usage statistics on the client.
 
-See [deferred.md](deferred.md) for the canonical list with rationale.
+Parked/future work beyond v1 is tracked as tasks in [plan.md](plan.md).
 
 ## Target users
 

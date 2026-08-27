@@ -120,7 +120,7 @@ BaseChallenge (public abstract root; open for custom kinds)
   `numeric=True`) are keyword-only. Kills the same-typed-string swap
   hazard and the non-default-after-default inheritance wart.
 
-### Provider-specific challenge field surface (ADR-0076, closes deferred item 2)
+### Provider-specific challenge field surface (ADR-0076)
 
 Concrete classes add provider extras beyond the universal kind-base
 fields. Convention: `sitekey`→`websiteKey` and `pageurl`→`websiteURL`
@@ -369,7 +369,8 @@ keyword-only challenge fields the provider's solver uses when loading the
 target page (token validity: tokens can be UA-bound). Distinct from the
 transport User-Agent (constructor kwarg, ADR-0024); no client-level default,
 so the two meanings never share a constructor. Per-provider surface (which
-kinds of which providers accept them) lands with deferred item 2.
+kinds of which providers accept them) is pinned in the ADR-0076 field
+tables above.
 
 ### SecretStr
 

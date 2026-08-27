@@ -11,8 +11,7 @@ what the project is, how it is designed, and why each decision was made.
 | [architecture.md](architecture.md) | Complete technical design: components, models, flows, defaults, toolchain |
 | [bootstrap.md](bootstrap.md) | Local environment setup: uv, venv, dev-loop commands |
 | [testing.md](testing.md) | How to run tests and checks |
-| [plan.md](plan.md) | Open tasks and their statuses |
-| [deferred.md](deferred.md) | Canonical list of explicitly deferred decisions |
+| [plan.md](plan.md) | Open tasks and parked work (includes formerly deferred items) |
 | [competitors.md](competitors.md) | Competitor survey: Go and Python universal libraries (2026-08-24) |
 | [providers.md](providers.md) | Supported provider directory: websites and official Python repos |
 | [ADR/](ADR/) | Architecture Decision Records, one per settled decision |
@@ -54,7 +53,7 @@ supersede.
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |
 | [0028](ADR/0028-no-proxy-validation.md) | No proxy validation | |
 | [0029](ADR/0029-unsolvable-captcha-error.md) | NoSolutionError | dedicated exception, no auto-resubmit |
-| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column; token-kind rows ratified 2026-08-25 — closes deferred 15 |
+| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column; token-kind rows ratified 2026-08-25 |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
 | [0032](ADR/0032-taskstatus-split.md) | TaskStatusResult split from TaskResult | amended: 0050, 0056 |
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |
@@ -67,7 +66,7 @@ supersede.
 | [0040](ADR/0040-lenient-parsing-and-usd.md) | Lenient parsing and USD balance | amended: currency note; EmptySolutionError; required fields |
 | [0041](ADR/0041-public-internal-boundary-and-adapter-sdk.md) | Public/internal boundary + adapter SDK | amended: 0052, 0053 |
 | [0042](ADR/0042-config-validation.md) | Config validation | InvalidConfigError; amended: 0052, 0053 |
-| [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge; amended: poll_delay; TimeConfig ratified 2026-08-25 — closes deferred 19 |
+| [0043](ADR/0043-config-shape-and-merge.md) | Config shape and merge semantics | None-able fields, field-wise merge; amended: poll_delay; TimeConfig ratified 2026-08-25 |
 | [0044](ADR/0044-event-attachment-and-parity.md) | Event handler attachment | constructor + per-call |
 | [0045](ADR/0045-taskref-and-provider-validation.md) | TaskRef and provider validation | amended: 0064; TaskTicket per 0067 |
 | [0046](ADR/0046-version-single-source-and-reference-adapter.md) | Version single source + reference adapter | |
@@ -91,7 +90,7 @@ supersede.
 | [0064](ADR/0064-kind-solve-and-provider-selection.md) | Kind-level solve + provider selection | amends 0005/0045/0048; random among supporting adapters |
 | [0065](ADR/0065-path-body.md) | Path accepted for image bodies | amends 0025: `bytes \| Path`, normalized to bytes |
 | [0066](ADR/0066-challenge-call-style.md) | Challenge call-style | amends 0006: keyword-only fields, positional payload |
-| [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; closes deferred 10; poll-delay skip; amended: 0075 |
+| [0067](ADR/0067-two-phase-submit-wait.md) | Two-phase submit/wait | TaskTicket; amends 0010/0018/0038/0045/0051; split submit/wait budgets; poll-delay skip; amended: 0075 |
 | [0068](ADR/0068-report-good-result.md) | report_good_result | amends 0013/0053: bool return, adapter report pairs |
 | [0069](ADR/0069-worker-context.md) | Worker context parameters | amends 0012: `user_agent`/`cookies` challenge fields |
 | [0070](ADR/0070-kind-taxonomy-expansion.md) | Kind taxonomy expansion | amends 0002/0030: FunCaptcha, GeeTest v3/v4, enterprise flags; amended: 0074 |
@@ -100,7 +99,7 @@ supersede.
 | [0073](ADR/0073-adapter-endpoints.md) | Adapter Endpoints | amends 0053: operation-keyed paths, all-or-nothing override |
 | [0074](ADR/0074-turnstile-kind.md) | Cloudflare Turnstile kind | amends 0002/0070: ninth v1 kind; resolves dangling deferred claim |
 | [0075](ADR/0075-submit-ready-fast-path.md) | Submit-ready fast path | amends 0053/0067, formalizes ParsedTask (0058): SubmitAccepted, ticket-carried `instant_answer` |
-| [0076](ADR/0076-per-provider-challenge-field-surface.md) | Per-provider challenge field surface | closes deferred 2; amends 0006/0031/0069 scope: concrete field lists in architecture §2 |
+| [0076](ADR/0076-per-provider-challenge-field-surface.md) | Per-provider challenge field surface | amends 0006/0031/0069 scope: concrete field lists in architecture §2 |
 
 ## Conventions
 
