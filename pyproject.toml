@@ -62,6 +62,14 @@ markers = [
     "integration: tests hitting real provider APIs; deselected by default, require API keys via environment",
 ]
 
+[tool.coverage.run]
+source = ["unicaptcha"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+# Informational only (ADR-0047): no fail_under gate.
+
 [dependency-groups]
 dev = [
     "ruff>=0.6",
