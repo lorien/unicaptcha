@@ -9,4 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Project knowledge base under `spec/ref/` (goals, architecture, ADRs, deferred list).
+- Project knowledge base under `spec/docs/` (goals, architecture, ADRs, deferred list).

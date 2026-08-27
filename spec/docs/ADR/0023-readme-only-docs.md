@@ -16,7 +16,7 @@ the library is, provider/kind table, install, usage sketch, adapter-SDK
 mention, experimental notice, MIT, repository URL. No doc generator, no
 hosted docs site.
 
-Internal design documentation lives in `spec/ref/` (this knowledge base),
+Internal design documentation lives in `spec/docs/` (this knowledge base),
 hand-written markdown, no tooling.
 
 Doc-site generation (MkDocs/Sphinx) is not deferred as a commitment — it

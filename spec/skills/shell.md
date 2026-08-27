@@ -1,6 +1,6 @@
 # Initial steps
 
-Study documents inside `spec/ref/` directory.
+Study documents inside `spec/docs/` directory.
 Now wait for my further instructions.
 
 # IMPORTANT:

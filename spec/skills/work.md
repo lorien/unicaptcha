@@ -1,6 +1,6 @@
 ## Workflow
 
-Study documents inside `spec/ref/` directory, this is collection of documents
+Study documents inside `spec/docs/` directory, this is collection of documents
 describing the current project.
 Read `spec/skills/task_tracking.md`.
 Read `spec/skills/report_tracking.md`.
@@ -18,7 +18,7 @@ Do not do github commit and do not create report file if you have not worked on 
 
 ## Task Work Final List
 
-1. Run the test suite and checks described in `spec/ref/testing.md`,
+1. Run the test suite and checks described in `spec/docs/testing.md`,
    and fix anything they surface.
 2. Ensure the security credentials are not hard-coded
 

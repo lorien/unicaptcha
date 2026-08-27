@@ -69,13 +69,13 @@ status = client.wait_ref(TaskRef("twocaptcha", 12345), timeout=120)  # from pers
 
 An async-native `AsyncSolver` and per-provider facade clients
 (`TwoCaptchaClient` and async counterpart) are part of the same design.
-See `spec/ref/architecture.md` for the complete specification.
+See `spec/docs/architecture.md` for the complete specification.
 
 ## Custom providers
 
 unicaptcha ships a public adapter SDK: third parties can implement their own
 provider adapters and register them in the universal client. See
-`spec/ref/architecture.md` ("Adapter SDK") for the contract.
+`spec/docs/architecture.md` ("Adapter SDK") for the contract.
 
 ## Funding
 

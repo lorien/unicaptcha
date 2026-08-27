@@ -5,7 +5,7 @@
 
 ## Context
 
-Competitor-analysis survey (2026-08-24; `spec/ref/competitors.md` and the
+Competitor-analysis survey (2026-08-24; `spec/docs/competitors.md` and the
 per-project reports behind it) re-examined the kind taxonomy against what
 providers and rival libraries actually ship. Cloudflare Turnstile was
 excluded from v1 by ADR-0002's scope freeze — but it was never added to
