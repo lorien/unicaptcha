@@ -34,8 +34,3 @@ owner decision needed), present the situation to the user and continue per
 their direction. Do not write any failure files and do not change the
 task's status; a task leaves `spec/docs/plan.md` only when its work is
 complete and committed.
-
-## When no more tasks to do
-
-If you choose tasks to work automatically and there is no more tasks to do,
-then create the empty file `var/plan.completed`.
