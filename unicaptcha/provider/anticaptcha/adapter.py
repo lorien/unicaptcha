@@ -3,7 +3,7 @@
 Pure translation unit (ADR-0041): challenge → request payload, response
 bytes → typed objects, provider error codes → the library error hierarchy.
 Field mapping per architecture §2 as verified against the official SDK
-clone (`var/repo/anticaptcha-python`, task-12 cross-check).
+clone (`var/vendor/repo/anticaptcha-python`, task-12 cross-check).
 
 Proxy rule (ADR-0076 / ADR-0012): Anti-Captcha accepts IP addresses only;
 this adapter validates the literal pre-flight and raises

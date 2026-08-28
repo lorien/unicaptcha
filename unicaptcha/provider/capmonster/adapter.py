@@ -3,7 +3,7 @@
 Pure translation unit (ADR-0041): challenge → request payload, response
 bytes → typed objects, provider error codes → the library error hierarchy.
 Field mapping per architecture §2 as verified against the official SDK
-clone (`var/repo/capmonster-python`, task-13 cross-check). CapMonster is
+clone (`var/vendor/repo/capmonster-python`, task-13 cross-check). CapMonster is
 proxyless-only (ADR-0012): no proxy serialization exists here, and the
 report pairs stay default-off — CapMonster has no report API.
 """

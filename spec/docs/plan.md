@@ -177,7 +177,7 @@ Status: new
 Priority: -1
 
 A repeatable algorithm to verify adapter integrity against official API
-docs and SDK clones (`var/repo/`): task-type strings, field wire names,
+docs and SDK clones (`var/vendor/repo/`): task-type strings, field wire names,
 kind coverage, error-code tables. Golden-payload fixtures should be
 derived from vendor sources, not hand-written twice.
 
