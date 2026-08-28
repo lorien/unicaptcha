@@ -357,6 +357,13 @@ def test_solution_shape_dispatch() -> None:
     v3 = a._solution_from({"token": "t", "score": 0.9})
     assert isinstance(v3, TwoCaptchaRecaptchaV3Solution)
     assert v3.score == 0.9
+    # Live-verified v3 shape: gRecaptchaResponse + token, no score.
+    v3_noscore = a._solution_from({"gRecaptchaResponse": "g", "token": "t"})
+    assert isinstance(v3_noscore, TwoCaptchaRecaptchaV3Solution)
+    assert v3_noscore.score is None
+    # v2 carries gRecaptchaResponse only.
+    v2 = a._solution_from({"gRecaptchaResponse": "g"})
+    assert isinstance(v2, TwoCaptchaRecaptchaV2Solution)
     with pytest.raises(EmptySolutionError):
         a._solution_from({"bogus": 1})
 

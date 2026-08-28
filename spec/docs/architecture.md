@@ -21,7 +21,7 @@ it states *what is* per the settled decisions; ADRs state *why*.
 | challenge -> payload; response bytes -> typed TaskResult          |
 +---------------------------------------------------------------+
 | HTTP layer (internal implementation behind a public Protocol) |
-| httpx wiring, retry policy, per-request User-Agent, pool      |
+| httpx wiring, per-request User-Agent, pool                    |
 +---------------------------------------------------------------+
 ```
 
@@ -176,7 +176,7 @@ serialize lowercase (`data`/`pagedata`).
 | hCaptcha | `CapMonsterHCaptchaChallenge` | `rqdata→data`, `fallback_to_actual_ua→fallbackToActualUA` | UA + cookies |
 | FunCaptcha | `CapMonsterFunCaptchaChallenge` | `public_key→websitePublicKey`, `data→data` (blob), `service_url→funcaptchaApiJSSubdomain` | UA + cookies |
 | GeeTest v3 | `CapMonsterGeeTestV3Challenge` | `gt_key→gt`, `challenge→challenge`, `api_server→geetestApiServerSubdomain`, `geetest_lib→geetestGetLib` | UA |
-| GeeTest v4 | `CapMonsterGeeTestV4Challenge` | `captcha_id→initParameters.captcha_id` (+`version:4`), `risk_type→initParameters.riskType` | — |
+| GeeTest v4 | `CapMonsterGeeTestV4Challenge` | `captcha_id→gt` (vendor SDK requires `gt` unconditionally; v4 included) + `version:4`, `risk_type→initParameters.riskType` | — |
 | Turnstile | `CapMonsterTurnstileChallenge` | `action→pageAction`, `c_data→data`, `chl_page_data→pageData`, `cloudflare_task_type→cloudflareTaskType` (`token` only in v1 — `cf_clearance`/`wait_room` require a proxy, impossible under ADR-0012's proxyless rule), `html_page_base64→htmlPageBase64`, `api_js_url→apiJsUrl` | UA (required for any `cloudflare_task_type`) |
 
 #### Capsolver (`capsolver`; dict-driven SDK — pass-through extras, minimal validation)
@@ -452,7 +452,7 @@ class Solver:
         name: str | None = None,
         user_agent: str | None = None,             # transport User-Agent (ADR-0026)
         proxy: Proxy | None = None,                # default proxy (ADR-0012)
-        abandoned_registry_limit: int | None = None,  # ADR-0038
+        abandoned_registry_limit: int | None = 1000,  # ADR-0038
         time: TimeConfig | None = None,
         retry: RetryConfig | None = None,
         network: NetworkConfig | None = None,
@@ -468,7 +468,7 @@ class AsyncSolver:
         name: str | None = None,
         user_agent: str | None = None,
         proxy: Proxy | None = None,
-        abandoned_registry_limit: int | None = None,
+        abandoned_registry_limit: int | None = 1000,
         time: TimeConfig | None = None,
         retry: RetryConfig | None = None,
         network: NetworkConfig | None = None,

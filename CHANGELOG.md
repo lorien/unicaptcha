@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- 2Captcha reCAPTCHA v3 solution classification: the live v3 solution
+  shape is `gRecaptchaResponse` + `token` **without** a `score` field;
+  it was previously mis-classified as a reCAPTCHA v2 solution. `score`
+  is `None` when the provider omits it.
+- CapMonster GeeTest v4 wire payload: the captcha id now rides `gt`
+  (CapMonster's SDK requires it unconditionally, v4 included) and
+  `risk_type` alone rides `initParameters.riskType`; previously the id
+  was mis-placed inside `initParameters` and `gt` was omitted.
+
 ### Added
 
 - Universal multi-provider clients: `Solver` (blocking) and `AsyncSolver`

@@ -10,7 +10,7 @@ import os
 import sys
 from pathlib import Path
 
-from unicaptcha.provider.twocaptcha import TwoCaptchaClient, TwoCaptchaImageChallenge
+from unicaptcha.provider.twocaptcha import TwoCaptchaClient
 from unicaptcha.types import Proxy, ProxyKind
 
 api_key = os.getenv("UNICAPTCHA_TWOCAPTCHA_API_KEY")
@@ -32,7 +32,7 @@ image = Path(__file__).resolve().parent.parent / "images" / "captcha.png"
 
 with TwoCaptchaClient(api_key) as client:
     # Per-challenge proxy: workers visit the target through it.
-    result = client.solve(TwoCaptchaImageChallenge(image, proxy=proxy))
+    result = client.solve_image(image, proxy=proxy)
     print("solved:", result.solution.text)
 
     # A client-level default also exists: TwoCaptchaClient(api_key, proxy=proxy).

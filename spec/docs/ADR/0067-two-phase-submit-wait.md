@@ -52,6 +52,10 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
 |---|---|---|---|
 | `wait(ticket, timeout=None)` | `TaskTicket[T]` | `TaskResult[T]` | **raises** (`NoSolutionError`, `ProviderError` on UNKNOWN per ADR-0058, `TaskTimeoutError`) |
 | `wait_ref(ref, timeout=...)` | `TaskRef` | `TaskStatusResult` | **answers**; budget exhaustion returns PENDING `TaskStatusResult` |
+
+`wait_ref` with `timeout=None` uses the generic fallback budget/cadence
+(120 s budget, 5 s poll interval): no per-kind timing exists for a bare
+`TaskRef` (per-kind defaults attach to challenges/tickets only).
 | `get_task_status(ref)` | `TaskRef` | `TaskStatusResult` | answers — single-shot, unchanged (ADR-0050) |
 
 - `wait` is an **operation** (solve-parity semantics); `wait_ref` and

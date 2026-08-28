@@ -163,27 +163,103 @@ pytest-cov stays informational only (ADR-0047); whether CI passes
 `--cov`, what reports are shown/uploaded, and if a coverage threshold
 becomes a gate — all undecided.
 
-## Provider-fidelity verification method
+## Kind timing defaults: text budget
 
 Status: new
 Priority: -1
 
-A repeatable algorithm to verify adapter integrity against official API
-docs and SDK clones (`var/vendor/repo/`): task-type strings, field wire names,
-kind coverage, error-code tables. Golden-payload fixtures should be
-derived from vendor sources, not hand-written twice.
+Live smoke (2026-08-28): the text kind's 30 s default budget (ADR-0030
+table) expired twice on real workers; the same solve passed with
+`total_timeout=180`. Revisit the per-kind timing table against
+real-solve latencies.
 
-## Observations backlog review
+## Shared JSON-family adapter base
 
 Status: new
 Priority: -1
 
-Review all accumulated observations — the `[open]`/`[needs-decision]`
-markers across `spec/report/` (canonical list via
-`grep -rn "\[open\]|\[needs-decision\]" spec/report/`) plus the
-recurring refactor/tooling themes (shared JSON-family adapter base,
-conftest `_fast_time`/`_fast_retry` consolidation,
-`_fake`/`ScriptedAdapter` → `_myservice`, shared `ErrorKind` table,
-`_internal/log.py`, markdown link checker in CI, README snippet
-verification, facade-generation approach, provider-fidelity method) —
-and turn each into a real `plan.md` task or remove it.
+The four JSON adapters duplicate near-identical helpers (`_decode`,
+`_decimal`, `_proxy_fields`, `_solution_dict`, task-id extraction,
+solution-shape dispatch). Extract a shared JSON-family base/mixin once the
+fidelity pass settles the wire surface, so the refactor lands on verified
+code.
+
+## conftest fast-config consolidation
+
+Status: new
+Priority: -1
+
+`FAST_TIME`/`FAST_RETRY`-style literals are duplicated across
+per-provider test files while `conftest.py` already ships `fast_time` /
+`fast_retry` fixtures; consolidate (~4 removable copies) and document the
+solve-path default in testing.md.
+
+## Test-double consolidation (`_fake`/ScriptedAdapter → `_myservice`)
+
+Status: new
+Priority: -1
+
+FakeAdapter + ScriptedAdapter + the reference MyServiceAdapter coexist;
+consolidating onto `tests/_myservice.py` would remove triple duplication
+of a provider double.
+
+## Shared ErrorKind mapping table
+
+Status: new
+Priority: -1
+
+Each adapter carries a private provider-code → ErrorKind dict and the
+event tests carry their own kind matrix; hoist one shared table/module so
+adapter tests and events cannot drift.
+
+## `_internal/log.py`
+
+Status: new
+Priority: -1
+
+A shared module for the flat `unicaptcha` logger if call sites
+proliferate (ADR-0018/0039 keep it flat; extract only on need).
+
+## Async clock seam
+
+Status: new
+Priority: -1
+
+`Clock.sleep` is sync-only; the async engine sleeps via asyncio directly.
+A loop-time injection seam would make async timeout/cadence tests fully
+instant (sync tier already has the seam, task 16).
+
+## Universal `solve()` kind overloads
+
+Status: new
+Priority: -1
+
+Universal-tier `solve` returns `TaskResult[Any]` statically (runtime fully
+typed). Add the nine-kind overload set if universal precision is wanted;
+facades already type precisely.
+
+## README snippet verification
+
+Status: new
+Priority: -1
+
+README snippets are prose-reviewed only (ADR-0023). Options: execute
+snippets with mocked transport or compile-check the fenced blocks (the
+examples/ dir already gets compile checks via `tests/test_examples.py`).
+
+## Markdown link checker in CI
+
+Status: new
+Priority: -1
+
+A README/docs link checker job; cheap, but decide scope (README only vs
+spec/docs too) and whether broken-link tolerance is needed for external
+URLs.
+
+## Report commit-hash traceability
+
+Status: new
+Priority: -1
+
+Whether session/task reports should cite commit hashes for traceability
+(undecided; currently reports cite task names and dates only).

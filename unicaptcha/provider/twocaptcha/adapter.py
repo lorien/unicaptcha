@@ -481,6 +481,13 @@ class TwoCaptchaAdapter(BaseAdapter):
                     else None
                 ),
             )
+        if g_response and token:
+            # Live-verified (fidelity pass 2026-08-28): the v3 solution
+            # shape is gRecaptchaResponse + token WITHOUT a score field;
+            # v2 responses carry gRecaptchaResponse only.
+            return TwoCaptchaRecaptchaV3Solution(
+                token=str(g_response), score=None, action=None
+            )
         if g_response:
             return TwoCaptchaRecaptchaV2Solution(str(g_response))
         if "text" in solution:

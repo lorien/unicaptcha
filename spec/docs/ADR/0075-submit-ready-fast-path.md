@@ -57,6 +57,7 @@ class TaskTicket[T]:
     task_ref: TaskRef
     submitted_at: datetime             # UTC-aware
     instant_answer: ParsedTask | None = None    # ADR-0075
+    time: TimeConfig | None = None     # resolved solve-timeline carried from submit
 ```
 
 ADR-0067 rejected handle **methods** because an engine reference inside

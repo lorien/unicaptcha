@@ -145,8 +145,8 @@ class CapMonsterGeeTestV3Challenge(GeeTestV3Challenge):
 
 @dataclass(frozen=True, slots=True)
 class CapMonsterGeeTestV4Challenge(GeeTestV4Challenge):
-    """GeeTest v4: the captcha id rides ``initParameters.captcha_id``
-    (no ``gt`` per the pinned spec); ``risk_type`` rides
+    """GeeTest v4: the captcha id rides ``gt`` (vendor SDK requires it
+    unconditionally, v4 included); ``risk_type`` rides
     ``initParameters.riskType``."""
 
     risk_type: str | None = field(kw_only=True, default=None)

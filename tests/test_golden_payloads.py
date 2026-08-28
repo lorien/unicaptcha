@@ -464,8 +464,8 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
             "task": {
                 "type": "GeeTestTask",
                 "websiteURL": "pu",
+                "gt": "cid",
                 "version": 4,
-                "initParameters": {"captcha_id": "cid"},
             },
         },
     ),

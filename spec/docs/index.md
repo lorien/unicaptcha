@@ -14,6 +14,7 @@ what the project is, how it is designed, and why each decision was made.
 | [plan.md](plan.md) | Open tasks and parked work (includes formerly deferred items) |
 | [competitors.md](competitors.md) | Competitor survey: Go and Python universal libraries (2026-08-24) |
 | [providers.md](providers.md) | Supported provider directory: websites and official Python repos |
+| [fidelity.md](fidelity.md) | Provider wire-contract verification: algorithm, evidence sources, verification matrix |
 | [ADR/](ADR/) | Architecture Decision Records, one per settled decision |
 
 ## ADR directory

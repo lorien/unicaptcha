@@ -297,15 +297,17 @@ class CapMonsterAdapter(BaseAdapter):
         return task
 
     def _geetest_v4_task(self, ch: CapMonsterGeeTestV4Challenge) -> dict[str, Any]:
-        init_parameters: dict[str, str] = {"captcha_id": ch.captcha_id}
-        if ch.risk_type is not None:
-            init_parameters["riskType"] = ch.risk_type
+        # Vendor-derived (fidelity.md, 2026-08-28): CapMonster's SDK model
+        # requires `gt` unconditionally and its v4 example passes the
+        # challenge id there; initParameters carries extras (riskType) only.
         task: dict[str, Any] = {
             "type": "GeeTestTask",
             "websiteURL": ch.pageurl,
+            "gt": ch.captcha_id,
             "version": 4,
-            "initParameters": init_parameters,
         }
+        if ch.risk_type is not None:
+            task["initParameters"] = {"riskType": ch.risk_type}
         if ch.api_server is not None:
             task["geetestApiServerSubdomain"] = ch.api_server
         if ch.geetest_lib is not None:

@@ -188,8 +188,8 @@ def test_hcaptcha_funcaptcha_geetest_turnstile_payloads() -> None:
     )["task"]
     assert gv4["type"] == "GeeTestTask"
     assert gv4["version"] == 4
-    assert gv4["initParameters"] == {"captcha_id": "cid", "riskType": "slide"}
-    assert "gt" not in gv4  # v4 id rides initParameters.captcha_id, no gt
+    assert gv4["gt"] == "cid"  # v4 id rides gt (vendor SDK requires gt)
+    assert gv4["initParameters"] == {"riskType": "slide"}
 
     ts = a.build_payload(
         CapMonsterTurnstileChallenge(
