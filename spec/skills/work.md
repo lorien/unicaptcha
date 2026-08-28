@@ -6,7 +6,8 @@ Read `spec/skills/task_tracking.md`.
 Read `spec/skills/report_tracking.md`.
 The user may give you an ad-hoc task directly (work not listed in
 `spec/docs/plan.md`). If the user has not instructed you on what task to
-work, select one yourself from `spec/docs/plan.md` (topmost `new` task)
+work, select one yourself from `spec/docs/plan.md` (the highest-priority
+`new` task; deferred tasks with `Priority: -1` are not picked)
 and work on it.
 Before implementing a task, present your implementation plan and wait
 for the owner's approval.

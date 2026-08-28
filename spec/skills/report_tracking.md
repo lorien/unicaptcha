@@ -23,7 +23,8 @@ For a task from plan.md, the report opens with the archived task record,
 then what was done, then the suggestions:
 
 - `### Task (archived from plan.md)` — the original task header and body
-  with `Status: done`, moved here verbatim when the task finished.
+  with `Status: done`, moved here verbatim when the task finished. The
+  plan-time `Priority:` line is dropped (not part of the archived record).
 - `### Done` — a brief list of things done during the work on the task.
 - `### Spec/ADR amendments` — spec/doc/ADR changes suggested.
 - `### Future-task notes` — reminders for work that later tasks must do.

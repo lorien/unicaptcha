@@ -1,12 +1,19 @@
 # Task Tracking
 
 Open tasks are stored in the `spec/docs/plan.md` document. A task is a
-record with a `##` header (task name), a `Status:` line, the task body,
-and an optional `References:` line.
+record with a `##` header (task name), a `Status:` line, a `Priority:`
+line, the task body, and an optional `References:` line.
 
 A task is `new` until it is done:
 
 - `new` — not started (the default for a newly added task).
+
+Priorities:
+
+- `Priority: N` right after the `Status:` line; default `0` for new
+  records. Higher numeric value = more important.
+- `Priority: -1` = deferred: the task is not auto-picked until its
+  priority is raised. To defer a task, set its priority to `-1`.
 
 `done` is not a status in plan.md: a finished task's record is removed
 from plan.md and archived into the report of the session that worked on it
@@ -19,22 +26,25 @@ are one-off work handled outside the plan and reported via
 
 ## Adding a Task
 
-- Add a `## {title}` record to plan.md, followed by `Status: new`, the task
-  body, and an optional `References:` line naming relevant ADRs.
-- Append it at the end of plan.md; the owner reorders records to set
-  priority.
+- Add a `## {title}` record to plan.md, followed by `Status: new`, a
+  `Priority: 0` line, the task body, and an optional `References:` line
+  naming relevant ADRs.
+- Append it at the end of plan.md; the owner edits `Priority:` values to
+  set priority (no physical reordering needed).
 
 ## Choosing a Task
 
-- Pick the topmost `new` record in plan.md.
+- Pick the highest-priority `new` record in plan.md; ties break by file
+  order. Deferred records (`Priority: -1`) are never auto-picked.
 
 ## Finishing a Task
 
 When a task is done:
 
 1. Remove its record from plan.md.
-2. Archive the record (header + body, with `Status: done`) into the report
-   file for the session — see `report_tracking.md`.
+2. Archive the record (header + body, with `Status: done`; the `Priority:`
+   line is dropped) into the report file for the session — see
+   `report_tracking.md`.
 
 ## When Work Is Blocked
 
