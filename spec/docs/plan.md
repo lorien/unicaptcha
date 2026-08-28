@@ -247,6 +247,30 @@ README snippets are prose-reviewed only (ADR-0023). Options: execute
 snippets with mocked transport or compile-check the fenced blocks (the
 examples/ dir already gets compile checks via `tests/test_examples.py`).
 
+## Example verification: execute, not just compile
+
+Status: new
+Priority: -1
+
+`tests/test_examples.py` only `compile()`s examples; it missed a
+facade-attribute misuse in `examples/sync/proxy.py` (live smoke caught
+it). Refactor examples to `if __name__ == "__main__":` guards, then run
+each module's main under respx with canned instant-ready provider
+responses, asserting no AttributeError/API misuse — CI-speed, no credits.
+
+## Example demo values: geetest_v3 dynamic challenge; funcaptcha annotation
+
+Status: new
+Priority: -1
+
+Live smoke (2026-08-28): geetest_v3 examples fail with `NoSolutionError`
+— the static demo `challenge` is stale by design (one-time value). Fetch
+a fresh challenge from the 2captcha demo page per run (the vendor SDK
+example's pattern: GET the page, `split(';')[0]`) in sync/async examples.
+FunCaptcha's public demo blob is not worker-solvable; keep those examples
+illustrative with an explicit docstring/README note (`NoSolutionError`
+expected).
+
 ## Markdown link checker in CI
 
 Status: new

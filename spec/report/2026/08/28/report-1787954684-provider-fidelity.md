@@ -65,6 +65,12 @@ against `api.2captcha.com` directly).
   caught. An import-and-attribute smoke (or running examples against the
   mocked transport) would close this; relates to the plan records
   "README snippet verification" and example verification.
+  [acted] Filed as plan.md record "Example verification: execute, not
+  just compile" (2026-08-28).
+- [open] Demo-value limitations: geetest_v3's static challenge is stale
+  by design; funcaptcha's public demo blob is not worker-solvable.
+  [acted] Filed as plan.md record "Example demo values: geetest_v3
+  dynamic challenge; funcaptcha annotation" (2026-08-28).
 
 ### Tooling/process
 
