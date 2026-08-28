@@ -13,6 +13,11 @@ uv run pytest                    # tests; integration tests deselected by defaul
 - Integration tests (real provider APIs, API keys via environment) are
   gated by the `integration` marker and deselected by default:
   `uv run pytest -m integration`.
+- Live 2Captcha tests live in `tests/test_live_twocaptcha.py`; they solve
+  against real workers (credits deducted) and skip when the key is absent:
+  `UNICAPTCHA_TWOCAPTCHA_API_KEY=<key> uv run pytest -m integration tests/test_live_twocaptcha.py`.
+  Demo sitekeys are public 2Captcha demo pages; the image fixture is a
+  generated text captcha under `tests/fixtures/`.
 - HTTP is mocked at the transport level (respx; no real API calls); the
   engine exposes an injectable clock/sleep seam for deterministic timing
   tests.
@@ -21,6 +26,37 @@ uv run pytest                    # tests; integration tests deselected by defaul
 - Baseline prerequisite: `tests/` must exist with at least one collectable
   test — pytest exits 4 when `testpaths = ["tests"]` points at a missing
   directory, and 5 when nothing is collected.
+
+### Marker selection
+
+`-m` filters the collected set; CLI `-m` overrides the `addopts` one:
+
+| Command | Runs |
+|---|---|
+| `uv run pytest` | all tests except `integration` (addopts `-m 'not integration'`) |
+| `uv run pytest -m integration` | only `integration`-marked tests; unmarked tests deselected |
+
+They are complements — there is no hybrid state. To run unit tests *plus* a
+live file, pass the file explicitly (e.g.
+`uv run pytest tests/test_live_twocaptcha.py`) or combine markers; `-m
+integration` alone always excludes unmarked tests.
+
+### Live-testing options per provider
+
+Real solves cost credits. Free/low-cost ways to exercise the same wire
+surface, per provider research:
+
+- **2Captcha:** `POST https://api.2captcha.com/test` echoes/validates a
+  request without solving (wire-contract only). Sandbox mode (account
+  setting `/setting#sandbox`) sends tasks to your own dashboard — free, but
+  you solve by hand; needs a funded account and does not support reCAPTCHA
+  v3 / Turnstile / VK / DataDome.
+- **Anti-Captcha:** `POST https://api.anti-captcha.com/test` echoes a JSON
+  POST for debugging (wire-contract only); no sandbox.
+- **CapMonster Cloud:** no `test` endpoint or sandbox; a $0.1 test balance
+  is granted on request to support.
+- **Capsolver:** no `test` endpoint or sandbox; `ERROR_CAPTCHA_UNSOLVABLE`
+  does not deduct balance (edge-path testing only).
 
 ## Static checks
 
