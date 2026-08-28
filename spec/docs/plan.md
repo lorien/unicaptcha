@@ -46,14 +46,6 @@ Priority: -1
 Whether a `v*` tag triggers automated publish, a TestPyPI dry-run, and
 trusted publishing vs token. Deliberately postponed.
 
-## examples/ directory
-
-Status: new
-Priority: -1
-
-Use-case examples; nature undecided (runnable scripts vs illustrative
-snippets). Directory name must be `examples/`.
-
 ## Provider selection / failover policy
 
 Status: new

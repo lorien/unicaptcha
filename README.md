@@ -144,6 +144,12 @@ Pass `on_event=` at construction or per call to observe the task lifecycle
 (`SUBMIT_REQUESTED`, `SUBMIT_ACCEPTED`, `RESULT_RECEIVED`, …) as typed
 `TaskEvent`s.
 
+## Examples
+
+Runnable scripts, one per use case in `examples/sync/` and `examples/async/`:
+every captcha kind, two-phase batch, aux ops, events, errors, proxy.
+See [examples/README.md](examples/README.md).
+
 ## Custom providers
 
 unicaptcha ships a public adapter SDK: third parties can implement their own

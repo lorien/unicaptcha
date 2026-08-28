@@ -43,3 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   strict, ruff, and slotscheck.
 - Base-URL mirror support (e.g. RuCaptcha via `base_url=`) and referral
   embedding for the built-in adapters.
+- An `examples/` directory: runnable per-use-case scripts in `sync/` and
+  `async/` flavors covering every captcha kind, two-phase batch, aux ops,
+  events, errors, and proxy usage, demonstrated on 2Captcha with public
+  demo sitekeys.
