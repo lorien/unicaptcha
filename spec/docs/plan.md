@@ -166,7 +166,7 @@ becomes a gate — all undecided.
 ## Kind timing defaults: text budget
 
 Status: new
-Priority: -1
+Priority: 3
 
 Live smoke (2026-08-28): the text kind's 30 s default budget (ADR-0030
 table) expired twice on real workers; the same solve passed with
@@ -176,7 +176,7 @@ real-solve latencies.
 ## Shared JSON-family adapter base
 
 Status: new
-Priority: -1
+Priority: 1
 
 The four JSON adapters duplicate near-identical helpers (`_decode`,
 `_decimal`, `_proxy_fields`, `_solution_dict`, task-id extraction,
@@ -250,7 +250,7 @@ examples/ dir already gets compile checks via `tests/test_examples.py`).
 ## Example verification: execute, not just compile
 
 Status: new
-Priority: -1
+Priority: 2
 
 `tests/test_examples.py` only `compile()`s examples; it missed a
 facade-attribute misuse in `examples/sync/proxy.py` (live smoke caught
