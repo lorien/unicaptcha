@@ -287,3 +287,48 @@ Priority: -1
 
 Whether session/task reports should cite commit hashes for traceability
 (undecided; currently reports cite task names and dates only).
+
+## Auto mode: HTML page detection + auto solve
+
+Status: new
+Priority: -1
+
+The library accepts the source code (HTML) of a page plus the page
+URL; it detects which captcha the page uses, extracts the needed
+tokens (sitekey / public_key / gt+challenge / captcha_id / ...) from
+the HTML, solves the captcha with a suitable provider, and returns an
+`AutoSolveResult` the caller can inject into the page's form inputs.
+
+Design (ADR-0077):
+- New public module `unicaptcha/detect.py`: `detect(html, pageurl) ->
+  tuple[DetectedChallenge, ...]` (DOM order; empty tuple when nothing
+  found). `DetectedChallenge{kind, challenge, page, signals}`.
+- Stdlib-only parsing (`html.parser.HTMLParser` + `re` + `html.unescape`)
+  in `_internal/_html.py`; no new runtime deps (ADR-0019).
+- Detectable kinds: reCAPTCHA v2 (incl. invisible), reCAPTCHA v3
+  (render= / grecaptcha.execute), hCaptcha, Turnstile (incl. action /
+  c_data / chl_page_data), FunCaptcha (data-pkey), GeeTest v3
+  (initGeetest), GeeTest v4 (initGeetest4). Image/text excluded
+  (API-driven, not HTML-detectable). v2 vs v3 disambiguated by
+  render=/execute; both present -> two detections.
+- `Solver.auto_solve` / `AsyncSolver.auto_solve(html, pageurl,
+  provider=None, *, index=0, time=None, retry=None, on_event=None) ->
+  AutoSolveResult`: solves detected[index] via the existing solve()
+  path (ADR-0064 dispatch; provider= pins).
+- `AutoSolveResult` (frozen): `result: TaskResult[BaseSolution]` +
+  `fill: Mapping[str, str]` — default selector->value per kind
+  (#g-recaptcha-response, textarea[name=h-captcha-response],
+  input[name=cf-turnstile-response], #geetest_challenge/
+  #geetest_validate/#geetest_seccode; GeeTest v4 field names verified
+  during implementation; none for FunCaptcha). Caller applies to the
+  live DOM (no browser).
+- New error `NoCaptchaDetectedError(UnicaptchaError)` on no detection.
+- pageurl is a required argument: serialized as websiteURL in the
+  payload; the returned token is bound to that domain.
+- goals.md non-goal amended: HTML detection + auto solve in scope;
+  browser automation stays out.
+- Tests: tests/test_detect.py (canned HTML per kind, multi-instance,
+  v2/v3, malformed HTML), tests/test_auto_solve.py (respx end-to-end,
+  uniform_choice monkeypatch, fill mapping).
+
+References: ADR-0077.
