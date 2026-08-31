@@ -27,6 +27,35 @@ and `Priority: -1` (deferred) tasks are never auto-picked. The owner edits
 Ad-hoc tasks requested directly by the user are not tracked here; their
 reports live in `spec/report/`.
 
+## Rename JsonAdapterBase to reflect the submit-poll protocol family
+
+Status: new
+Priority: 2
+
+`JsonAdapterBase` (committed 2026-08-31) is too generic: the name
+implies a base for any JSON API, but it is the shared base for the
+`createTask`/`getTaskResult` submit→poll→result captcha-provider
+protocol family (ADR-0001) — a design all captcha providers mimic
+(submit → poll → get, plus balance/reports). Rename to a name that
+states the design, not the encoding:
+
+- `SubmitPollAdapterBase` (recommended — matches the existing
+  submit/poll vocabulary: ADR-0067 two-phase submit/wait, ADR-0011
+  polling policy, the `submit()`/`wait()` methods).
+- `TaskQueueAdapterBase` (model-flavored alternative).
+
+Touch points: `unicaptcha/adapter.py` (class name, `__all__`,
+docstring wording), `unicaptcha/__init__.py`, the four provider
+adapters (import + subclass line), `tests/test_package.py`,
+`spec/docs/architecture.md` §9 (the added layout-tree / public-surface /
+adapter-SDK wording, aligned to submit→poll / `createTask`–`getTaskResult`),
+and `CHANGELOG.md` (Unreleased Changed entry). The historical session
+report `spec/report/2026/08/31/report-1788185812-json-adapter-base.md`
+is not rewritten (historical records stay as-is). Pick the name on
+execution, then run the full verification suite.
+
+References: ADR-0001.
+
 ## Release-consistency CI guards
 
 Status: new
