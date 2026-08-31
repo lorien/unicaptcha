@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Extracted a shared `JsonAdapterBase` in the public adapter SDK
+  (`unicaptcha.adapter`, re-exported from the root) for the JSON-family
+  `createTask`/`getTaskResult` adapters: the four shipped adapters now
+  inherit the response-parsing pipeline (`parse_submit_response`,
+  `parse_task_status`, `parse_balance`, `map_provider_error`,
+  `build_payload`) and the shared field helpers (`_decode`, `_decimal`,
+  `_proxy_fields`, `_cookies`, `_soft_id`, `_single_token`, `_task_id`,
+  ...). `unicaptcha.errors.error_from_kind` is now public so third-party
+  adapters can raise mapped provider errors without importing `_internal`
+  (ADR-0041). No behavior change. The Anti-Captcha proxy-hostname error
+  message no longer names the challenge class.
+
 ### Fixed
 
 - Example scripts are now import-safe: executable code lives under

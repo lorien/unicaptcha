@@ -163,17 +163,6 @@ pytest-cov stays informational only (ADR-0047); whether CI passes
 `--cov`, what reports are shown/uploaded, and if a coverage threshold
 becomes a gate — all undecided.
 
-## Shared JSON-family adapter base
-
-Status: new
-Priority: 1
-
-The four JSON adapters duplicate near-identical helpers (`_decode`,
-`_decimal`, `_proxy_fields`, `_solution_dict`, task-id extraction,
-solution-shape dispatch). Extract a shared JSON-family base/mixin once the
-fidelity pass settles the wire surface, so the refactor lands on verified
-code.
-
 ## conftest fast-config consolidation
 
 Status: new

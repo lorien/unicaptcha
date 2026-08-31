@@ -688,7 +688,8 @@ unicaptcha/
                        # configs, Proxy/ProxyKind, challenge/solution kind bases
     _version.py        # single version source (pyproject reads it)
     client.py          # Solver / AsyncSolver
-    errors.py          # hierarchy + ErrorKind
+    adapter.py         # adapter SDK: BaseAdapter ABC, Endpoints, JsonAdapterBase
+    errors.py          # hierarchy + ErrorKind + error_from_kind
     events.py          # TaskEvent
     types.py           # public model vocabulary (TaskResult, TaskStatusResult, TaskRef,
                        # Proxy, SecretStr, configs, kind bases re-exported)
@@ -730,10 +731,15 @@ unicaptcha/
   inside a provider package is singular, one file per concern
   (`challenge.py`, `solution.py`, `adapter.py`, `client.py`).
 - Public surface: root + provider packages + the adapter SDK contract
-  (`BaseChallenge`, `BaseAdapter` ABC, registration). Everything under
-  `_internal/` plus module privates are implementation details. The HTTP
-  layer is exposed as a public **Protocol** (what may be injected), while its
-  implementation stays internal (ADR-0041).
+  (`BaseChallenge`, `BaseAdapter` ABC, `Endpoints`, `JsonAdapterBase`,
+  registration). `JsonAdapterBase` is the shared implementation base for
+  the JSON-family `createTask`/`getTaskResult` adapters (response-parsing
+  pipeline + field helpers); third-party JSON-family adapters may subclass
+  it, and `unicaptcha.errors.error_from_kind` is public so adapters can
+  raise mapped provider errors without touching `_internal`. Everything
+  under `_internal/` plus module privates are implementation details. The
+  HTTP layer is exposed as a public **Protocol** (what may be injected),
+  while its implementation stays internal (ADR-0041).
 - Naming: universal `Solver` / `AsyncSolver`; facades
   `<Provider>Client` / `Async<Provider>Client`; challenges
   `<Provider><Kind>Challenge`; solutions `<Provider><Kind>Solution`
@@ -748,8 +754,11 @@ unicaptcha/
 ### Adapter SDK (ADR-0041)
 
 ```python
-class MyServiceAdapter(BaseAdapter):
+class MyServiceAdapter(JsonAdapterBase):   # or BaseAdapter for divergent protocols
     provider: ClassVar[str] = "myservice"
+    json_provider: ClassVar[str] = "myservice"   # error-message label
+    error_kinds: ClassVar[Mapping[str, ErrorKind]]
+    unknown_task_codes: ClassVar[frozenset[str]]
     challenges: ClassVar[frozenset[type[BaseChallenge]]]
     default_task_config: ClassVar[...]        # per-kind timing defaults; optional
     endpoints: ClassVar[Endpoints]             # JSON-family default; all-or-nothing

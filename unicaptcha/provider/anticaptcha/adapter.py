@@ -20,19 +20,15 @@ from __future__ import annotations
 
 import base64
 import ipaddress
-import json
-from decimal import Decimal, InvalidOperation
+from collections.abc import Mapping
 from typing import Any, ClassVar, cast
 
-from unicaptcha._internal.errors import error_from_kind
-from unicaptcha.adapter import BaseAdapter
+from unicaptcha.adapter import JsonAdapterBase
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import (
     EmptySolutionError,
     ErrorKind,
     InvalidChallengeError,
-    InvalidConfigError,
-    ProviderError,
     UnsupportedChallengeError,
 )
 from unicaptcha.provider.anticaptcha.challenge import (
@@ -54,110 +50,26 @@ from unicaptcha.provider.anticaptcha.solution import (
     AntiCaptchaRecaptchaV2Solution,
     AntiCaptchaRecaptchaV3Solution,
 )
-from unicaptcha.types import ParsedTask, Proxy, SubmitAccepted, TaskStatus
-
-# ADR-0072: project affiliate id, registered at implementation time. No id
-# yet — ``referral=True`` therefore embeds nothing until one is recorded.
-_PROJECT_SOFT_ID: int | None = None
-
-_ERROR_KINDS: dict[str, ErrorKind] = {
-    "ERROR_KEY_DOES_NOT_EXIST": ErrorKind.AUTHENTICATION,
-    "ERROR_WRONG_USER_KEY": ErrorKind.AUTHENTICATION,
-    "ERROR_IP_NOT_ALLOWED": ErrorKind.AUTHENTICATION,
-    "ERROR_IP_BANNED": ErrorKind.AUTHENTICATION,
-    "ERROR_ZERO_BALANCE": ErrorKind.INSUFFICIENT_BALANCE,
-    "ERROR_NO_SLOT_AVAILABLE": ErrorKind.SERVICE_BUSY,
-    "ERROR_TOO_MANY_REQUESTS": ErrorKind.RATE_LIMIT,
-}
-_UNKNOWN_TASK_CODES = frozenset(
-    {"ERROR_TASK_ABSENT", "ERROR_WRONG_CAPTCHA_ID", "ERROR_TASK_NOT_FOUND"}
-)
+from unicaptcha.types import Proxy
 
 
-def _decode(raw: bytes) -> dict[str, Any]:
-    """Lenient JSON-object decode; failures chain into ``ProviderError``
-    with the verbatim body preserved (ADR-0040)."""
-    try:
-        data = json.loads(raw.decode("utf-8", errors="replace").strip())
-    except ValueError as exc:
-        raise ProviderError(
-            "malformed JSON response from anti-captcha", raw_response=raw
-        ) from exc
-    if not isinstance(data, dict):
-        raise ProviderError(
-            "anti-captcha response is not a JSON object", raw_response=raw
-        )
-    return cast(dict[str, Any], data)
-
-
-def _decimal(value: Any) -> Decimal | None:
-    if value is None:
-        return None
-    try:
-        return Decimal(str(value))
-    except (InvalidOperation, ValueError) as exc:
-        raise ProviderError(f"invalid balance/cost value {value!r}") from exc
-
-
-def _proxy_fields(proxy: Proxy | None, challenge_name: str) -> dict[str, Any]:
-    """Serialize the five-field proxy block. Anti-Captcha accepts IP
-    addresses only (ADR-0076); hostnames are rejected here — pure code,
-    no DNS resolution."""
-    if proxy is None:
-        return {}
-    try:
-        ipaddress.ip_address(proxy.host)
-    except ValueError as exc:
-        raise InvalidChallengeError(
-            f"{challenge_name}: anti-captcha accepts proxy IP addresses "
-            f"only, got hostname {proxy.host!r}"
-        ) from exc
-    fields: dict[str, Any] = {
-        "proxyType": proxy.kind.value.lower(),
-        "proxyAddress": proxy.host,
-        "proxyPort": proxy.port,
-    }
-    if proxy.username is not None:
-        fields["proxyLogin"] = proxy.username
-    if proxy.password is not None:
-        fields["proxyPassword"] = proxy.password
-    return fields
-
-
-def _cookies(cookies: Any) -> str | None:
-    if not cookies:
-        return None
-    return "; ".join(f"{key}={value}" for key, value in cookies.items())
-
-
-def _soft_id(referral: bool | str) -> int | None:
-    """Trinary referral resolution for Anti-Captcha's integer ``softId``
-    (ADR-0072)."""
-    if referral is True:
-        return _PROJECT_SOFT_ID
-    if referral is False:
-        return None
-    try:
-        return int(referral)
-    except ValueError as exc:
-        raise InvalidConfigError(
-            f"referral must be an integer id for anti-captcha softId, got {referral!r}"
-        ) from exc
-
-
-def _single_token(field_name: str, mapping: dict[str, str]) -> str:
-    """Collapse a one-entry mapping into the token string it wraps."""
-    if len(mapping) != 1:
-        raise InvalidChallengeError(
-            f"{field_name} must contain exactly one entry to be sent as a string token"
-        )
-    return next(iter(mapping.values()))
-
-
-class AntiCaptchaAdapter(BaseAdapter):
+class AntiCaptchaAdapter(JsonAdapterBase):
     """Adapter speaking Anti-Captcha's createTask/getTaskResult API."""
 
     provider: ClassVar[str] = "anti-captcha"
+    json_provider: ClassVar[str] = "anti-captcha"
+    error_kinds: ClassVar[Mapping[str, ErrorKind]] = {
+        "ERROR_KEY_DOES_NOT_EXIST": ErrorKind.AUTHENTICATION,
+        "ERROR_WRONG_USER_KEY": ErrorKind.AUTHENTICATION,
+        "ERROR_IP_NOT_ALLOWED": ErrorKind.AUTHENTICATION,
+        "ERROR_IP_BANNED": ErrorKind.AUTHENTICATION,
+        "ERROR_ZERO_BALANCE": ErrorKind.INSUFFICIENT_BALANCE,
+        "ERROR_NO_SLOT_AVAILABLE": ErrorKind.SERVICE_BUSY,
+        "ERROR_TOO_MANY_REQUESTS": ErrorKind.RATE_LIMIT,
+    }
+    unknown_task_codes: ClassVar[frozenset[str]] = frozenset(
+        {"ERROR_TASK_ABSENT", "ERROR_WRONG_CAPTCHA_ID", "ERROR_TASK_NOT_FOUND"}
+    )
     challenges: ClassVar[frozenset[type[BaseChallenge]]] = frozenset(
         {
             AntiCaptchaImageChallenge,
@@ -175,16 +87,20 @@ class AntiCaptchaAdapter(BaseAdapter):
 
     # -- submit ----------------------------------------------------------
 
-    def build_payload(self, challenge: BaseChallenge) -> dict[str, Any]:
-        task = self._build_task(challenge)
-        payload: dict[str, Any] = {
-            "clientKey": self._api_key.get_secret_value(),
-            "task": task,
-        }
-        soft_id = _soft_id(self._referral)
-        if soft_id is not None:
-            payload["softId"] = soft_id
-        return payload
+    def _proxy_fields(self, proxy: Proxy | None) -> dict[str, Any]:
+        """Serialize the five-field proxy block. Anti-Captcha accepts IP
+        addresses only (ADR-0076); hostnames are rejected here — pure code,
+        no DNS resolution."""
+        if proxy is None:
+            return {}
+        try:
+            ipaddress.ip_address(proxy.host)
+        except ValueError as exc:
+            raise InvalidChallengeError(
+                f"anti-captcha accepts proxy IP addresses only, "
+                f"got hostname {proxy.host!r}"
+            ) from exc
+        return super()._proxy_fields(proxy)
 
     def _build_task(self, challenge: BaseChallenge) -> dict[str, Any]:
         if isinstance(challenge, AntiCaptchaImageChallenge):
@@ -256,10 +172,10 @@ class AntiCaptchaAdapter(BaseAdapter):
                 task["enterprisePayload"] = enterprise_payload
             if ch.user_agent is not None:
                 task["userAgent"] = ch.user_agent
-            cookie_header = _cookies(ch.cookies)
+            cookie_header = self._cookies(ch.cookies)
             if cookie_header is not None:
                 task["cookies"] = cookie_header
-            task.update(_proxy_fields(ch.proxy, type(ch).__name__))
+            task.update(self._proxy_fields(ch.proxy))
             return task
         base = "RecaptchaV2Task" if ch.proxy is not None else "RecaptchaV2TaskProxyless"
         task = {
@@ -270,15 +186,15 @@ class AntiCaptchaAdapter(BaseAdapter):
         if ch.stoken is not None:
             task["websiteSToken"] = ch.stoken
         if ch.data_s:
-            task["recaptchaDataSValue"] = _single_token("data_s", dict(ch.data_s))
+            task["recaptchaDataSValue"] = self._single_token("data_s", dict(ch.data_s))
         if ch.invisible:
             task["isInvisible"] = True
         if ch.user_agent is not None:
             task["userAgent"] = ch.user_agent
-        cookie_header = _cookies(ch.cookies)
+        cookie_header = self._cookies(ch.cookies)
         if cookie_header is not None:
             task["cookies"] = cookie_header
-        task.update(_proxy_fields(ch.proxy, type(ch).__name__))
+        task.update(self._proxy_fields(ch.proxy))
         return task
 
     def _recaptcha_v3_task(self, ch: AntiCaptchaRecaptchaV3Challenge) -> dict[str, Any]:
@@ -310,10 +226,10 @@ class AntiCaptchaAdapter(BaseAdapter):
             task["enterprisePayload"] = {"rqdata": ch.rqdata}
         if ch.is_invisible:
             task["isInvisible"] = True
-        cookie_header = _cookies(ch.cookies)
+        cookie_header = self._cookies(ch.cookies)
         if cookie_header is not None:
             task["cookies"] = cookie_header
-        task.update(_proxy_fields(ch.proxy, type(ch).__name__))
+        task.update(self._proxy_fields(ch.proxy))
         return task
 
     def _funcaptcha_task(self, ch: AntiCaptchaFunCaptchaChallenge) -> dict[str, Any]:
@@ -330,7 +246,7 @@ class AntiCaptchaAdapter(BaseAdapter):
         if ch.proxy is not None and ch.user_agent is not None:
             # UA rides proxy-on tasks only for FunCaptcha (SDK behavior).
             task["userAgent"] = ch.user_agent
-        task.update(_proxy_fields(ch.proxy, type(ch).__name__))
+        task.update(self._proxy_fields(ch.proxy))
         return task
 
     def _geetest_v3_task(self, ch: AntiCaptchaGeeTestV3Challenge) -> dict[str, Any]:
@@ -346,7 +262,7 @@ class AntiCaptchaAdapter(BaseAdapter):
             task["geetestGetLib"] = ch.geetest_lib
         if ch.user_agent is not None:
             task["userAgent"] = ch.user_agent
-        task.update(_proxy_fields(ch.proxy, type(ch).__name__))
+        task.update(self._proxy_fields(ch.proxy))
         return task
 
     def _geetest_v4_task(self, ch: AntiCaptchaGeeTestV4Challenge) -> dict[str, Any]:
@@ -365,7 +281,7 @@ class AntiCaptchaAdapter(BaseAdapter):
             task["geetestApiServerSubdomain"] = ch.api_server
         if ch.user_agent is not None:
             task["userAgent"] = ch.user_agent
-        task.update(_proxy_fields(ch.proxy, type(ch).__name__))
+        task.update(self._proxy_fields(ch.proxy))
         return task
 
     def _turnstile_task(self, ch: AntiCaptchaTurnstileChallenge) -> dict[str, Any]:
@@ -384,82 +300,10 @@ class AntiCaptchaAdapter(BaseAdapter):
             task["cData"] = ch.c_data
         if ch.chl_page_data is not None:
             task["chlPageData"] = ch.chl_page_data
-        task.update(_proxy_fields(ch.proxy, type(ch).__name__))
+        task.update(self._proxy_fields(ch.proxy))
         return task
 
-    # -- response parsing --------------------------------------------------
-
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
-        data = _decode(raw)
-        if data.get("errorId"):
-            kind, message = self.map_provider_error(raw)
-            raise error_from_kind(kind, message, raw)
-        task_id = _task_id(data)
-        if data.get("status") == "ready":
-            solution = _solution_dict(data)
-            instant = ParsedTask(
-                state=TaskStatus.READY,
-                solution=self._solution_from(solution),
-                cost=_decimal(data.get("cost")),
-                raw=raw,
-            )
-            return SubmitAccepted(task_id=task_id, instant_answer=instant)
-        return SubmitAccepted(task_id=task_id)
-
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
-        data = _decode(raw)
-        if data.get("errorId"):
-            code = _provider_code(data)
-            message = _provider_message(data)
-            if code == "ERROR_CAPTCHA_UNSOLVABLE":
-                return ParsedTask(
-                    state=TaskStatus.NO_SOLUTION, solution=None, cost=None, raw=raw
-                )
-            if code in _UNKNOWN_TASK_CODES:
-                return ParsedTask(
-                    state=TaskStatus.UNKNOWN,
-                    solution=None,
-                    cost=None,
-                    raw=raw,
-                    detail=message,
-                )
-            _, mapped = self.map_provider_error(raw)
-            return ParsedTask(
-                state=TaskStatus.UNKNOWN,
-                solution=None,
-                cost=None,
-                raw=raw,
-                detail=mapped,
-            )
-        if data.get("status") == "ready":
-            solution = _solution_dict(data)
-            return ParsedTask(
-                state=TaskStatus.READY,
-                solution=self._solution_from(solution),
-                cost=_decimal(data.get("cost")),
-                raw=raw,
-            )
-        return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)
-
-    def parse_balance(self, raw: bytes) -> Decimal:
-        data = _decode(raw)
-        if data.get("errorId"):
-            kind, message = self.map_provider_error(raw)
-            raise error_from_kind(kind, message, raw)
-        balance = _decimal(data.get("balance"))
-        if balance is None:
-            raise ProviderError(
-                "balance response lacks a usable 'balance' field",
-                raw_response=raw,
-            )
-        return balance
-
-    def map_provider_error(self, raw: bytes) -> tuple[ErrorKind, str]:
-        data = _decode(raw)
-        code = _provider_code(data)
-        kind = _ERROR_KINDS.get(code, ErrorKind.PROVIDER)
-        message = _provider_message(data) or code or "unknown provider error"
-        return kind, message
+    # -- solution dispatch --------------------------------------------------
 
     def _solution_from(self, solution: dict[str, Any]) -> Any:
         g_response = solution.get("gRecaptchaResponse")
@@ -504,34 +348,6 @@ class AntiCaptchaAdapter(BaseAdapter):
         raise EmptySolutionError(
             f"unrecognized anti-captcha solution shape: keys={sorted(solution)}"
         )
-
-
-def _solution_dict(data: dict[str, Any]) -> dict[str, Any]:
-    solution = data.get("solution")
-    if not isinstance(solution, dict) or not solution:
-        raise EmptySolutionError(
-            "task solved but the payload carries no solution fields"
-        )
-    return cast(dict[str, Any], solution)
-
-
-def _provider_code(data: dict[str, Any]) -> str:
-    return str(data.get("errorCode") or "").upper()
-
-
-def _provider_message(data: dict[str, Any]) -> str:
-    return str(data.get("errorDescription") or "")
-
-
-def _task_id(data: dict[str, Any]) -> int:
-    value = data.get("taskId")
-    if isinstance(value, bool):
-        raise ProviderError(f"invalid taskId {value!r}")
-    if isinstance(value, int):
-        return value
-    if isinstance(value, str) and value.isdigit():
-        return int(value)
-    raise ProviderError(f"submit response lacks a usable taskId: {value!r}")
 
 
 def _optional_str(value: Any) -> str | None:

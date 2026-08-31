@@ -1,54 +1,9 @@
-"""Map ``ErrorKind`` to the exception leaf (ADR-0009 1:1 invariant)."""
+"""Re-export shim: ``error_from_kind`` now lives in the public
+``unicaptcha.errors`` module (ADR-0041 boundary — third-party adapters may
+use it without importing ``_internal``). Kept so the engines and tests that
+import ``unicaptcha._internal.errors`` keep working.
+"""
 
-from __future__ import annotations
-
-from collections.abc import Callable
-
-from unicaptcha.errors import (
-    AuthenticationError,
-    ClientClosedError,
-    EmptySolutionError,
-    ErrorKind,
-    InsufficientBalanceError,
-    InvalidChallengeError,
-    InvalidConfigError,
-    NetworkError,
-    NoSolutionError,
-    ProviderError,
-    RateLimitError,
-    ServiceBusyError,
-    TaskTimeoutError,
-    UnicaptchaError,
-    UnsupportedChallengeError,
-)
-
-_KIND_CLASS: dict[ErrorKind, Callable[..., UnicaptchaError]] = {
-    ErrorKind.NETWORK: NetworkError,
-    ErrorKind.AUTHENTICATION: AuthenticationError,
-    ErrorKind.INSUFFICIENT_BALANCE: InsufficientBalanceError,
-    ErrorKind.UNSUPPORTED_CHALLENGE: UnsupportedChallengeError,
-    ErrorKind.INVALID_CHALLENGE: InvalidChallengeError,
-    ErrorKind.TASK_TIMEOUT: TaskTimeoutError,
-    ErrorKind.RATE_LIMIT: RateLimitError,
-    ErrorKind.SERVICE_BUSY: ServiceBusyError,
-    ErrorKind.NO_SOLUTION: NoSolutionError,
-    ErrorKind.EMPTY_SOLUTION: EmptySolutionError,
-    ErrorKind.CLIENT_CLOSED: ClientClosedError,
-    ErrorKind.INVALID_CONFIG: InvalidConfigError,
-    ErrorKind.PROVIDER: ProviderError,
-}
-
-
-def error_from_kind(
-    kind: ErrorKind,
-    message: str,
-    raw_response: bytes = b"",
-) -> UnicaptchaError:
-    """Construct the exception leaf for an ``ErrorKind`` (provider mapping)."""
-    if kind is ErrorKind.INVALID_CONFIG:
-        return InvalidConfigError(message)
-    cls = _KIND_CLASS.get(kind, ProviderError)
-    return cls(message, raw_response=raw_response)
-
+from unicaptcha.errors import error_from_kind
 
 __all__ = ["error_from_kind"]
