@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Example scripts are now import-safe: executable code lives under
+  `if __name__ == "__main__":` guards, and `tests/test_examples.py`
+  executes each example against a respx-mocked 2Captcha transport (no
+  credits) — catching the class of facade-attribute misuse that
+  `compile()`-only checks missed (e.g. the former `examples/sync/proxy.py`
+  generic `solve()` call).
 - Text captcha kind default solve budget: `total_timeout` raised to
   120 s (was 30 s, shared with image). Two live 2Captcha text solves
   exceeded the old budget; image keeps 30 s.

@@ -11,17 +11,18 @@ import sys
 
 from unicaptcha.provider.twocaptcha import TwoCaptchaClient
 
-api_key = os.getenv("UNICAPTCHA_TWOCAPTCHA_API_KEY")
-if not api_key:
-    sys.exit(
-        "Set UNICAPTCHA_TWOCAPTCHA_API_KEY to your 2Captcha API key "
-        "(https://2captcha.com/setting/devcenter)"
-    )
+if __name__ == "__main__":
+    api_key = os.getenv("UNICAPTCHA_TWOCAPTCHA_API_KEY")
+    if not api_key:
+        sys.exit(
+            "Set UNICAPTCHA_TWOCAPTCHA_API_KEY to your 2Captcha API key "
+            "(https://2captcha.com/setting/devcenter)"
+        )
 
-# Public demo page from 2captcha.com.
-sitekey = "6LfD3PIbAAAAAJs_eEHvoOl75_83eXSqpPSRFJ_u"
-pageurl = "https://2captcha.com/demo/recaptcha-v2"
+    # Public demo page from 2captcha.com.
+    sitekey = "6LfD3PIbAAAAAJs_eEHvoOl75_83eXSqpPSRFJ_u"
+    pageurl = "https://2captcha.com/demo/recaptcha-v2"
 
-with TwoCaptchaClient(api_key) as client:
-    result = client.solve_recaptcha_v2(sitekey=sitekey, pageurl=pageurl)
-    print("token:", result.solution.token)
+    with TwoCaptchaClient(api_key) as client:
+        result = client.solve_recaptcha_v2(sitekey=sitekey, pageurl=pageurl)
+        print("token:", result.solution.token)

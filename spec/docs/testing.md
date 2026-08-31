@@ -21,6 +21,12 @@ uv run pytest                    # tests; integration tests deselected by defaul
 - HTTP is mocked at the transport level (respx; no real API calls); the
   engine exposes an injectable clock/sleep seam for deterministic timing
   tests.
+- Examples execute (not just `compile()`): `tests/test_examples.py` runs
+  every `examples/` script's `__main__` under respx with canned
+  instant-ready 2Captcha responses (no credits, CI-speed), catching API
+  misuse like the old `examples/sync/proxy.py` generic-`solve()` bug. A
+  companion guard asserts each script is import-safe (executable code only
+  under `if __name__ == "__main__":`).
 - pytest-asyncio runs in strict mode (`asyncio_mode = "strict"`): every
   async test function needs `@pytest.mark.asyncio`.
 - Baseline prerequisite: `tests/` must exist with at least one collectable

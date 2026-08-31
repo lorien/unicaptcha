@@ -13,20 +13,21 @@ from pathlib import Path
 from unicaptcha import ImageChallenge, Solver
 from unicaptcha.provider.twocaptcha import TwoCaptchaAdapter
 
-api_key = os.getenv("UNICAPTCHA_TWOCAPTCHA_API_KEY")
-if not api_key:
-    sys.exit(
-        "Set UNICAPTCHA_TWOCAPTCHA_API_KEY to your 2Captcha API key "
-        "(https://2captcha.com/setting/devcenter)"
-    )
+if __name__ == "__main__":
+    api_key = os.getenv("UNICAPTCHA_TWOCAPTCHA_API_KEY")
+    if not api_key:
+        sys.exit(
+            "Set UNICAPTCHA_TWOCAPTCHA_API_KEY to your 2Captcha API key "
+            "(https://2captcha.com/setting/devcenter)"
+        )
 
-client = Solver(adapters=[TwoCaptchaAdapter(api_key)])
+    client = Solver(adapters=[TwoCaptchaAdapter(api_key)])
 
-# Any path or bytes works; the value is normalized to bytes at construction.
-image = Path(__file__).resolve().parent.parent / "images" / "captcha.png"
+    # Any path or bytes works; the value is normalized to bytes at construction.
+    image = Path(__file__).resolve().parent.parent / "images" / "captcha.png"
 
-result = client.solve(ImageChallenge(image))
-print("solved:", result.solution.text)
-print("task id:", result.task_id, "cost:", result.cost)
+    result = client.solve(ImageChallenge(image))
+    print("solved:", result.solution.text)
+    print("task id:", result.task_id, "cost:", result.cost)
 
-client.close()
+    client.close()

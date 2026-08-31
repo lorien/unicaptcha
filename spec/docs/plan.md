@@ -237,17 +237,6 @@ README snippets are prose-reviewed only (ADR-0023). Options: execute
 snippets with mocked transport or compile-check the fenced blocks (the
 examples/ dir already gets compile checks via `tests/test_examples.py`).
 
-## Example verification: execute, not just compile
-
-Status: new
-Priority: 2
-
-`tests/test_examples.py` only `compile()`s examples; it missed a
-facade-attribute misuse in `examples/sync/proxy.py` (live smoke caught
-it). Refactor examples to `if __name__ == "__main__":` guards, then run
-each module's main under respx with canned instant-ready provider
-responses, asserting no AttributeError/API misuse — CI-speed, no credits.
-
 ## Example demo values: geetest_v3 dynamic challenge; funcaptcha annotation
 
 Status: new

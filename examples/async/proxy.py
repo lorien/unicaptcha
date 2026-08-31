@@ -43,4 +43,5 @@ async def main() -> None:
         # AsyncTwoCaptchaClient(api_key, proxy=proxy).
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

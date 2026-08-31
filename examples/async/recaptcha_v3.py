@@ -36,4 +36,5 @@ async def main() -> None:
         print("token:", result.solution.token, "score:", result.solution.score)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

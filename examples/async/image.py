@@ -31,4 +31,5 @@ async def main() -> None:
         print("task id:", result.task_id, "cost:", result.cost)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

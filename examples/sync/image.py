@@ -12,17 +12,18 @@ from pathlib import Path
 
 from unicaptcha.provider.twocaptcha import TwoCaptchaClient
 
-api_key = os.getenv("UNICAPTCHA_TWOCAPTCHA_API_KEY")
-if not api_key:
-    sys.exit(
-        "Set UNICAPTCHA_TWOCAPTCHA_API_KEY to your 2Captcha API key "
-        "(https://2captcha.com/setting/devcenter)"
-    )
+if __name__ == "__main__":
+    api_key = os.getenv("UNICAPTCHA_TWOCAPTCHA_API_KEY")
+    if not api_key:
+        sys.exit(
+            "Set UNICAPTCHA_TWOCAPTCHA_API_KEY to your 2Captcha API key "
+            "(https://2captcha.com/setting/devcenter)"
+        )
 
-# Demo image from the 2Captcha normal-captcha demo page.
-image = Path(__file__).resolve().parent.parent / "images" / "captcha.png"
+    # Demo image from the 2Captcha normal-captcha demo page.
+    image = Path(__file__).resolve().parent.parent / "images" / "captcha.png"
 
-with TwoCaptchaClient(api_key) as client:
-    result = client.solve_image(image)
-    print("solved:", result.solution.text)
-    print("task id:", result.task_id, "cost:", result.cost)
+    with TwoCaptchaClient(api_key) as client:
+        result = client.solve_image(image)
+        print("solved:", result.solution.text)
+        print("task id:", result.task_id, "cost:", result.cost)

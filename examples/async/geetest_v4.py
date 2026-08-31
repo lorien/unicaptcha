@@ -31,4 +31,5 @@ async def main() -> None:
         print("captcha_output:", result.solution.captcha_output)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
