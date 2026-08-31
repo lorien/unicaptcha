@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Text captcha kind default solve budget: `total_timeout` raised to
+  120 s (was 30 s, shared with image). Two live 2Captcha text solves
+  exceeded the old budget; image keeps 30 s.
 - 2Captcha reCAPTCHA v3 solution classification: the live v3 solution
   shape is `gRecaptchaResponse` + `token` **without** a `score` field;
   it was previously mis-classified as a reCAPTCHA v2 solution. `score`

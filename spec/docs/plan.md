@@ -163,16 +163,6 @@ pytest-cov stays informational only (ADR-0047); whether CI passes
 `--cov`, what reports are shown/uploaded, and if a coverage threshold
 becomes a gate — all undecided.
 
-## Kind timing defaults: text budget
-
-Status: new
-Priority: 3
-
-Live smoke (2026-08-28): the text kind's 30 s default budget (ADR-0030
-table) expired twice on real workers; the same solve passed with
-`total_timeout=180`. Revisit the per-kind timing table against
-real-solve latencies.
-
 ## Shared JSON-family adapter base
 
 Status: new

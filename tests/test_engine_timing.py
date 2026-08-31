@@ -41,6 +41,7 @@ from unicaptcha.challenge import (
     FunCaptchaChallenge,
     GeeTestV4Challenge,
     RecaptchaV2Challenge,
+    TextChallenge,
     TurnstileChallenge,
 )
 from unicaptcha.challenge.base import BaseChallenge
@@ -225,6 +226,11 @@ class TestTotalBudget:
     def test_per_kind_default_rows(self, adapter: TimingAdapter) -> None:
         cases = {
             ImageChallenge(b"png"): (30.0, 2.0, 5.0),
+            TextChallenge("If tomorrow is Saturday, what day is today?"): (
+                120.0,
+                2.0,
+                5.0,
+            ),
             RecaptchaV2Challenge(sitekey="k", pageurl="https://x"): (
                 120.0,
                 5.0,

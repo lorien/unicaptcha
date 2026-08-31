@@ -77,7 +77,7 @@ ticket = tc.submit(ImageChallenge(Path("t.png")))              # facade: implici
 - `wait(timeout=None)`: the clock **starts at the `wait()` call**; the
   budget covers polls + transient-failure tolerance (ADR-0011 poll
   rules). Default resolves through the None-merge chain (ADR-0043) to
-  the per-kind `total_timeout` (ADR-0030: image/text 30 s,
+  the per-kind `total_timeout` (ADR-0030: image 30 s, text 120 s,
   reCAPTCHA-class 120 s) — so `solve() = submit() + wait(default)`.
 - Wall-clock anchoring at `submitted_at` (Option B) was rejected:
   fresh-budget-at-call is simpler to reason about, and providers do

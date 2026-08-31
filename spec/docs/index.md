@@ -54,7 +54,7 @@ supersede.
 | [0027](ADR/0027-concurrency-guarantees.md) | Concurrency guarantees | |
 | [0028](ADR/0028-no-proxy-validation.md) | No proxy validation | |
 | [0029](ADR/0029-unsolvable-captcha-error.md) | NoSolutionError | dedicated exception, no auto-resubmit |
-| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column; token-kind rows ratified 2026-08-25 |
+| [0030](ADR/0030-numeric-defaults.md) | Numeric defaults table | amended: 0070 adds FunCaptcha/GeeTest rows; poll_delay column; token-kind rows ratified 2026-08-25; image/text row split, text total_timeout 30→120 s 2026-08-31 |
 | [0031](ADR/0031-field-surface-level.md) | Field surface specification level | |
 | [0032](ADR/0032-taskstatus-split.md) | TaskStatusResult split from TaskResult | amended: 0050, 0056 |
 | [0033](ADR/0033-client-lifecycle.md) | Client lifecycle | amended: shutdown event, surviving registry |

@@ -1,26 +1,27 @@
 # ADR-0030: Numeric defaults
 
-**Status:** Accepted (amended: table gains FunCaptcha / GeeTest v3 / GeeTest v4 rows per ADR-0070 — values at implementation, GeeTest/FunCaptcha class near reCAPTCHA cadence; `poll_delay` initial-wait column added; amended 2026-08-24: draft rows pinned for FunCaptcha / GeeTest v3/v4 / Turnstile from vendor-observed data (ADR-0074 session), pending thorough review — deferred item 15; ratified 2026-08-25: final token-kind rows and the source-hierarchy methodology settled, closing deferred item 15)
+**Status:** Accepted (amended: table gains FunCaptcha / GeeTest v3 / GeeTest v4 rows per ADR-0070 — values at implementation, GeeTest/FunCaptcha class near reCAPTCHA cadence; `poll_delay` initial-wait column added; amended 2026-08-24: draft rows pinned for FunCaptcha / GeeTest v3/v4 / Turnstile from vendor-observed data (ADR-0074 session), pending thorough review — deferred item 15; ratified 2026-08-25: final token-kind rows and the source-hierarchy methodology settled, closing deferred item 15; amended 2026-08-31: image/text row split — text default `total_timeout` raised 30 s → 120 s (two live 2Captcha solves exceeded 30 s; 120 s anchored to 2Captcha's own `defaultTimeout`; image keeps 30 s))
 **Date:** 2026-08-23, ratification 2026-08-25
 
 ## Context
 
 Poll intervals, timeouts, retry counts, and backoff parameters need
 ratified concrete values. Defaults differ by challenge kind (reCAPTCHA-class
-tasks take far longer than image/text tasks).
+tasks take far longer than image/text tasks; text is human-answered and
+queue-bound, slower than OCR image tasks).
 
 ## Decision
 
 The engine's per-kind default table:
 
-| Parameter | reCAPTCHA v2/v3, hCaptcha | image / text | FunCaptcha, GeeTest v3/v4 | Turnstile |
-|---|---|---|---|---|
-| poll delay (before first poll) | 15 s | 5 s | 10 s | 5 s |
-| poll interval | 5 s | 2 s | 3 s | 3 s |
-| total_timeout (default) | 120 s | 30 s | 180 s | 120 s |
-| per-request HTTP timeout | 20 s | 20 s | 20 s | 20 s |
-| submit retry attempts (total) | 3 | 3 | 3 | 3 |
-| backoff | full jitter, base 1 s, cap 30 s | same | same | same |
+| Parameter | reCAPTCHA v2/v3, hCaptcha | image | text | FunCaptcha, GeeTest v3/v4 | Turnstile |
+|---|---|---|---|---|---|
+| poll delay (before first poll) | 15 s | 5 s | 5 s | 10 s | 5 s |
+| poll interval | 5 s | 2 s | 2 s | 3 s | 3 s |
+| total_timeout (default) | 120 s | 30 s | 120 s | 180 s | 120 s |
+| per-request HTTP timeout | 20 s | 20 s | 20 s | 20 s | 20 s |
+| submit retry attempts (total) | 3 | 3 | 3 | 3 | 3 |
+| backoff | full jitter, base 1 s, cap 30 s | same | same | same | same |
 
 - **`poll_delay`** (amendment, from second-pass competitive analysis):
   the initial wait after submission before the first `getTaskResult`
@@ -50,6 +51,12 @@ The engine's per-kind default table:
     180 s for FunCaptcha/GeeTest (Anti-Captcha documents up-to-10-minute
     solves; 120 s would false-timeout the slow tail) and 120 s for
     Turnstile (reCAPTCHA-class parity; typically fast).
+- **Text row** (amended 2026-08-31): text split from the image/text
+  row — 5/2/120 (delay/interval/total). Text is a human-answered question
+  (`TextCaptchaTask`), queue-bound rather than OCR: two live 2Captcha
+  solves exceeded the old 30 s budget (image solves at 30 s passed). The
+  120 s total is anchored to 2Captcha's own `defaultTimeout=120`; the
+  poll cadence stays at the image row's 5/2.
 - Generic fallback gains `poll_delay` ~10 s.
 
 - All values overridable at client level and per call via the None-merge
@@ -63,7 +70,8 @@ The engine's per-kind default table:
 ## Rationale
 
 - Numbers follow provider guidance (reCAPTCHA-class: poll ~5 s, solve up
-  to ~2 min; images: fast, ~2 s polls, 30 s is ample).
+  to ~2 min; images: fast, ~2 s polls, 30 s is ample; text: human-answered
+  and queue-bound, 120 s anchored to 2Captcha's own `defaultTimeout`).
 - Provider-recommended poll intervals avoid the too-fast-polling
   rate-limit trap.
 

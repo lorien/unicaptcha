@@ -87,11 +87,12 @@ class ResolvedRetry:
         )
 
 
-# ADR-0030: reCAPTCHA-class 15/5/120, image/text 5/2/30, FunCaptcha/GeeTest
+# ADR-0030: reCAPTCHA-class 15/5/120, image 5/2/30, text 5/2/120
+# (human-answered; 30 s expired twice on real workers), FunCaptcha/GeeTest
 # 10/3/180, Turnstile 5/3/120 (delay/interval/total).
 _KIND_TIMINGS: Mapping[type[BaseChallenge], KindTiming] = {
     ImageChallenge: KindTiming(5.0, 2.0, 30.0),
-    TextChallenge: KindTiming(5.0, 2.0, 30.0),
+    TextChallenge: KindTiming(5.0, 2.0, 120.0),
     RecaptchaV2Challenge: KindTiming(15.0, 5.0, 120.0),
     RecaptchaV3Challenge: KindTiming(15.0, 5.0, 120.0),
     HCaptchaChallenge: KindTiming(15.0, 5.0, 120.0),
