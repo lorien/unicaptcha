@@ -274,7 +274,7 @@ def test_malformed_json_chains_provider_error() -> None:
 
 
 @respx.mock
-def test_sync_facade_instant_image() -> None:
+def test_sync_facade_instant_image(fast_time, fast_retry) -> None:
     respx.post(CREATE).mock(
         return_value=httpx.Response(
             200,
@@ -286,7 +286,7 @@ def test_sync_facade_instant_image() -> None:
             ),
         )
     )
-    with CapsolverClient("test-key", time=_fast_time(), retry=_fast_retry()) as client:
+    with CapsolverClient("test-key", time=fast_time, retry=fast_retry) as client:
         result = client.solve_image(b"png", module="common")
     assert result.task_id == TASK_ID
     assert result.solution.text == "hello"
@@ -294,7 +294,7 @@ def test_sync_facade_instant_image() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_async_facade_solve() -> None:
+async def test_async_facade_solve(fast_time, fast_retry) -> None:
     respx.post(CREATE).mock(
         return_value=httpx.Response(200, content=_j(errorId=0, taskId=TASK_ID))
     )
@@ -309,7 +309,7 @@ async def test_async_facade_solve() -> None:
         )
     )
     async with AsyncCapsolverClient(
-        "test-key", time=_fast_time(), retry=_fast_retry()
+        "test-key", time=fast_time, retry=fast_retry
     ) as client:
         result = await client.solve_geetest_v3(
             gt_key="g", challenge="c0", pageurl="https://page"
@@ -330,15 +330,3 @@ def test_facade_rejects_wrong_provider_and_closed_use() -> None:
         assert status.task_id == TASK_ID
     with pytest.raises(ClientClosedError):
         client.get_balance()
-
-
-def _fast_time():
-    from unicaptcha.types import TimeConfig
-
-    return TimeConfig(poll_delay=0.0, poll_interval=0.01, total_timeout=1.0)
-
-
-def _fast_retry():
-    from unicaptcha.types import RetryConfig
-
-    return RetryConfig(max_attempts=2, backoff_base=0.001, backoff_cap=0.001)

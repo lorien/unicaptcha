@@ -45,10 +45,6 @@ CREATE = f"{BASE}/createTask"
 POLL = f"{BASE}/getTaskResult"
 BALANCE = f"{BASE}/getBalance"
 
-FAST_TIME_ARGS = {
-    "time": None,
-}
-
 
 def _j(**data: object) -> bytes:
     return json.dumps(data).encode()
@@ -421,7 +417,7 @@ def test_referral_string_must_be_integer() -> None:
 
 
 @respx.mock
-def test_sync_facade_solve_happy_path() -> None:
+def test_sync_facade_solve_happy_path(fast_time, fast_retry) -> None:
     create = respx.post(CREATE).mock(
         return_value=httpx.Response(200, content=_j(errorId=0, taskId=99))
     )
@@ -439,8 +435,8 @@ def test_sync_facade_solve_happy_path() -> None:
     events: list[str] = []
     with TwoCaptchaClient(
         "test-key",
-        time=_fast_time(),
-        retry=_fast_retry(),
+        time=fast_time,
+        retry=fast_retry,
         on_event=lambda e: events.append(e.kind.name),
     ) as client:
         result = client.solve_image(b"png", numeric=1)
@@ -458,7 +454,7 @@ def test_sync_facade_solve_happy_path() -> None:
 
 
 @respx.mock
-def test_sync_facade_aux_ops() -> None:
+def test_sync_facade_aux_ops(fast_time, fast_retry) -> None:
     respx.post(BALANCE).mock(
         return_value=httpx.Response(200, content=_j(errorId=0, balance="7.5"))
     )
@@ -470,7 +466,7 @@ def test_sync_facade_aux_ops() -> None:
     respx.post(f"{BASE}/reportIncorrect").mock(
         return_value=httpx.Response(200, content=_j(errorId=0, status="success"))
     )
-    with TwoCaptchaClient("test-key", time=_fast_time(), retry=_fast_retry()) as client:
+    with TwoCaptchaClient("test-key", time=fast_time, retry=fast_retry) as client:
         assert client.get_balance() == Decimal("7.5")
         status = client.get_task_status(55)
         assert status.task_id == 55
@@ -482,7 +478,7 @@ def test_sync_facade_aux_ops() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_async_facade_solve_happy_path() -> None:
+async def test_async_facade_solve_happy_path(fast_time, fast_retry) -> None:
     respx.post(CREATE).mock(
         return_value=httpx.Response(200, content=_j(errorId=0, taskId=11))
     )
@@ -497,7 +493,7 @@ async def test_async_facade_solve_happy_path() -> None:
         )
     )
     async with AsyncTwoCaptchaClient(
-        "test-key", time=_fast_time(), retry=_fast_retry()
+        "test-key", time=fast_time, retry=fast_retry
     ) as client:
         result = await client.solve_geetest_v3(
             gt_key="g", challenge="c0", pageurl="https://page"
@@ -527,18 +523,6 @@ def test_speed_defaults_to_kind_timing(monkeypatch: pytest.MonkeyPatch) -> None:
         raise AssertionError(f"unexpected sleep {seconds}")
 
     monkeypatch.setattr(asyncio, "sleep", fail_sleep)
-
-
-def _fast_time():
-    from unicaptcha.types import TimeConfig
-
-    return TimeConfig(poll_delay=0.0, poll_interval=0.01, total_timeout=1.0)
-
-
-def _fast_retry():
-    from unicaptcha.types import RetryConfig
-
-    return RetryConfig(max_attempts=2, backoff_base=0.001, backoff_cap=0.001)
 
 
 def _utc_now():

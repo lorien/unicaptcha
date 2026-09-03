@@ -97,18 +97,6 @@ def _body(request: httpx.Request) -> dict[str, object]:
     return json.loads(request.content)
 
 
-def _fast_time():
-    from unicaptcha.types import TimeConfig
-
-    return TimeConfig(poll_delay=0.0, poll_interval=0.01, total_timeout=1.0)
-
-
-def _fast_retry():
-    from unicaptcha.types import RetryConfig
-
-    return RetryConfig(max_attempts=2, backoff_base=0.001, backoff_cap=0.001)
-
-
 def _submit_once(adapter, challenge) -> httpx.Request:
     """Submit through a real Solver over respx; return the captured request."""
     target = f"{adapter.base_url}/createTask"
@@ -998,7 +986,7 @@ def test_capsolver_image_module() -> None:
 # (four-state ParsedTask), ADR-0075 (submit-ready fast path).
 
 
-def test_solve_submit_then_poll_wire_round_trip() -> None:
+def test_solve_submit_then_poll_wire_round_trip(fast_time, fast_retry) -> None:
     with respx.mock:
         create = respx.post("https://api.2captcha.com/createTask").mock(
             return_value=httpx.Response(200, content=_j(errorId=0, taskId=99))
@@ -1019,8 +1007,8 @@ def test_solve_submit_then_poll_wire_round_trip() -> None:
         )
         with Solver(
             adapters=[TwoCaptchaAdapter("test-key")],
-            time=_fast_time(),
-            retry=_fast_retry(),
+            time=fast_time,
+            retry=fast_retry,
         ) as solver:
             result = solver.solve(TwoCaptchaImageChallenge(b"png"))
         create_request = create.calls.last.request
@@ -1039,7 +1027,7 @@ def test_solve_submit_then_poll_wire_round_trip() -> None:
     assert result.cost == Decimal("0.00025")
 
 
-def test_instant_answer_fast_path_no_poll() -> None:
+def test_instant_answer_fast_path_no_poll(fast_time, fast_retry) -> None:
     with respx.mock:
         create = respx.post("https://api.capsolver.com/createTask").mock(
             return_value=httpx.Response(
@@ -1055,8 +1043,8 @@ def test_instant_answer_fast_path_no_poll() -> None:
         poll = respx.post("https://api.capsolver.com/getTaskResult")
         with Solver(
             adapters=[CapsolverAdapter("test-key")],
-            time=_fast_time(),
-            retry=_fast_retry(),
+            time=fast_time,
+            retry=fast_retry,
         ) as solver:
             ticket = solver.submit(CapsolverImageChallenge(b"png"))
             result = solver.wait(ticket)
@@ -1068,7 +1056,7 @@ def test_instant_answer_fast_path_no_poll() -> None:
         assert not poll.called
 
 
-def test_no_solution_raises_through_poll() -> None:
+def test_no_solution_raises_through_poll(fast_time, fast_retry) -> None:
     with respx.mock:
         respx.post("https://api.2captcha.com/createTask").mock(
             return_value=httpx.Response(200, content=_j(errorId=0, taskId=3))
@@ -1081,15 +1069,15 @@ def test_no_solution_raises_through_poll() -> None:
         with (
             Solver(
                 adapters=[TwoCaptchaAdapter("test-key")],
-                time=_fast_time(),
-                retry=_fast_retry(),
+                time=fast_time,
+                retry=fast_retry,
             ) as solver,
             pytest.raises(NoSolutionError),
         ):
             solver.solve(TwoCaptchaImageChallenge(b"png"))
 
 
-def test_unknown_task_fails_fast_provider_error() -> None:
+def test_unknown_task_fails_fast_provider_error(fast_time, fast_retry) -> None:
     with respx.mock:
         respx.post("https://api.2captcha.com/createTask").mock(
             return_value=httpx.Response(200, content=_j(errorId=0, taskId=4))
@@ -1102,8 +1090,8 @@ def test_unknown_task_fails_fast_provider_error() -> None:
         with (
             Solver(
                 adapters=[TwoCaptchaAdapter("test-key")],
-                time=_fast_time(),
-                retry=_fast_retry(),
+                time=fast_time,
+                retry=fast_retry,
             ) as solver,
             pytest.raises(ProviderError),
         ):
@@ -1140,7 +1128,7 @@ def test_wrong_shape_body_provider_error() -> None:
     assert excinfo.value.__cause__ is None
 
 
-def test_ready_with_empty_solution_raises_empty() -> None:
+def test_ready_with_empty_solution_raises_empty(fast_time, fast_retry) -> None:
     with respx.mock:
         respx.post("https://api.2captcha.com/createTask").mock(
             return_value=httpx.Response(200, content=_j(errorId=0, taskId=7))
@@ -1153,8 +1141,8 @@ def test_ready_with_empty_solution_raises_empty() -> None:
         with (
             Solver(
                 adapters=[TwoCaptchaAdapter("test-key")],
-                time=_fast_time(),
-                retry=_fast_retry(),
+                time=fast_time,
+                retry=fast_retry,
             ) as solver,
             pytest.raises(EmptySolutionError),
         ):
@@ -1202,7 +1190,7 @@ def test_report_bad_good_wire_round_trip() -> None:
         )
 
 
-def test_wait_ref_polls_with_task_id_payload() -> None:
+def test_wait_ref_polls_with_task_id_payload(fast_time, fast_retry) -> None:
     with respx.mock:
         route = respx.post("https://api.2captcha.com/getTaskResult").mock(
             return_value=httpx.Response(
@@ -1216,8 +1204,8 @@ def test_wait_ref_polls_with_task_id_payload() -> None:
         )
         with Solver(
             adapters=[TwoCaptchaAdapter("test-key")],
-            time=_fast_time(),
-            retry=_fast_retry(),
+            time=fast_time,
+            retry=fast_retry,
         ) as solver:
             status = solver.wait_ref(
                 TaskRef(provider="twocaptcha", task_id=7), timeout=1.0
@@ -1265,7 +1253,7 @@ SUBMIT_ERROR_CASES: list[tuple[str, object, object, str, type[BaseException]]] =
 @pytest.mark.parametrize(
     "case", SUBMIT_ERROR_CASES, ids=[c[0] for c in SUBMIT_ERROR_CASES]
 )
-def test_submit_provider_error_maps_kind(case: tuple[object, ...]) -> None:
+def test_submit_provider_error_maps_kind(case: tuple[object, ...], fast_retry) -> None:
     _, adapter, challenge, code, exc_cls = case  # type: ignore[misc]
     with respx.mock:
         respx.post(f"{adapter.base_url}/createTask").mock(
@@ -1274,7 +1262,7 @@ def test_submit_provider_error_maps_kind(case: tuple[object, ...]) -> None:
             )
         )
         with (
-            Solver(adapters=[adapter], retry=_fast_retry()) as solver,
+            Solver(adapters=[adapter], retry=fast_retry) as solver,
             pytest.raises(exc_cls) as excinfo,
         ):
             solver.submit(challenge)
@@ -1283,14 +1271,14 @@ def test_submit_provider_error_maps_kind(case: tuple[object, ...]) -> None:
     )
 
 
-def test_submit_http_429_rate_limit() -> None:
+def test_submit_http_429_rate_limit(fast_retry) -> None:
     with respx.mock:
         create = respx.post("https://api.2captcha.com/createTask").mock(
             return_value=httpx.Response(429, content=b"slow down")
         )
         with (
             Solver(
-                adapters=[TwoCaptchaAdapter("test-key")], retry=_fast_retry()
+                adapters=[TwoCaptchaAdapter("test-key")], retry=fast_retry
             ) as solver,
             pytest.raises(RateLimitError),
         ):
@@ -1381,7 +1369,7 @@ async def test_async_golden_submit_wire_payload(case: tuple[object, ...]) -> Non
 
 
 @pytest.mark.asyncio
-async def test_async_instant_answer_fast_path() -> None:
+async def test_async_instant_answer_fast_path(fast_time, fast_retry) -> None:
     with respx.mock:
         respx.post("https://api.capsolver.com/createTask").mock(
             return_value=httpx.Response(
@@ -1397,8 +1385,8 @@ async def test_async_instant_answer_fast_path() -> None:
         poll = respx.post("https://api.capsolver.com/getTaskResult")
         async with AsyncSolver(
             adapters=[CapsolverAdapter("test-key")],
-            time=_fast_time(),
-            retry=_fast_retry(),
+            time=fast_time,
+            retry=fast_retry,
         ) as solver:
             result = await solver.solve(CapsolverImageChallenge(b"png"))
         assert result.solution.text == "instant"
@@ -1406,7 +1394,7 @@ async def test_async_instant_answer_fast_path() -> None:
 
 
 @pytest.mark.asyncio
-async def test_async_submit_error_maps_kind() -> None:
+async def test_async_submit_error_maps_kind(fast_retry) -> None:
     with respx.mock:
         respx.post("https://api.2captcha.com/createTask").mock(
             return_value=httpx.Response(
@@ -1419,7 +1407,7 @@ async def test_async_submit_error_maps_kind() -> None:
             )
         )
         async with AsyncSolver(
-            adapters=[TwoCaptchaAdapter("test-key")], retry=_fast_retry()
+            adapters=[TwoCaptchaAdapter("test-key")], retry=fast_retry
         ) as solver:
             with pytest.raises(AuthenticationError):
                 await solver.submit(TwoCaptchaImageChallenge(b"png"))

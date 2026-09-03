@@ -29,6 +29,15 @@ uv run pytest                    # tests; integration tests deselected by defaul
   under `if __name__ == "__main__":`).
 - pytest-asyncio runs in strict mode (`asyncio_mode = "strict"`): every
   async test function needs `@pytest.mark.asyncio`.
+- Fast solve config: unit suites that exercise the solve path keep timing
+  fast through the shared `fast_time` / `fast_retry` fixtures
+  (`tests/conftest.py`: `poll_delay` 0, `poll_interval` 0.01 s,
+  `total_timeout` 1.0 s; `max_attempts` 2) — take them as function params
+  rather than re-declaring literals. Engine/client timing tests that need
+  a tighter budget or specific retry counts declare their own module-level
+  `TimeConfig`/`RetryConfig` constants instead (e.g.
+  `tests/test_engine.py`, `tests/test_client.py`), and slow paths use
+  inline `slow_time` overrides.
 - Baseline prerequisite: `tests/` must exist with at least one collectable
   test — pytest exits 4 when `testpaths = ["tests"]` points at a missing
   directory, and 5 when nothing is collected.
