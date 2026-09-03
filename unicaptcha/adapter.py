@@ -179,10 +179,10 @@ class BaseAdapter(ABC):
         )
 
 
-class JsonAdapterBase(BaseAdapter):
-    """Shared implementation base for the JSON-family
-    ``createTask``/``getTaskResult`` adapters (2Captcha, Anti-Captcha,
-    CapMonster Cloud, Capsolver).
+class AntiCaptchaCompatAdapterBase(BaseAdapter):
+    """Shared implementation base for the Anti-Captcha-compatible
+    ``createTask``/``getTaskResult`` JSON protocol family (2Captcha's
+    modern JSON API, Anti-Captcha, CapMonster Cloud, Capsolver).
 
     Provides the response-parsing pipeline (decode -> error mapping ->
     submit/status/balance parsing) and the shared field/payload helpers;
@@ -190,8 +190,9 @@ class JsonAdapterBase(BaseAdapter):
     ``unknown_task_codes`` and supply the per-provider task builders
     (``_build_task``) and solution dispatch (``_solution_from``).
 
-    Public so third-party JSON-family adapters can reuse it without
-    touching ``unicaptcha._internal`` (ADR-0041 boundary).
+    Public so third-party adapters speaking the Anti-Captcha-compatible
+    protocol can reuse it without touching ``unicaptcha._internal``
+    (ADR-0041 boundary).
     """
 
     # Placeholder declarations satisfy the ``BaseAdapter`` subclass
@@ -404,4 +405,4 @@ class JsonAdapterBase(BaseAdapter):
         return kind, message
 
 
-__all__ = ["BaseAdapter", "Endpoints", "JsonAdapterBase"]
+__all__ = ["AntiCaptchaCompatAdapterBase", "BaseAdapter", "Endpoints"]

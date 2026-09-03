@@ -1,7 +1,11 @@
 """Universal async/sync interface to multiple anti-captcha services."""
 
 from unicaptcha._version import __version__
-from unicaptcha.adapter import BaseAdapter, Endpoints, JsonAdapterBase
+from unicaptcha.adapter import (
+    AntiCaptchaCompatAdapterBase,
+    BaseAdapter,
+    Endpoints,
+)
 from unicaptcha.challenge import (
     BaseChallenge,
     FunCaptchaChallenge,
@@ -62,6 +66,7 @@ from unicaptcha.types import (
 )
 
 __all__ = [
+    "AntiCaptchaCompatAdapterBase",
     "AsyncSolver",
     "AuthenticationError",
     "BaseAdapter",
@@ -84,7 +89,6 @@ __all__ = [
     "InsufficientBalanceError",
     "InvalidChallengeError",
     "InvalidConfigError",
-    "JsonAdapterBase",
     "NetworkConfig",
     "NetworkError",
     "NoSolutionError",

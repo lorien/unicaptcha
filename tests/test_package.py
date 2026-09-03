@@ -3,7 +3,7 @@ import importlib
 import pytest
 
 import unicaptcha
-from unicaptcha import JsonAdapterBase
+from unicaptcha import AntiCaptchaCompatAdapterBase
 from unicaptcha.provider.anticaptcha.adapter import AntiCaptchaAdapter
 from unicaptcha.provider.capmonster.adapter import CapMonsterAdapter
 from unicaptcha.provider.capsolver.adapter import CapsolverAdapter
@@ -30,16 +30,16 @@ def test_subpackages_importable(name: str) -> None:
     importlib.import_module(name)
 
 
-def test_json_adapters_share_the_json_family_base() -> None:
+def test_compat_adapters_share_the_compat_family_base() -> None:
     for adapter in (
         TwoCaptchaAdapter,
         AntiCaptchaAdapter,
         CapMonsterAdapter,
         CapsolverAdapter,
     ):
-        assert issubclass(adapter, JsonAdapterBase)
+        assert issubclass(adapter, AntiCaptchaCompatAdapterBase)
 
 
-def test_json_adapter_base_is_abstract() -> None:
+def test_compat_adapter_base_is_abstract() -> None:
     with pytest.raises(TypeError):
-        JsonAdapterBase("key")  # type: ignore[abstract]
+        AntiCaptchaCompatAdapterBase("key")  # type: ignore[abstract]

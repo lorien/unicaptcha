@@ -13,7 +13,7 @@ import base64
 from collections.abc import Mapping
 from typing import Any, ClassVar, cast
 
-from unicaptcha.adapter import JsonAdapterBase
+from unicaptcha.adapter import AntiCaptchaCompatAdapterBase
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import (
     EmptySolutionError,
@@ -43,7 +43,7 @@ from unicaptcha.provider.twocaptcha.solution import (
 from unicaptcha.types import TaskRef
 
 
-class TwoCaptchaAdapter(JsonAdapterBase):
+class TwoCaptchaAdapter(AntiCaptchaCompatAdapterBase):
     """Adapter speaking 2Captcha's modern JSON API."""
 
     provider: ClassVar[str] = "twocaptcha"

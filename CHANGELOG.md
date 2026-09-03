@@ -9,9 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Extracted a shared `JsonAdapterBase` in the public adapter SDK
-  (`unicaptcha.adapter`, re-exported from the root) for the JSON-family
-  `createTask`/`getTaskResult` adapters: the four shipped adapters now
+- Extracted a shared `AntiCaptchaCompatAdapterBase` in the public adapter SDK
+  (`unicaptcha.adapter`, re-exported from the root) for the
+  Anti-Captcha-compatible `createTask`/`getTaskResult` JSON protocol
+  family: the four shipped adapters now
   inherit the response-parsing pipeline (`parse_submit_response`,
   `parse_task_status`, `parse_balance`, `map_provider_error`,
   `build_payload`) and the shared field helpers (`_decode`, `_decimal`,

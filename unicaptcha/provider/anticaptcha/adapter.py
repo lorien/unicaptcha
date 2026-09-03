@@ -23,7 +23,7 @@ import ipaddress
 from collections.abc import Mapping
 from typing import Any, ClassVar, cast
 
-from unicaptcha.adapter import JsonAdapterBase
+from unicaptcha.adapter import AntiCaptchaCompatAdapterBase
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import (
     EmptySolutionError,
@@ -53,7 +53,7 @@ from unicaptcha.provider.anticaptcha.solution import (
 from unicaptcha.types import Proxy
 
 
-class AntiCaptchaAdapter(JsonAdapterBase):
+class AntiCaptchaAdapter(AntiCaptchaCompatAdapterBase):
     """Adapter speaking Anti-Captcha's createTask/getTaskResult API."""
 
     provider: ClassVar[str] = "anti-captcha"

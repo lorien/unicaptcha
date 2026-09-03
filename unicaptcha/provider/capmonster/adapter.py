@@ -14,7 +14,7 @@ import base64
 from collections.abc import Mapping
 from typing import Any, ClassVar, cast
 
-from unicaptcha.adapter import JsonAdapterBase
+from unicaptcha.adapter import AntiCaptchaCompatAdapterBase
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import (
     EmptySolutionError,
@@ -41,7 +41,7 @@ from unicaptcha.provider.capmonster.solution import (
 )
 
 
-class CapMonsterAdapter(JsonAdapterBase):
+class CapMonsterAdapter(AntiCaptchaCompatAdapterBase):
     """Adapter speaking CapMonster Cloud's createTask/getTaskResult API."""
 
     provider: ClassVar[str] = "capmonster"
