@@ -163,16 +163,6 @@ pytest-cov stays informational only (ADR-0047); whether CI passes
 `--cov`, what reports are shown/uploaded, and if a coverage threshold
 becomes a gate — all undecided.
 
-## conftest fast-config consolidation
-
-Status: new
-Priority: -1
-
-`FAST_TIME`/`FAST_RETRY`-style literals are duplicated across
-per-provider test files while `conftest.py` already ships `fast_time` /
-`fast_retry` fixtures; consolidate (~4 removable copies) and document the
-solve-path default in testing.md.
-
 ## Test-double consolidation (`_fake`/ScriptedAdapter → `_myservice`)
 
 Status: new
