@@ -11,6 +11,7 @@ what the project is, how it is designed, and why each decision was made.
 | [architecture.md](architecture.md) | Complete technical design: components, models, flows, defaults, toolchain |
 | [bootstrap.md](bootstrap.md) | Local environment setup: uv, venv, dev-loop commands |
 | [testing.md](testing.md) | How to run tests and checks |
+| [releasing.md](releasing.md) | How to cut a release: consistency rule, PyPI setup, per-release steps |
 | [plan.md](plan.md) | Open tasks and parked work (includes formerly deferred items) |
 | [competitors.md](competitors.md) | Competitor survey: Go and Python universal libraries (2026-08-24) |
 | [providers.md](providers.md) | Supported provider directory: websites and official Python repos |
@@ -47,7 +48,7 @@ supersede.
 | [0020](ADR/0020-mit-license.md) | MIT license | |
 | [0021](ADR/0021-static-semver-versioning.md) | Static SemVer versioning | 0.1.0 start |
 | [0022](ADR/0022-manual-changelog-with-ci-guards.md) | Manual changelog with CI guards | |
-| [0023](ADR/0023-readme-only-docs.md) | README-only docs for v1 | |
+| [0023](ADR/0023-readme-only-docs.md) | README-only docs for v1 | superseded by 0078 |
 | [0024](ADR/0024-network-knobs.md) | Network knobs | amended: mutual exclusion, per-request UA, per-stage timeout semantics |
 | [0025](ADR/0025-image-input-bytes-only.md) | Image input as bytes only | amended: 0065 |
 | [0026](ADR/0026-user-agent-and-repo-url.md) | User-Agent and repo URL | |
@@ -101,6 +102,7 @@ supersede.
 | [0074](ADR/0074-turnstile-kind.md) | Cloudflare Turnstile kind | amends 0002/0070: ninth v1 kind; resolves dangling deferred claim |
 | [0075](ADR/0075-submit-ready-fast-path.md) | Submit-ready fast path | amends 0053/0067, formalizes ParsedTask (0058): SubmitAccepted, ticket-carried `instant_answer` |
 | [0076](ADR/0076-per-provider-challenge-field-surface.md) | Per-provider challenge field surface | amends 0006/0031/0069 scope: concrete field lists in architecture §2 |
+| [0078](ADR/0078-docs-site.md) | Static documentation site | supersedes 0023 |
 
 ## Conventions
 
