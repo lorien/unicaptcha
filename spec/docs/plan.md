@@ -163,15 +163,6 @@ pytest-cov stays informational only (ADR-0047); whether CI passes
 `--cov`, what reports are shown/uploaded, and if a coverage threshold
 becomes a gate — all undecided.
 
-## Shared ErrorKind mapping table
-
-Status: new
-Priority: -1
-
-Each adapter carries a private provider-code → ErrorKind dict and the
-event tests carry their own kind matrix; hoist one shared table/module so
-adapter tests and events cannot drift.
-
 ## `_internal/log.py`
 
 Status: new
