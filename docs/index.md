@@ -77,6 +77,7 @@ only); unsupported kinds raise `UnsupportedChallengeError`.
 
 ## Project links
 
+- Live site: <https://lorien.github.io/unicaptcha/>
 - [Getting started](getting-started.md)
 - [API Reference](api/index.md)
 - Source: <https://github.com/lorien/unicaptcha>

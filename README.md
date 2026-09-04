@@ -4,6 +4,8 @@ Universal Python interface to multiple anti-captcha services.
 
 **Status: highly experimental.** Pre-1.0. No public API stability is promised, even for the documented surface. Anything may change between releases.
 
+Documentation: https://lorien.github.io/unicaptcha/
+
 ## Supported services
 
 | Provider | Kind string | Default base URL |
@@ -37,11 +39,15 @@ only); unsupported kinds raise `UnsupportedChallengeError`.
 
 ## Install
 
+Not yet published to PyPI — install from the repository:
+
 ```
-uv add unicaptcha
+uv add git+https://github.com/lorien/unicaptcha
 ```
 
-Requires Python 3.11+. Single runtime dependency: `httpx`.
+or `pip install git+https://github.com/lorien/unicaptcha`. Once published,
+the plain `uv add unicaptcha` works. Requires Python 3.11+. Single runtime
+dependency: `httpx`.
 
 ## Usage
 
