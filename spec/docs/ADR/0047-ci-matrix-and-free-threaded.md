@@ -1,6 +1,7 @@
 # ADR-0047: CI matrix and free-threaded Python
 
-**Status:** Accepted
+**Status:** Accepted (amended 2026-09-05: the matrix runs the canonical
+`scripts/check.sh` — one command, local/CI parity; tool selection unchanged)
 **Date:** 2026-08-23
 
 ## Context
@@ -15,7 +16,10 @@ the value real: the sync client's documented thread-safety guarantee
 ## Decision
 
 - **Blocking matrix**: Python {3.11, 3.12, 3.13, 3.14} x {Linux, macOS},
-  running lint, mypy, pyright, tests.
+  running the canonical `scripts/check.sh` (lint, mypy, pyright, slotscheck,
+  tests). The script is the single definition of the check set; the matrix
+  step and the local workflow (see `testing.md`) both invoke it, so local
+  and remote cannot drift apart.
 - **Free-threaded**: 3.14t x Linux as a separate **informational** job
   (`continue-on-error: true`). 3.13t skipped (experimental, superseded
   by 3.14t per PEP 779). Promotion to blocking after a few stable green

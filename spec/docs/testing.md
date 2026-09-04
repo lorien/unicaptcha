@@ -73,6 +73,19 @@ surface, per provider research:
 - **Capsolver:** no `test` endpoint or sandbox; `ERROR_CAPTCHA_UNSOLVABLE`
   does not deduct balance (edge-path testing only).
 
+## Canonical check
+
+The full suite plus all static checks in one command — this is exactly
+what CI runs (`.github/workflows/ci.yml`):
+
+```
+uv run ./scripts/check.sh
+```
+
+`scripts/check.sh` is the single source of truth for the check set;
+local verification and CI share it, so the two cannot drift apart. The
+individual commands below remain for targeted, single-tool runs.
+
 ## Static checks
 
 ```

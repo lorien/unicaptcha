@@ -49,7 +49,7 @@ class TwoCaptchaAdapter(AntiCaptchaCompatAdapterBase):
     provider: ClassVar[str] = "twocaptcha"
     json_provider: ClassVar[str] = "2captcha"
     #: ADR-0072 project affiliate id (2Captcha/RuCaptcha catalog).
-    project_soft_id: ClassVar[int] = 5859
+    project_soft_id: ClassVar[int | None] = 5859
     error_kinds: ClassVar[Mapping[str, ErrorKind]] = {
         "ERROR_KEY_DOES_NOT_EXIST": ErrorKind.AUTHENTICATION,
         "ERROR_WRONG_USER_KEY": ErrorKind.AUTHENTICATION,

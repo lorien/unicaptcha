@@ -19,12 +19,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: uv sync
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
-      - run: uv run mypy unicaptcha
-      - run: uv run pyright
-      - run: uv run slotscheck unicaptcha
-      - run: uv run pytest --cov=unicaptcha --cov-report=term-missing
+      - run: uv run ./scripts/check.sh
 
   freethreaded:
     name: "3.14t / ubuntu (informational)"

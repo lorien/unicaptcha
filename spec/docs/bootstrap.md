@@ -43,7 +43,9 @@ Note: `uv.lock` is intentionally **not committed** (stays gitignored).
 
 All checks (lint, formatting, type checking, tests, slotscheck) run through
 `uv run`; the commands and acceptance criteria live in
-[testing.md](testing.md).
+[testing.md](testing.md). The one-shot command covering everything is
+`uv run ./scripts/check.sh` — the same command CI runs, so local and
+remote can't drift apart.
 
 ## Known toolchain notes
 
