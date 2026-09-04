@@ -180,15 +180,6 @@ Universal-tier `solve` returns `TaskResult[Any]` statically (runtime fully
 typed). Add the nine-kind overload set if universal precision is wanted;
 facades already type precisely.
 
-## README snippet verification
-
-Status: new
-Priority: -1
-
-README snippets are prose-reviewed only (ADR-0023). Options: execute
-snippets with mocked transport or compile-check the fenced blocks (the
-examples/ dir already gets compile checks via `tests/test_examples.py`).
-
 ## Example demo values: geetest_v3 dynamic challenge; funcaptcha annotation
 
 Status: new
