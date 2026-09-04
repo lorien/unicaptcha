@@ -19,7 +19,7 @@ from unicaptcha.provider.twocaptcha import TwoCaptchaClient
 client = TwoCaptchaClient(
     "YOUR_API_KEY",
     base_url=None,     # override for mirrors (e.g. RuCaptcha)
-    referral=True,     # embed the project's affiliate id (see Funding)
+    referral=True,     # embed the project's affiliate id
     proxy=None,        # default proxy for challenges that carry one
     time=None,         # TimeConfig
     retry=None,        # RetryConfig

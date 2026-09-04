@@ -160,14 +160,6 @@ The test suite includes a reference third-party adapter, `MyServiceAdapter`
 (`tests/_myservice.py`), written against the public API only — the pattern to
 follow. See `spec/docs/architecture.md` ("Adapter SDK") for the contract.
 
-## Funding
-
-The built-in adapters embed unicaptcha's referral ID in every request by
-default; the provider pays the project a small commission per solve at no
-change to your pricing. Pass `referral=False` to disable it, or
-`referral="your-own-id"` to credit your own software registration.
-Third-party adapters embed nothing by default.
-
 ## License
 
 MIT. Repository: https://github.com/lorien/unicaptcha
