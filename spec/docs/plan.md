@@ -171,15 +171,6 @@ Priority: -1
 A shared module for the flat `unicaptcha` logger if call sites
 proliferate (ADR-0018/0039 keep it flat; extract only on need).
 
-## Async clock seam
-
-Status: new
-Priority: -1
-
-`Clock.sleep` is sync-only; the async engine sleeps via asyncio directly.
-A loop-time injection seam would make async timeout/cadence tests fully
-instant (sync tier already has the seam, task 16).
-
 ## Universal `solve()` kind overloads
 
 Status: new
