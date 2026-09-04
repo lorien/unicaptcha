@@ -54,6 +54,8 @@ except UnicaptchaError as exc:
 invaluable for debugging:
 
 ```python
+try:
+    result = client.solve(challenge)
 except ProviderError as exc:
     print(exc.raw_response)   # b'{"errorId":1,...}'
 ```
