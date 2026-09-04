@@ -17,7 +17,7 @@ from decimal import Decimal
 import httpx
 import pytest
 import respx
-from _fake import FakeClock, FakeSolution
+from _fake import FakeAsyncSleep, FakeClock, FakeSolution
 
 from unicaptcha import (
     ClientClosedError,
@@ -157,7 +157,13 @@ def make_async_engine(
     time: TimeConfig | None = None,
     retry=None,
 ) -> AsyncTaskEngine:
-    return AsyncTaskEngine(AsyncHttpTransport(), time=time, retry=retry, clock=clock)
+    return AsyncTaskEngine(
+        AsyncHttpTransport(),
+        time=time,
+        retry=retry,
+        clock=clock,
+        sleep=FakeAsyncSleep(clock),
+    )
 
 
 # -- backoff math -------------------------------------------------------
@@ -201,6 +207,31 @@ class TestTotalBudget:
             )
             result = engine.solve(adapter, challenge)
         assert result.task_id == 1
+        assert create.call_count == 2
+        assert clock.sleep_total <= 30.0
+
+    @pytest.mark.asyncio
+    async def test_async_backoff_and_poll_fit_in_budget(
+        self, adapter: TimingAdapter, challenge: ImageChallenge
+    ) -> None:
+        clock = FakeClock()
+        with respx.mock:
+            create = respx.post(CREATE).mock(
+                side_effect=[
+                    httpx.Response(500, content=b"boom"),
+                    httpx.Response(200, content=_submit(13)),
+                ]
+            )
+            respx.post(STATUS).mock(
+                return_value=httpx.Response(200, content=_status("ready"))
+            )
+            engine = make_async_engine(
+                clock,
+                time=TimeConfig(total_timeout=30.0, poll_interval=1.0, poll_delay=1.0),
+                retry=RetryConfig(max_attempts=3, backoff_base=1.0, backoff_cap=1.0),
+            )
+            result = await engine.solve(adapter, challenge)
+        assert result.task_id == 13
         assert create.call_count == 2
         assert clock.sleep_total <= 30.0
 
@@ -518,7 +549,9 @@ class TestCancellationLifecycle:
             )
             engine = make_async_engine(
                 clock,
-                time=TimeConfig(total_timeout=30.0, poll_interval=0.01, poll_delay=0.0),
+                time=TimeConfig(
+                    total_timeout=10000.0, poll_interval=0.01, poll_delay=0.0
+                ),
             )
             task = asyncio.get_running_loop().create_task(
                 engine.solve(adapter, challenge)
@@ -542,7 +575,8 @@ class TestCancellationLifecycle:
             )
             engine = make_async_engine(
                 clock,
-                time=TimeConfig(total_timeout=0.1, poll_interval=0.01, poll_delay=0.0),
+                time=TimeConfig(total_timeout=30.0, poll_interval=1.0, poll_delay=0.0),
             )
             with pytest.raises(TaskTimeoutError):
                 await engine.solve(adapter, challenge)
+        assert clock.sleep_total == 30.0

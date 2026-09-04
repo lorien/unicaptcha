@@ -1,5 +1,6 @@
 """Shared test fakes. Not collected by pytest (filename not test_*)."""
 
+import asyncio
 import json
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -55,6 +56,19 @@ class FakeClock(Clock):
     @property
     def sleep_total(self) -> float:
         return sum(self.sleep_calls)
+
+
+class FakeAsyncSleep:
+    """Async sleep seam for the async engine: advances a ``FakeClock``
+    instantly and yields once so the event loop is not starved (cancellation
+    stays deliverable); mirrors the sync tier's ``FakeClock.sleep``."""
+
+    def __init__(self, clock: FakeClock) -> None:
+        self._clock = clock
+
+    async def __call__(self, seconds: float) -> None:
+        self._clock.sleep(seconds)
+        await asyncio.sleep(0)
 
 
 class StubAdapter(BaseAdapter):

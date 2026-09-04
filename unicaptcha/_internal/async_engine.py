@@ -1,12 +1,13 @@
 """Internal asynchronous TaskEngine (ADR-0010/0011/0016/0018/0030/0050/
-0058/0067/0075). Async-native: budgets via ``asyncio.timeout()``, converted
-to ``TaskTimeoutError`` at the scope boundary only; external cancellation
-passes through untouched (ADR-0016)."""
+0058/0067/0075). Async-native: budgets are clock deadlines checked between
+awaits (mirroring the sync engine), so an injected clock + sleep seam makes
+timing tests fully deterministic; external cancellation passes through
+untouched (ADR-0016)."""
 
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from decimal import Decimal
 from typing import Any, Generic, TypeVar, cast
@@ -67,6 +68,7 @@ class AsyncTaskEngine(Generic[_T]):
         retry: RetryConfig | None = None,
         on_event: AsyncEventHandler | None = None,
         clock: Clock | None = None,
+        sleep: Callable[[float], Awaitable[None]] | None = None,
         abandoned_registry_limit: int | None = 1000,
     ) -> None:
         self._transport = transport
@@ -74,6 +76,7 @@ class AsyncTaskEngine(Generic[_T]):
         self._client_retry = retry
         self._handler = on_event
         self._clock = clock or RealClock()
+        self._sleep_fn = sleep or asyncio.sleep
         self._closed = False
         self._registry = AbandonedTaskRegistry(limit=abandoned_registry_limit)
 
@@ -87,7 +90,7 @@ class AsyncTaskEngine(Generic[_T]):
         return self._registry.snapshot()
 
     async def _sleep(self, seconds: float) -> None:
-        await asyncio.sleep(seconds)
+        await self._sleep_fn(seconds)
 
     def _check_open(self) -> None:
         if self._closed:
@@ -279,34 +282,10 @@ class AsyncTaskEngine(Generic[_T]):
         self._check_open()
         timing = resolve_time(challenge, adapter, self._client_time, time)
         handler = on_event if on_event is not None else self._handler
-        submitted = False
-        try:
-            async with asyncio.timeout(timing.total_timeout):
-                ticket = await self.submit(
-                    adapter, challenge, retry=retry, on_event=handler
-                )
-                submitted = True
-                return await self.wait(
-                    adapter, ticket, timeout=timing.total_timeout, on_event=handler
-                )
-        except TimeoutError:
-            fail_kind = (
-                TaskEventKind.RESULT_FAILED
-                if submitted
-                else TaskEventKind.SUBMIT_FAILED
-            )
-            await emit_async(
-                handler,
-                self._event(
-                    fail_kind,
-                    adapter.provider,
-                    self._clock.monotonic(),
-                    error_kind=ErrorKind.TASK_TIMEOUT,
-                ),
-            )
-            raise TaskTimeoutError(
-                f"task not solved within {timing.total_timeout}s"
-            ) from None
+        deadline = self._clock.monotonic() + timing.total_timeout
+        ticket = await self.submit(adapter, challenge, retry=retry, on_event=handler)
+        remaining = max(0.0, deadline - self._clock.monotonic())
+        return await self.wait(adapter, ticket, timeout=remaining, on_event=handler)
 
     # -- wait -----------------------------------------------------------
 
@@ -336,26 +315,13 @@ class AsyncTaskEngine(Generic[_T]):
             return result
         timing = ResolvedTime.from_config(ticket.time)
         total = timeout if timeout is not None else timing.total_timeout
-        try:
-            async with asyncio.timeout(total):
-                age = self._clock.wallclock() - ticket.submitted_at
-                if age < timedelta(seconds=timing.poll_interval):
-                    await self._sleep(timing.poll_delay)
-                return await self._poll(adapter, ticket, timing, handler, start)
-        except TimeoutError:
-            await emit_async(
-                handler,
-                self._event(
-                    TaskEventKind.RESULT_FAILED,
-                    adapter.provider,
-                    start,
-                    task_id=ticket.task_ref.task_id,
-                    error_kind=ErrorKind.TASK_TIMEOUT,
-                ),
+        deadline = self._clock.monotonic() + total
+        age = self._clock.wallclock() - ticket.submitted_at
+        if age < timedelta(seconds=timing.poll_interval):
+            await self._sleep(
+                min(timing.poll_delay, max(0.0, deadline - self._clock.monotonic()))
             )
-            raise TaskTimeoutError(
-                f"task {ticket.task_ref.task_id} not solved within {total}s"
-            ) from None
+        return await self._poll(adapter, ticket, timing, handler, start, deadline)
 
     async def _poll(
         self,
@@ -364,11 +330,27 @@ class AsyncTaskEngine(Generic[_T]):
         timing: ResolvedTime,
         handler: AsyncEventHandler | None,
         start: float,
+        deadline: float,
     ) -> TaskResult[_T]:
         url = join_url(adapter.base_url, adapter.endpoints.get_task_status)
         attempt = 0
         while True:
             self._check_open()
+            if self._clock.monotonic() >= deadline:
+                await emit_async(
+                    handler,
+                    self._event(
+                        TaskEventKind.RESULT_FAILED,
+                        adapter.provider,
+                        start,
+                        task_id=ticket.task_ref.task_id,
+                        error_kind=ErrorKind.TASK_TIMEOUT,
+                    ),
+                )
+                raise TaskTimeoutError(
+                    f"task {ticket.task_ref.task_id} not solved within "
+                    f"{self._clock.monotonic() - start:.3f}s"
+                )
             attempt += 1
             await emit_async(
                 handler,
@@ -384,7 +366,12 @@ class AsyncTaskEngine(Generic[_T]):
             try:
                 response = await self._transport.post(url, payload)
             except NetworkError:
-                await self._sleep(timing.poll_interval)
+                await self._sleep(
+                    min(
+                        timing.poll_interval,
+                        max(0.0, deadline - self._clock.monotonic()),
+                    )
+                )
                 continue
             parsed = adapter.parse_task_status(response.body)
             if parsed.state is TaskStatus.READY:
@@ -434,7 +421,12 @@ class AsyncTaskEngine(Generic[_T]):
                     parsed.detail or f"task {ticket.task_ref.task_id} not found",
                     raw_response=parsed.raw,
                 )
-            await self._sleep(timing.poll_interval)
+            await self._sleep(
+                min(
+                    timing.poll_interval,
+                    max(0.0, deadline - self._clock.monotonic()),
+                )
+            )
 
     # -- aux operations (ADR-0013, ADR-0050, ADR-0067) -------------------
 
@@ -450,35 +442,40 @@ class AsyncTaskEngine(Generic[_T]):
         Never applies a poll delay (ADR-0030)."""
         self._check_open()
         total = timeout if timeout is not None else GENERIC_TIMING.total_timeout
-        try:
-            async with asyncio.timeout(total):
-                return await self._poll_ref(adapter, ref)
-        except TimeoutError:
-            return TaskStatusResult(
-                task_id=ref.task_id,
-                provider=ref.provider,
-                status=TaskStatus.PENDING,
-                solution=None,
-                cost=None,
-                raw=b"",
-            )
+        deadline = self._clock.monotonic() + total
+        return await self._poll_ref(adapter, ref, deadline)
 
-    async def _poll_ref(self, adapter: BaseAdapter, ref: TaskRef) -> TaskStatusResult:
+    async def _poll_ref(
+        self, adapter: BaseAdapter, ref: TaskRef, deadline: float
+    ) -> TaskStatusResult:
         interval = GENERIC_TIMING.poll_interval
         url = join_url(adapter.base_url, adapter.endpoints.get_task_status)
         while True:
             self._check_open()
+            if self._clock.monotonic() >= deadline:
+                return TaskStatusResult(
+                    task_id=ref.task_id,
+                    provider=ref.provider,
+                    status=TaskStatus.PENDING,
+                    solution=None,
+                    cost=None,
+                    raw=b"",
+                )
             payload = adapter.build_task_status(ref.task_id)
             try:
                 response = await self._transport.post(url, payload)
             except NetworkError:
-                await self._sleep(interval)
+                await self._sleep(
+                    min(interval, max(0.0, deadline - self._clock.monotonic()))
+                )
                 continue
             parsed = adapter.parse_task_status(response.body)
             if parsed.state is not TaskStatus.PENDING:
                 self._registry.remove(ref)
                 return self._status_result(ref, parsed)
-            await self._sleep(interval)
+            await self._sleep(
+                min(interval, max(0.0, deadline - self._clock.monotonic()))
+            )
 
     async def get_task_status(
         self, adapter: BaseAdapter, ref: TaskRef
