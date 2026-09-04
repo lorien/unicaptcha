@@ -163,15 +163,6 @@ pytest-cov stays informational only (ADR-0047); whether CI passes
 `--cov`, what reports are shown/uploaded, and if a coverage threshold
 becomes a gate — all undecided.
 
-## Test-double consolidation (`_fake`/ScriptedAdapter → `_myservice`)
-
-Status: new
-Priority: -1
-
-FakeAdapter + ScriptedAdapter + the reference MyServiceAdapter coexist;
-consolidating onto `tests/_myservice.py` would remove triple duplication
-of a provider double.
-
 ## Shared ErrorKind mapping table
 
 Status: new
