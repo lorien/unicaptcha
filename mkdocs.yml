@@ -1,5 +1,6 @@
 site_name: unicaptcha
 site_description: Universal Python interface to multiple anti-captcha services
+site_url: https://lorien.github.io/unicaptcha/
 repo_url: https://github.com/lorien/unicaptcha
 edit_uri: ""
 
