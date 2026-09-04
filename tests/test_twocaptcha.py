@@ -105,7 +105,7 @@ def test_payload_envelope_and_softid() -> None:
     own = adapter("4704").build_payload(ch)
     assert own["softId"] == 4704
     default = TwoCaptchaAdapter("test-key").build_payload(ch)
-    assert "softId" not in default
+    assert default["softId"] == 5859
 
 
 def test_image_payload_uses_min_length_wire_names() -> None:

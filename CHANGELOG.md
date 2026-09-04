@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- 2Captcha/RuCaptcha solves now embed the project's registered `soft_id`
+  (5859) by default (ADR-0072): the provider pays the project a small
+  commission per solve. Pass `referral=False` to disable it, or
+  `referral="<your-id>"` to credit your own software registration. Other
+  providers have no registered id yet.
+
 ## [0.1.0] - 2026-09-04
 
 ### Changed

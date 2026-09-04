@@ -113,8 +113,8 @@ def _submit_once(adapter, challenge) -> httpx.Request:
 #
 # One case per kind x provider. Expected payloads follow the ADR-0076 field
 # tables (architecture.md section 2); adapters use the default constructor,
-# which also pins ADR-0072's "referral=True embeds nothing until an id is
-# recorded" behavior (no ``softId`` anywhere).
+# which embeds ADR-0072's registered 2Captcha/RuCaptcha ``soft_id`` 5859
+# (other providers have no registered id yet, so no ``softId``).
 
 GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
     # -- 2Captcha (https://api.2captcha.com) -------------------------------
@@ -125,6 +125,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {"type": "ImageToTextTask", "body": "aW1nLWJ5dGVz"},
         },
     ),
@@ -135,6 +136,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {"type": "TextCaptchaTask", "comment": "2+2?"},
         },
     ),
@@ -145,6 +147,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {
                 "type": "RecaptchaV2TaskProxyless",
                 "websiteURL": "pu",
@@ -159,6 +162,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {
                 "type": "RecaptchaV3TaskProxyless",
                 "websiteURL": "pu",
@@ -173,6 +177,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {
                 "type": "HCaptchaTaskProxyless",
                 "websiteURL": "pu",
@@ -187,6 +192,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {
                 "type": "FunCaptchaTaskProxyless",
                 "websiteURL": "pu",
@@ -201,6 +207,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {
                 "type": "GeeTestTaskProxyless",
                 "websiteURL": "pu",
@@ -216,6 +223,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {
                 "type": "GeeTestTaskProxyless",
                 "websiteURL": "pu",
@@ -231,6 +239,7 @@ GOLDEN_CASES: list[tuple[str, object, object, str, dict[str, object]]] = [
         "https://api.2captcha.com/createTask",
         {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {
                 "type": "TurnstileTaskProxyless",
                 "websiteURL": "pu",
@@ -664,14 +673,14 @@ def test_referral_false_embeds_nothing_twocaptcha() -> None:
     }
 
 
-def test_referral_true_embeds_nothing_until_id_recorded() -> None:
-    # ADR-0072: the project affiliate id is not registered yet, so the
-    # default ``referral=True`` must send no ``softId``.
+def test_referral_true_embeds_project_soft_id() -> None:
+    # ADR-0072: the default ``referral=True`` embeds the project's
+    # registered 2Captcha/RuCaptcha soft_id.
     request = _submit_once(
         TwoCaptchaAdapter("test-key"),
         TwoCaptchaTextChallenge("q"),
     )
-    assert "softId" not in _body(request)
+    assert _body(request)["softId"] == 5859
 
 
 def test_capsolver_referral_inert() -> None:
@@ -714,6 +723,7 @@ def test_twocaptcha_v2_proxy_and_worker_context_wire() -> None:
     )
     assert _body(request) == {
         "clientKey": "test-key",
+        "softId": 5859,
         "task": {
             "type": "RecaptchaV2Task",
             "websiteURL": "pu",
@@ -830,6 +840,7 @@ def test_twocaptcha_image_extras_and_language_pool() -> None:
     )
     assert _body(request) == {
         "clientKey": "test-key",
+        "softId": 5859,
         "languagePool": "en",
         "task": {
             "type": "ImageToTextTask",
@@ -859,6 +870,7 @@ def test_twocaptcha_recaptcha_v3_extras() -> None:
     )
     assert _body(request) == {
         "clientKey": "test-key",
+        "softId": 5859,
         "task": {
             "type": "RecaptchaV3TaskProxyless",
             "websiteURL": "pu",
@@ -1015,6 +1027,7 @@ def test_solve_submit_then_poll_wire_round_trip(fast_time, fast_retry) -> None:
         assert str(create_request.url) == "https://api.2captcha.com/createTask"
         assert _body(create_request) == {
             "clientKey": "test-key",
+            "softId": 5859,
             "task": {"type": "ImageToTextTask", "body": "cG5n"},
         }
         for poll_call in poll.calls:
