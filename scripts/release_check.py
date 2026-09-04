@@ -33,19 +33,25 @@ def _tag_ok(tag: str | None) -> bool:
     return True
 
 
-def _changelog_ok() -> bool:
-    text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+def _changelog_ok(path: Path) -> bool:
+    text = path.read_text(encoding="utf-8")
     if re.search(rf"^## \[{re.escape(__version__)}\]", text, re.M):
         return True
-    print(f"CHANGELOG.md has no [{__version__}] section")
+    print(f"{path.name} has no [{__version__}] section")
     return False
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--tag", default=os.environ.get("GITHUB_REF_NAME"))
+    parser.add_argument(
+        "--changelog",
+        type=Path,
+        default=ROOT / "CHANGELOG.md",
+        help="changelog path (default: CHANGELOG.md)",
+    )
     args = parser.parse_args()
-    if not (_tag_ok(args.tag) and _changelog_ok()):
+    if not (_tag_ok(args.tag) and _changelog_ok(args.changelog)):
         return 1
     print("release-consistent")
     return 0
