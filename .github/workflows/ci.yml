@@ -38,9 +38,20 @@ jobs:
       - run: uv sync
       - run: uv run pytest
 
+  docs-check:
+    name: docs-check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - run: uv run mkdocs build
+
   docs:
     name: docs
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       pages: write
