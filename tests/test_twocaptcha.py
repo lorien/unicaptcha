@@ -7,6 +7,7 @@ from decimal import Decimal
 import httpx
 import pytest
 import respx
+from _error_kinds import PROVIDER_ERROR_KINDS
 
 from unicaptcha.errors import (
     AuthenticationError,
@@ -375,14 +376,8 @@ def test_balance_parsing() -> None:
 
 
 def test_map_provider_error_table() -> None:
-    cases = {
-        "ERROR_KEY_DOES_NOT_EXIST": ErrorKind.AUTHENTICATION,
-        "ERROR_WRONG_USER_KEY": ErrorKind.AUTHENTICATION,
-        "ERROR_ZERO_BALANCE": ErrorKind.INSUFFICIENT_BALANCE,
-        "ERROR_NO_SLOT_AVAILABLE": ErrorKind.SERVICE_BUSY,
-        "ERROR_TOO_MANY_REQUESTS": ErrorKind.RATE_LIMIT,
-        "ERROR_SOMETHING_ELSE": ErrorKind.PROVIDER,
-    }
+    cases = dict(PROVIDER_ERROR_KINDS["twocaptcha"])
+    cases["ERROR_SOMETHING_ELSE"] = ErrorKind.PROVIDER
     for code, expected in cases.items():
         kind, message = adapter().map_provider_error(
             _j(errorId=1, errorCode=code, errorDescription="boom")

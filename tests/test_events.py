@@ -4,41 +4,10 @@ from dataclasses import FrozenInstanceError
 from datetime import timedelta
 
 import pytest
+from _error_kinds import TERMINAL_ERROR_KINDS
 
 from unicaptcha import ErrorKind, InvalidConfigError, TaskEvent, TaskEventKind
 from unicaptcha._internal.handlers import check_sync_handler, emit_async, emit_sync
-
-_TERMINAL_ERROR_KINDS = {
-    TaskEventKind.PRE_FLIGHT_FAILED: frozenset(
-        {
-            None,
-            ErrorKind.INVALID_CHALLENGE,
-            ErrorKind.UNSUPPORTED_CHALLENGE,
-            ErrorKind.INVALID_CONFIG,
-            ErrorKind.CLIENT_CLOSED,
-        }
-    ),
-    TaskEventKind.SUBMIT_FAILED: frozenset(
-        {
-            ErrorKind.NETWORK,
-            ErrorKind.RATE_LIMIT,
-            ErrorKind.SERVICE_BUSY,
-            ErrorKind.AUTHENTICATION,
-            ErrorKind.INSUFFICIENT_BALANCE,
-            ErrorKind.PROVIDER,
-            ErrorKind.CLIENT_CLOSED,
-        }
-    ),
-    TaskEventKind.RESULT_FAILED: frozenset(
-        {
-            ErrorKind.NO_SOLUTION,
-            ErrorKind.EMPTY_SOLUTION,
-            ErrorKind.TASK_TIMEOUT,
-            ErrorKind.PROVIDER,
-            ErrorKind.CLIENT_CLOSED,
-        }
-    ),
-}
 
 _NON_FAILURE_KINDS = (
     TaskEventKind.SUBMIT_REQUESTED,
@@ -109,7 +78,7 @@ class TestTaskEvent:
 
 class TestErrorKindMatrix:
     def test_matrix_covers_exactly_the_terminal_failure_kinds(self) -> None:
-        assert set(_TERMINAL_ERROR_KINDS) == {
+        assert set(TERMINAL_ERROR_KINDS) == {
             TaskEventKind.PRE_FLIGHT_FAILED,
             TaskEventKind.SUBMIT_FAILED,
             TaskEventKind.RESULT_FAILED,
