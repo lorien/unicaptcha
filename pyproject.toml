@@ -80,4 +80,7 @@ dev = [
     "respx>=0.21",
     "pytest-cov>=5.0",
     "slotscheck>=0.16",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.7",
+    "mkdocstrings[python]>=1.0.6",
 ]

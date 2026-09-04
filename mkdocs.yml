@@ -1,0 +1,60 @@
+site_name: unicaptcha
+site_description: Universal Python interface to multiple anti-captcha services
+repo_url: https://github.com/lorien/unicaptcha
+edit_uri: ""
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            heading_level: 3
+            members_order: source
+            separate_signature: true
+            show_source: false
+            show_root_heading: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Guides:
+      - Universal client: guides/universal-client.md
+      - Provider facades: guides/facades.md
+      - Two-phase batch: guides/two-phase.md
+      - Configuration: guides/configuration.md
+      - Proxy: guides/proxy.md
+      - Errors: guides/errors.md
+      - Events: guides/events.md
+      - Custom providers: guides/custom-providers.md
+      - Examples: guides/examples.md
+  - API Reference:
+      - api/index.md
+      - Clients: api/clients.md
+      - Challenges: api/challenges.md
+      - Solutions: api/solutions.md
+      - Types: api/types.md
+      - Errors: api/errors.md
+      - Events: api/events.md
+      - Adapter SDK: api/adapter.md
+      - Providers: api/providers.md
