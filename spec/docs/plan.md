@@ -27,25 +27,6 @@ and `Priority: -1` (deferred) tasks are never auto-picked. The owner edits
 Ad-hoc tasks requested directly by the user are not tracked here; their
 reports live in `spec/report/`.
 
-## Release-consistency CI guards
-
-Status: new
-Priority: -1
-
-Add a `release-check` job to `.github/workflows/ci.yml` running on `v*`
-tag pushes: tag == `unicaptcha/_version.py` version == matching
-`## [{version}]` CHANGELOG section.
-
-References: ADR-0021, ADR-0022.
-
-## PyPI publishing / release automation
-
-Status: new
-Priority: -1
-
-Whether a `v*` tag triggers automated publish, a TestPyPI dry-run, and
-trusted publishing vs token. Deliberately postponed.
-
 ## Provider selection / failover policy
 
 Status: new
@@ -153,15 +134,6 @@ Priority: -1
 
 `getQueueStats` / `getAppStats` / `getSpendingStats` on the Anti-Captcha
 surface; aux ops deliberately stop at balance + good/bad reports.
-
-## CI coverage presentation/gating
-
-Status: new
-Priority: -1
-
-pytest-cov stays informational only (ADR-0047); whether CI passes
-`--cov`, what reports are shown/uploaded, and if a coverage threshold
-becomes a gate — all undecided.
 
 ## `_internal/log.py`
 
