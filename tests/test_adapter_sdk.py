@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, ClassVar
 
 import pytest
-from _fake import ScriptedAdapter
+from _fake import StubAdapter
 
 from unicaptcha import (
     BaseAdapter,
@@ -106,43 +106,43 @@ class TestInitSubclass:
                 challenges: ClassVar[frozenset[type[BaseChallenge]]] = frozenset()
 
     def test_complete_subclass_accepted(self) -> None:
-        assert ScriptedAdapter("key").provider == "myservice"
+        assert StubAdapter("key").provider == "myservice"
 
 
 class TestConstructor:
     def test_plain_str_wrapped(self) -> None:
-        a = ScriptedAdapter("plain-key")
+        a = StubAdapter("plain-key")
         assert isinstance(a._api_key, SecretStr)
         assert a._api_key.get_secret_value() == "plain-key"
 
     def test_secret_str_passthrough(self) -> None:
         key = SecretStr("already-secret")
-        a = ScriptedAdapter(key)
+        a = StubAdapter(key)
         assert a._api_key is key
 
     def test_base_url_defaults(self) -> None:
-        assert ScriptedAdapter("key").base_url == "https://myservice.example"
+        assert StubAdapter("key").base_url == "https://myservice.example"
 
     def test_base_url_override(self) -> None:
-        a = ScriptedAdapter("key", base_url="https://mirror.example")
+        a = StubAdapter("key", base_url="https://mirror.example")
         assert a.base_url == "https://mirror.example"
 
     def test_referral_default_true(self) -> None:
-        assert ScriptedAdapter("key")._referral is True
+        assert StubAdapter("key")._referral is True
 
     def test_referral_explicit(self) -> None:
-        assert ScriptedAdapter("key", referral=False)._referral is False
-        assert ScriptedAdapter("key", referral="4704")._referral == "4704"
+        assert StubAdapter("key", referral=False)._referral is False
+        assert StubAdapter("key", referral="4704")._referral == "4704"
 
     def test_referral_is_keyword_only(self) -> None:
         with pytest.raises(TypeError):
-            ScriptedAdapter("key", "https://x", False)  # type: ignore[call-arg]
+            StubAdapter("key", "https://x", False)  # type: ignore[call-arg]
 
 
 class TestRepr:
     def test_key_masked(self) -> None:
-        a = ScriptedAdapter("super-secret-key")
-        assert repr(a) == "ScriptedAdapter(api_key=***)"
+        a = StubAdapter("super-secret-key")
+        assert repr(a) == "StubAdapter(api_key=***)"
         assert "super-secret-key" not in repr(a)
         assert str(a) == repr(a)
 
@@ -168,13 +168,13 @@ class TestReportDefaults:
 
 class TestRequestBuilders:
     def test_build_task_status_default(self) -> None:
-        assert ScriptedAdapter("key").build_task_status(5) == {
+        assert StubAdapter("key").build_task_status(5) == {
             "clientKey": "key",
             "taskId": 5,
         }
 
     def test_build_balance_default(self) -> None:
-        assert ScriptedAdapter("key").build_balance() == {"clientKey": "key"}
+        assert StubAdapter("key").build_balance() == {"clientKey": "key"}
 
 
 class TestAdapterSdkIsolation:

@@ -57,7 +57,7 @@ class FakeClock(Clock):
         return sum(self.sleep_calls)
 
 
-class ScriptedAdapter(BaseAdapter):
+class StubAdapter(BaseAdapter):
     """Shared minimal concrete adapter speaking the createTask/getTaskResult
     shape, driven by respx response sequences in engine and SDK-contract
     tests."""

@@ -14,7 +14,7 @@ from decimal import Decimal
 import httpx
 import pytest
 import respx
-from _fake import FakeSolution, ScriptedAdapter
+from _fake import FakeSolution, StubAdapter
 
 from unicaptcha import (
     AuthenticationError,
@@ -78,8 +78,8 @@ def challenge_ref() -> ImageChallenge:
 
 
 @pytest.fixture
-def adapter() -> ScriptedAdapter:
-    return ScriptedAdapter("test-key")
+def adapter() -> StubAdapter:
+    return StubAdapter("test-key")
 
 
 @pytest.fixture
@@ -89,7 +89,7 @@ def challenge() -> ImageChallenge:
 
 class TestSyncCore:
     def test_solve_happy_path(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         events = []
         with respx.mock:
@@ -121,7 +121,7 @@ class TestSyncCore:
         assert poll_request == {"clientKey": "test-key", "taskId": 777}
 
     def test_instant_answer_fast_path(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         events = []
         with respx.mock:
@@ -142,7 +142,7 @@ class TestSyncCore:
         ]
 
     def test_submit_then_wait_two_phase(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -160,7 +160,7 @@ class TestSyncCore:
         assert result.task_id == 9
 
     def test_retry_on_500_then_success(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             create = respx.post(CREATE).mock(
@@ -178,7 +178,7 @@ class TestSyncCore:
         assert create.call_count == 2
 
     def test_429_exhaustion_raises_rate_limit(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             create = respx.post(CREATE).mock(
@@ -190,7 +190,7 @@ class TestSyncCore:
         assert create.call_count == 3
 
     def test_502_fails_fast(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             create = respx.post(CREATE).mock(
@@ -202,7 +202,7 @@ class TestSyncCore:
         assert create.call_count == 1
 
     def test_presend_network_error_retried(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             create = respx.post(CREATE).mock(
@@ -220,7 +220,7 @@ class TestSyncCore:
         assert create.call_count == 2
 
     def test_read_timeout_fails_fast(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             create = respx.post(CREATE).mock(side_effect=httpx.ReadTimeout("late"))
@@ -230,7 +230,7 @@ class TestSyncCore:
         assert create.call_count == 1
 
     def test_provider_payload_error_maps_kind(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         body = json.dumps(
             {"errorId": 12, "errorCode": "ERROR_KEY_DOES_NOT_EXIST"}
@@ -243,7 +243,7 @@ class TestSyncCore:
         assert excinfo.value.raw_response == body
 
     def test_busy_payload_retried_then_service_busy(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         body = json.dumps(
             {"errorId": 1, "errorCode": "ERROR_NO_SLOT_AVAILABLE"}
@@ -257,9 +257,7 @@ class TestSyncCore:
                 engine.solve(adapter, challenge)
         assert create.call_count == 3
 
-    def test_no_solution(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
-    ) -> None:
+    def test_no_solution(self, adapter: StubAdapter, challenge: ImageChallenge) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
                 return_value=httpx.Response(200, content=_submit_body(3))
@@ -272,7 +270,7 @@ class TestSyncCore:
                 engine.solve(adapter, challenge)
 
     def test_unknown_fails_fast_provider_error(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -286,7 +284,7 @@ class TestSyncCore:
                 engine.solve(adapter, challenge)
 
     def test_total_timeout(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -301,7 +299,7 @@ class TestSyncCore:
 
 
 class TestSyncAux:
-    def test_wait_ref_terminal_ready(self, adapter: ScriptedAdapter) -> None:
+    def test_wait_ref_terminal_ready(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 21)
         with respx.mock:
             respx.post(STATUS).mock(
@@ -312,9 +310,7 @@ class TestSyncAux:
         assert result.task_id == 21
         assert isinstance(result.solution, FakeSolution)
 
-    def test_wait_ref_budget_out_answers_pending(
-        self, adapter: ScriptedAdapter
-    ) -> None:
+    def test_wait_ref_budget_out_answers_pending(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 22)
         with respx.mock:
             respx.post(STATUS).mock(
@@ -323,7 +319,7 @@ class TestSyncAux:
             result = make_engine().wait_ref(adapter, ref, timeout=0.2)
         assert result.status is TaskStatus.PENDING
 
-    def test_wait_ref_never_raises_on_unknown(self, adapter: ScriptedAdapter) -> None:
+    def test_wait_ref_never_raises_on_unknown(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 23)
         with respx.mock:
             respx.post(STATUS).mock(
@@ -332,7 +328,7 @@ class TestSyncAux:
             result = make_engine().wait_ref(adapter, ref, timeout=0.5)
         assert result.status is TaskStatus.UNKNOWN
 
-    def test_get_task_status_single_shot(self, adapter: ScriptedAdapter) -> None:
+    def test_get_task_status_single_shot(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 24)
         with respx.mock:
             status = respx.post(STATUS).mock(
@@ -342,14 +338,14 @@ class TestSyncAux:
         assert result.status is TaskStatus.READY
         assert status.call_count == 1
 
-    def test_get_balance(self, adapter: ScriptedAdapter) -> None:
+    def test_get_balance(self, adapter: StubAdapter) -> None:
         with respx.mock:
             respx.post(f"{BASE}/getBalance").mock(
                 return_value=httpx.Response(200, content=b'{"balance": 1.23}')
             )
             assert make_engine().get_balance(adapter) == Decimal("1.23")
 
-    def test_report_bad_result(self, adapter: ScriptedAdapter) -> None:
+    def test_report_bad_result(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 25)
         with respx.mock:
             respx.post(f"{BASE}/reportIncorrect").mock(
@@ -357,7 +353,7 @@ class TestSyncAux:
             )
             assert make_engine().report_bad_result(adapter, ref) is True
 
-    def test_report_good_default_unsupported(self, adapter: ScriptedAdapter) -> None:
+    def test_report_good_default_unsupported(self, adapter: StubAdapter) -> None:
         with pytest.raises(UnsupportedChallengeError):
             make_engine().report_good_result(adapter, TaskRef("myservice", 26))
 
@@ -395,7 +391,7 @@ class TestRegistry:
 
 class TestSyncLifecycle:
     def test_delivery_removes_registry_entry(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -408,7 +404,7 @@ class TestSyncLifecycle:
             engine.solve(adapter, challenge)
         assert engine.get_abandoned_tasks() == ()
 
-    def test_wait_ref_terminal_cleans_registry(self, adapter: ScriptedAdapter) -> None:
+    def test_wait_ref_terminal_cleans_registry(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 52)
         with respx.mock:
             respx.post(CREATE).mock(
@@ -423,9 +419,7 @@ class TestSyncLifecycle:
             engine.wait_ref(adapter, ref, timeout=0.5)
         assert engine.get_abandoned_tasks() == ()
 
-    def test_close_idempotent_and_use_after_close(
-        self, adapter: ScriptedAdapter
-    ) -> None:
+    def test_close_idempotent_and_use_after_close(self, adapter: StubAdapter) -> None:
         engine = make_engine()
         engine.close()
         engine.close()
@@ -435,7 +429,7 @@ class TestSyncLifecycle:
             engine.get_balance(adapter)
 
     def test_close_wakes_blocked_solve_and_registry_keeps_ref(
-        self, adapter: ScriptedAdapter
+        self, adapter: StubAdapter
     ) -> None:
         slow_time = TimeConfig(poll_delay=0.0, poll_interval=0.2, total_timeout=30.0)
         errors: list[BaseException] = []
@@ -472,7 +466,7 @@ class TestSyncLifecycle:
 class TestAsyncLifecycle:
     @pytest.mark.asyncio
     async def test_delivery_removes_registry_entry(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -486,7 +480,7 @@ class TestAsyncLifecycle:
         assert engine.get_abandoned_tasks() == ()
 
     @pytest.mark.asyncio
-    async def test_aclose_then_use_raises(self, adapter: ScriptedAdapter) -> None:
+    async def test_aclose_then_use_raises(self, adapter: StubAdapter) -> None:
         engine = make_async_engine()
         await engine.aclose()
         await engine.aclose()
@@ -495,7 +489,7 @@ class TestAsyncLifecycle:
 
     @pytest.mark.asyncio
     async def test_cancellation_keeps_registry_entry(
-        self, adapter: ScriptedAdapter
+        self, adapter: StubAdapter
     ) -> None:
         slow_time = TimeConfig(poll_delay=0.0, poll_interval=0.05, total_timeout=30.0)
         with respx.mock:
@@ -521,7 +515,7 @@ class TestAsyncLifecycle:
 class TestAsyncCore:
     @pytest.mark.asyncio
     async def test_solve_happy_path(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -537,7 +531,7 @@ class TestAsyncCore:
 
     @pytest.mark.asyncio
     async def test_instant_answer(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -553,7 +547,7 @@ class TestAsyncCore:
 
     @pytest.mark.asyncio
     async def test_429_exhaustion(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             create = respx.post(CREATE).mock(
@@ -566,7 +560,7 @@ class TestAsyncCore:
 
     @pytest.mark.asyncio
     async def test_total_timeout(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         with respx.mock:
             respx.post(CREATE).mock(
@@ -580,7 +574,7 @@ class TestAsyncCore:
                 await engine.solve(adapter, challenge)
 
     @pytest.mark.asyncio
-    async def test_wait_ref_and_aux(self, adapter: ScriptedAdapter) -> None:
+    async def test_wait_ref_and_aux(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 31)
         with respx.mock:
             respx.post(STATUS).mock(
@@ -590,7 +584,7 @@ class TestAsyncCore:
         assert result.status is TaskStatus.READY
 
     @pytest.mark.asyncio
-    async def test_wait_ref_budget_out(self, adapter: ScriptedAdapter) -> None:
+    async def test_wait_ref_budget_out(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 32)
         with respx.mock:
             respx.post(STATUS).mock(
@@ -600,7 +594,7 @@ class TestAsyncCore:
         assert result.status is TaskStatus.PENDING
 
     @pytest.mark.asyncio
-    async def test_get_balance(self, adapter: ScriptedAdapter) -> None:
+    async def test_get_balance(self, adapter: StubAdapter) -> None:
         with respx.mock:
             respx.post(f"{BASE}/getBalance").mock(
                 return_value=httpx.Response(200, content=b'{"balance": 2.5}')
@@ -609,7 +603,7 @@ class TestAsyncCore:
 
     @pytest.mark.asyncio
     async def test_external_cancellation_passes_through(
-        self, adapter: ScriptedAdapter, challenge: ImageChallenge
+        self, adapter: StubAdapter, challenge: ImageChallenge
     ) -> None:
         slow_time = TimeConfig(poll_delay=0.0, poll_interval=0.05, total_timeout=30.0)
         with respx.mock:
