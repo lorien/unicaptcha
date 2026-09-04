@@ -39,15 +39,11 @@ only); unsupported kinds raise `UnsupportedChallengeError`.
 
 ## Install
 
-Not yet published to PyPI — install from the repository:
-
 ```
-uv add git+https://github.com/lorien/unicaptcha
+uv add unicaptcha
 ```
 
-or `pip install git+https://github.com/lorien/unicaptcha`. Once published,
-the plain `uv add unicaptcha` works. Requires Python 3.11+. Single runtime
-dependency: `httpx`.
+Requires Python 3.11+. Single runtime dependency: `httpx`.
 
 ## Usage
 

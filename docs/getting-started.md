@@ -2,21 +2,15 @@
 
 ## Install
 
-The package is not yet published to PyPI — install directly from the
-repository:
-
 ```
-uv add git+https://github.com/lorien/unicaptcha
+uv add unicaptcha
 ```
 
 or with pip:
 
 ```
-pip install git+https://github.com/lorien/unicaptcha
+pip install unicaptcha
 ```
-
-Once published, the plain form will work too:
-`uv add unicaptcha` / `pip install unicaptcha`.
 
 Requires Python 3.11+. The only runtime dependency is `httpx`.
 
