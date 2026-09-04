@@ -14,7 +14,7 @@ from decimal import Decimal
 import httpx
 import pytest
 import respx
-from _fake import FakeSolution
+from _fake import FakeSolution, ScriptedAdapter
 
 from unicaptcha import (
     AuthenticationError,
@@ -34,13 +34,9 @@ from unicaptcha import (
 )
 from unicaptcha._internal.async_engine import AsyncTaskEngine
 from unicaptcha._internal.engine import TaskEngine
-from unicaptcha._internal.errors import error_from_kind
 from unicaptcha._internal.http import AsyncHttpTransport, HttpTransport
 from unicaptcha._internal.registry import AbandonedTaskRegistry
-from unicaptcha.adapter import BaseAdapter
-from unicaptcha.challenge.base import BaseChallenge
-from unicaptcha.errors import ErrorKind
-from unicaptcha.types import ParsedTask, SubmitAccepted, TaskRef
+from unicaptcha.types import TaskRef
 
 BASE = "https://myservice.example"
 CREATE = f"{BASE}/createTask"
@@ -48,78 +44,6 @@ STATUS = f"{BASE}/getTaskResult"
 
 FAST_TIME = TimeConfig(poll_delay=0.0, poll_interval=0.01, total_timeout=0.5)
 FAST_RETRY = RetryConfig(max_attempts=3, backoff_base=0.001, backoff_cap=0.001)
-
-
-class ScriptedAdapter(BaseAdapter):
-    """JSON-family adapter speaking the createTask/getTaskResult shape."""
-
-    provider = "myservice"
-    challenges: frozenset[type[BaseChallenge]] = frozenset()
-    default_base_url = BASE
-
-    def build_payload(self, challenge: BaseChallenge) -> dict[str, object]:
-        return {"clientKey": "test-key", "task": "data"}
-
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
-        data = json.loads(raw)
-        if data.get("errorId"):
-            kind, message = self.map_provider_error(raw)
-            raise error_from_kind(kind, message, raw)
-        instant = None
-        if data.get("status") == "ready":
-            instant = ParsedTask(
-                state=TaskStatus.READY,
-                solution=FakeSolution("tok1234"),
-                cost=Decimal("0.001"),
-                raw=raw,
-            )
-        return SubmitAccepted(task_id=data["taskId"], instant_answer=instant)
-
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
-        data = json.loads(raw)
-        status = data["status"]
-        if status == "ready":
-            return ParsedTask(
-                state=TaskStatus.READY,
-                solution=FakeSolution("tok1234"),
-                cost=Decimal("0.001"),
-                raw=raw,
-            )
-        if status == "unsolvable":
-            return ParsedTask(
-                state=TaskStatus.NO_SOLUTION, solution=None, cost=None, raw=raw
-            )
-        if status == "notfound":
-            return ParsedTask(
-                state=TaskStatus.UNKNOWN,
-                solution=None,
-                cost=None,
-                raw=raw,
-                detail="no such task",
-            )
-        return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)
-
-    def parse_balance(self, raw: bytes) -> Decimal:
-        return Decimal(str(json.loads(raw)["balance"]))
-
-    def report_bad_supported(self, challenge_type: type[BaseChallenge]) -> bool:
-        return True
-
-    def build_report_bad(self, task: TaskRef) -> dict[str, object]:
-        return {"clientKey": "test-key", "taskId": task.task_id}
-
-    def parse_report_bad(self, raw: bytes) -> bool:
-        return json.loads(raw)["status"] == "success"
-
-    def map_provider_error(self, raw: bytes) -> tuple[ErrorKind, str]:
-        code = json.loads(raw).get("errorCode", "")
-        if code == "ERROR_KEY_DOES_NOT_EXIST":
-            return ErrorKind.AUTHENTICATION, "bad key"
-        if code == "ERROR_TOO_MANY_REQUESTS":
-            return ErrorKind.RATE_LIMIT, "too many requests"
-        if code == "ERROR_NO_SLOT_AVAILABLE":
-            return ErrorKind.SERVICE_BUSY, "no slot"
-        return ErrorKind.PROVIDER, code
 
 
 def _submit_body(task_id: int = 777, **extra: object) -> bytes:

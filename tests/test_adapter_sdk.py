@@ -1,10 +1,11 @@
 import ast
 from dataclasses import FrozenInstanceError
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, ClassVar
 
 import pytest
-from _fake import FakeAdapter
+from _fake import ScriptedAdapter
 
 from unicaptcha import (
     BaseAdapter,
@@ -14,7 +15,32 @@ from unicaptcha import (
     UnsupportedChallengeError,
 )
 from unicaptcha.challenge.base import BaseChallenge
-from unicaptcha.types import TaskRef
+from unicaptcha.errors import ErrorKind
+from unicaptcha.types import ParsedTask, SubmitAccepted, TaskRef, TaskStatus
+
+
+class MinimalAdapter(BaseAdapter):
+    """Minimal complete adapter asserting the base report defaults
+    (reports off / raising)."""
+
+    provider: ClassVar[str] = "myservice"
+    challenges: ClassVar[frozenset[type[BaseChallenge]]] = frozenset()
+    default_base_url: ClassVar[str] = "https://myservice.example"
+
+    def build_payload(self, challenge: BaseChallenge) -> dict[str, Any]:
+        return {}
+
+    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
+        return SubmitAccepted(task_id=1)
+
+    def parse_task_status(self, raw: bytes) -> ParsedTask:
+        return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)
+
+    def parse_balance(self, raw: bytes) -> Decimal:
+        return Decimal("0")
+
+    def map_provider_error(self, raw: bytes) -> tuple[ErrorKind, str]:
+        return ErrorKind.PROVIDER, "provider error"
 
 
 class TestEndpoints:
@@ -80,55 +106,55 @@ class TestInitSubclass:
                 challenges: ClassVar[frozenset[type[BaseChallenge]]] = frozenset()
 
     def test_complete_subclass_accepted(self) -> None:
-        assert FakeAdapter("key").provider == "myservice"
+        assert ScriptedAdapter("key").provider == "myservice"
 
 
 class TestConstructor:
     def test_plain_str_wrapped(self) -> None:
-        a = FakeAdapter("plain-key")
+        a = ScriptedAdapter("plain-key")
         assert isinstance(a._api_key, SecretStr)
         assert a._api_key.get_secret_value() == "plain-key"
 
     def test_secret_str_passthrough(self) -> None:
         key = SecretStr("already-secret")
-        a = FakeAdapter(key)
+        a = ScriptedAdapter(key)
         assert a._api_key is key
 
     def test_base_url_defaults(self) -> None:
-        assert FakeAdapter("key").base_url == "https://myservice.example"
+        assert ScriptedAdapter("key").base_url == "https://myservice.example"
 
     def test_base_url_override(self) -> None:
-        a = FakeAdapter("key", base_url="https://mirror.example")
+        a = ScriptedAdapter("key", base_url="https://mirror.example")
         assert a.base_url == "https://mirror.example"
 
     def test_referral_default_true(self) -> None:
-        assert FakeAdapter("key")._referral is True
+        assert ScriptedAdapter("key")._referral is True
 
     def test_referral_explicit(self) -> None:
-        assert FakeAdapter("key", referral=False)._referral is False
-        assert FakeAdapter("key", referral="4704")._referral == "4704"
+        assert ScriptedAdapter("key", referral=False)._referral is False
+        assert ScriptedAdapter("key", referral="4704")._referral == "4704"
 
     def test_referral_is_keyword_only(self) -> None:
         with pytest.raises(TypeError):
-            FakeAdapter("key", "https://x", False)  # type: ignore[call-arg]
+            ScriptedAdapter("key", "https://x", False)  # type: ignore[call-arg]
 
 
 class TestRepr:
     def test_key_masked(self) -> None:
-        a = FakeAdapter("super-secret-key")
-        assert repr(a) == "FakeAdapter(api_key=***)"
+        a = ScriptedAdapter("super-secret-key")
+        assert repr(a) == "ScriptedAdapter(api_key=***)"
         assert "super-secret-key" not in repr(a)
         assert str(a) == repr(a)
 
 
 class TestReportDefaults:
     def test_supported_false(self) -> None:
-        a = FakeAdapter("key")
+        a = MinimalAdapter("key")
         assert a.report_bad_supported(ImageChallenge) is False
         assert a.report_good_supported(ImageChallenge) is False
 
     def test_build_and_parse_raise(self) -> None:
-        a = FakeAdapter("key")
+        a = MinimalAdapter("key")
         ref = TaskRef(provider="myservice", task_id=1)
         with pytest.raises(UnsupportedChallengeError):
             a.build_report_bad(ref)
@@ -142,13 +168,13 @@ class TestReportDefaults:
 
 class TestRequestBuilders:
     def test_build_task_status_default(self) -> None:
-        assert FakeAdapter("key").build_task_status(5) == {
+        assert ScriptedAdapter("key").build_task_status(5) == {
             "clientKey": "key",
             "taskId": 5,
         }
 
     def test_build_balance_default(self) -> None:
-        assert FakeAdapter("key").build_balance() == {"clientKey": "key"}
+        assert ScriptedAdapter("key").build_balance() == {"clientKey": "key"}
 
 
 class TestAdapterSdkIsolation:

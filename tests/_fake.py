@@ -1,16 +1,16 @@
 """Shared test fakes. Not collected by pytest (filename not test_*)."""
 
+import json
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any, ClassVar
 
 from unicaptcha._internal.clock import Clock
 from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
-from unicaptcha.errors import ErrorKind
+from unicaptcha.errors import ErrorKind, error_from_kind
 from unicaptcha.solution.base import BaseSolution
-from unicaptcha.types import ParsedTask, SubmitAccepted, TaskStatus
+from unicaptcha.types import ParsedTask, SubmitAccepted, TaskRef, TaskStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,25 +57,75 @@ class FakeClock(Clock):
         return sum(self.sleep_calls)
 
 
-class FakeAdapter(BaseAdapter):
-    """Minimal concrete adapter implementing the SDK contract (ADR-0046
-    reference-adapter stand-in for tests)."""
+class ScriptedAdapter(BaseAdapter):
+    """Shared minimal concrete adapter speaking the createTask/getTaskResult
+    shape, driven by respx response sequences in engine and SDK-contract
+    tests."""
 
-    provider: ClassVar[str] = "myservice"
-    challenges: ClassVar[frozenset[type[BaseChallenge]]] = frozenset()
-    default_base_url: ClassVar[str] = "https://myservice.example"
+    provider = "myservice"
+    challenges: frozenset[type[BaseChallenge]] = frozenset()
+    default_base_url = "https://myservice.example"
 
-    def build_payload(self, challenge: BaseChallenge) -> dict[str, Any]:
-        return {}
+    def build_payload(self, challenge: BaseChallenge) -> dict[str, object]:
+        return {"clientKey": "test-key", "task": "data"}
 
     def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
-        return SubmitAccepted(task_id=1)
+        data = json.loads(raw)
+        if data.get("errorId"):
+            kind, message = self.map_provider_error(raw)
+            raise error_from_kind(kind, message, raw)
+        instant = None
+        if data.get("status") == "ready":
+            instant = ParsedTask(
+                state=TaskStatus.READY,
+                solution=FakeSolution("tok1234"),
+                cost=Decimal("0.001"),
+                raw=raw,
+            )
+        return SubmitAccepted(task_id=data["taskId"], instant_answer=instant)
 
     def parse_task_status(self, raw: bytes) -> ParsedTask:
+        data = json.loads(raw)
+        status = data["status"]
+        if status == "ready":
+            return ParsedTask(
+                state=TaskStatus.READY,
+                solution=FakeSolution("tok1234"),
+                cost=Decimal("0.001"),
+                raw=raw,
+            )
+        if status == "unsolvable":
+            return ParsedTask(
+                state=TaskStatus.NO_SOLUTION, solution=None, cost=None, raw=raw
+            )
+        if status == "notfound":
+            return ParsedTask(
+                state=TaskStatus.UNKNOWN,
+                solution=None,
+                cost=None,
+                raw=raw,
+                detail="no such task",
+            )
         return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)
 
     def parse_balance(self, raw: bytes) -> Decimal:
-        return Decimal("0.00")
+        return Decimal(str(json.loads(raw)["balance"]))
+
+    def report_bad_supported(self, challenge_type: type[BaseChallenge]) -> bool:
+        return True
+
+    def build_report_bad(self, task: TaskRef) -> dict[str, object]:
+        return {"clientKey": "test-key", "taskId": task.task_id}
+
+    def parse_report_bad(self, raw: bytes) -> bool:
+        return json.loads(raw)["status"] == "success"
 
     def map_provider_error(self, raw: bytes) -> tuple[ErrorKind, str]:
-        return ErrorKind.PROVIDER, "provider error"
+        code = json.loads(raw).get("errorCode", "")
+        if code == "ERROR_KEY_DOES_NOT_EXIST":
+            return ErrorKind.AUTHENTICATION, "bad key"
+        if code == "ERROR_TOO_MANY_REQUESTS":
+            return ErrorKind.RATE_LIMIT, "too many requests"
+        if code == "ERROR_NO_SLOT_AVAILABLE":
+            return ErrorKind.SERVICE_BUSY, "no slot"
+        return ErrorKind.PROVIDER, code

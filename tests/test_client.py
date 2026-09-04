@@ -55,7 +55,7 @@ class LoneChallenge(ImageChallenge):
     pass
 
 
-class ScriptedAdapter(BaseAdapter):
+class ProbeAdapter(BaseAdapter):
     """JSON-family test adapter driven by respx response sequences."""
 
     provider = "scripted"
@@ -114,13 +114,13 @@ class ScriptedAdapter(BaseAdapter):
         return ErrorKind.PROVIDER, code
 
 
-class AlphaAdapter(ScriptedAdapter):
+class AlphaAdapter(ProbeAdapter):
     provider = "alpha"
     challenges: frozenset[type[BaseChallenge]] = frozenset({AlphaChallenge})
     default_base_url = "https://alpha.example"
 
 
-class BetaAdapter(ScriptedAdapter):
+class BetaAdapter(ProbeAdapter):
     provider = "beta"
     challenges: frozenset[type[BaseChallenge]] = frozenset({BetaChallenge})
     default_base_url = "https://beta.example"
@@ -246,19 +246,19 @@ class TestDispatch:
         class SubRecV2(RecaptchaV2Challenge):
             pass
 
-        class UpcastAdapter(ScriptedAdapter):
+        class UpcastAdapter(ProbeAdapter):
             provider = "up"
             challenges: frozenset[type[BaseChallenge]] = frozenset({SubRecV2})
             default_base_url = "https://up.example"
 
-        original = ScriptedAdapter.build_payload
+        original = ProbeAdapter.build_payload
 
         def capturing(self: BaseAdapter, challenge: BaseChallenge) -> dict[str, object]:
             payload = original(self, challenge)
             captured.append(payload)
             return payload
 
-        monkeypatch.setattr(ScriptedAdapter, "build_payload", capturing)
+        monkeypatch.setattr(ProbeAdapter, "build_payload", capturing)
         solver = Solver([UpcastAdapter("k")], time=FAST_TIME, retry=FAST_RETRY)
         with respx.mock:
             respx.post(f"{UpcastAdapter.default_base_url}/createTask").mock(
@@ -279,12 +279,12 @@ class TestDispatch:
         seen_proxy: list[object] = []
 
         def capturing(
-            self: ScriptedAdapter, challenge: BaseChallenge
+            self: ProbeAdapter, challenge: BaseChallenge
         ) -> dict[str, object]:
             seen_proxy.append(getattr(challenge, "proxy", None))
             return {"clientKey": "k"}
 
-        monkeypatch.setattr(ScriptedAdapter, "build_payload", capturing)
+        monkeypatch.setattr(ProbeAdapter, "build_payload", capturing)
         solver = Solver(
             [AlphaAdapter("k")],
             proxy=Proxy(host="127.0.0.1", port=9),
@@ -341,15 +341,15 @@ class TestProxyDefault:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         seen: list[object] = []
-        original = ScriptedAdapter.build_payload
+        original = ProbeAdapter.build_payload
 
         def capturing(
-            self: ScriptedAdapter, challenge: BaseChallenge
+            self: ProbeAdapter, challenge: BaseChallenge
         ) -> dict[str, object]:
             seen.append(getattr(challenge, "proxy", None))
             return original(self, challenge)
 
-        monkeypatch.setattr(ScriptedAdapter, "build_payload", capturing)
+        monkeypatch.setattr(ProbeAdapter, "build_payload", capturing)
         solver = Solver(
             [AlphaAdapter("k")],
             proxy=Proxy(host="10.0.0.1", port=8080),
