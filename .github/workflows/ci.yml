@@ -24,7 +24,7 @@ jobs:
       - run: uv run mypy unicaptcha
       - run: uv run pyright
       - run: uv run slotscheck unicaptcha
-      - run: uv run pytest
+      - run: uv run pytest --cov=unicaptcha --cov-report=term-missing
 
   freethreaded:
     name: "3.14t / ubuntu (informational)"
