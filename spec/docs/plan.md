@@ -226,3 +226,34 @@ Design (ADR-0077):
   uniform_choice monkeypatch, fill mapping).
 
 References: ADR-0077.
+
+## Register project soft_ids for Anti-Captcha and CapMonster Cloud
+
+Status: new
+Priority: -1
+
+2Captcha/RuCaptcha soft_id 5859 is integrated (report-1788542943). Both
+Anti-Captcha and CapMonster Cloud support a per-request `softId`
+(referral embedding, ADR-0072), so their project ids can be registered
+the same way:
+
+- Anti-Captcha: `softId` field, 10% commission. Register at
+  https://anti-captcha.com/clients/tools/devcenter (confirmed via the
+  anticaptcha-python vendor examples).
+- CapMonster Cloud: `softId` confirmed in the vendor SDK
+  (var/vendor/repo/capmonster-python-captcha-solver/
+  capmonstercloud_client/clientOptions.py — default_soft_id=55, sent in
+  the createTask envelope); affiliate program up to 30% (register in
+  their developer dashboard).
+- Capsolver: no affiliate field.
+
+When the ids are obtained: set `AntiCaptchaAdapter.project_soft_id` and
+`CapMonsterAdapter.project_soft_id`; update the respective default
+payload / golden tests (mirror the 5859 change: the compat base already
+sends `softId` from the registered id); add a CHANGELOG [Unreleased]
+entry. Both adapters inherit the `_soft_id`/`project_soft_id`
+machinery — one-line code change each.
+
+References: ADR-0072, report-1788542943 (soft_id 5859),
+var/vendor/anticaptcha-python-analysis.md,
+var/vendor/capmonster-python-captcha-solver-analysis.md.
