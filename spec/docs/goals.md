@@ -34,7 +34,7 @@ differ, instead of a lossy lowest-common-denominator abstraction.
 - Client-side rate limiting or concurrency caps.
 - API-key rotation or multi-account management per provider.
 - Webhook/pingback solve mode; solving is strictly poll-based.
-- Browser automation, CAPTCHA detection, or page scraping.
+- Browser automation or page scraping.
 - A fake/test double module for downstream users (unicaptcha.testing).
 - Per-provider billing dashboards or usage statistics on the client.
 

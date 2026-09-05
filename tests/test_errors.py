@@ -8,6 +8,7 @@ from unicaptcha import (
     InvalidChallengeError,
     InvalidConfigError,
     NetworkError,
+    NoCaptchaDetectedError,
     NoSolutionError,
     ProviderError,
     RateLimitError,
@@ -30,13 +31,14 @@ _LEAF_KINDS = [
     (ErrorKind.EMPTY_SOLUTION, EmptySolutionError),
     (ErrorKind.CLIENT_CLOSED, ClientClosedError),
     (ErrorKind.INVALID_CONFIG, InvalidConfigError),
+    (ErrorKind.NO_CAPTCHA_DETECTED, NoCaptchaDetectedError),
     (ErrorKind.PROVIDER, ProviderError),
 ]
 
 
 class TestErrorKind:
     def test_values(self) -> None:
-        assert len(ErrorKind) == 13
+        assert len(ErrorKind) == 14
         assert {e.value for e in ErrorKind} == {
             "NETWORK",
             "AUTHENTICATION",
@@ -50,6 +52,7 @@ class TestErrorKind:
             "EMPTY_SOLUTION",
             "CLIENT_CLOSED",
             "INVALID_CONFIG",
+            "NO_CAPTCHA_DETECTED",
             "PROVIDER",
         }
 

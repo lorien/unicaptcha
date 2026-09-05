@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Auto mode (ADR-0077): `unicaptcha.detect` with `detect(html, pageurl)`
+  finds the captchas a page uses from its HTML source (reCAPTCHA v2/v3,
+  hCaptcha, Turnstile, FunCaptcha, GeeTest v3/v4), and
+  `Solver.auto_solve` / `AsyncSolver.auto_solve` solve the first match
+  and return an `AutoSolveResult` with a `fill` map of DOM selectors to
+  the solved values. `NoCaptchaDetectedError` (new `ErrorKind.
+  NO_CAPTCHA_DETECTED`) is raised when nothing is detected. Provider
+  solution reprs no longer leak full tokens (ADR-0034).
+
 ### Changed
 
 - 2Captcha/RuCaptcha solves now embed the project's registered `soft_id`

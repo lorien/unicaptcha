@@ -19,6 +19,7 @@ from unicaptcha.challenge import (
     TurnstileChallenge,
 )
 from unicaptcha.client import AsyncSolver, Solver
+from unicaptcha.detect import AutoSolveResult, DetectedChallenge, detect
 from unicaptcha.errors import (
     AuthenticationError,
     ClientClosedError,
@@ -28,6 +29,7 @@ from unicaptcha.errors import (
     InvalidChallengeError,
     InvalidConfigError,
     NetworkError,
+    NoCaptchaDetectedError,
     NoSolutionError,
     ProviderError,
     RateLimitError,
@@ -69,10 +71,12 @@ __all__ = [
     "AntiCaptchaCompatAdapterBase",
     "AsyncSolver",
     "AuthenticationError",
+    "AutoSolveResult",
     "BaseAdapter",
     "BaseChallenge",
     "BaseSolution",
     "ClientClosedError",
+    "DetectedChallenge",
     "EmptySolutionError",
     "Endpoints",
     "ErrorKind",
@@ -91,6 +95,7 @@ __all__ = [
     "InvalidConfigError",
     "NetworkConfig",
     "NetworkError",
+    "NoCaptchaDetectedError",
     "NoSolutionError",
     "ParsedTask",
     "ProviderError",
@@ -122,4 +127,5 @@ __all__ = [
     "UnicaptchaError",
     "UnsupportedChallengeError",
     "__version__",
+    "detect",
 ]

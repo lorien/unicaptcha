@@ -22,17 +22,17 @@ from unicaptcha.solution.text import TextSolution
 from unicaptcha.solution.turnstile import TurnstileSolution
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaImageSolution(ImageSolution):
     """Solved image captcha text."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaTextSolution(TextSolution):
     """Solved question-captcha answer text."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaRecaptchaV2Solution(RecaptchaV2Solution):
     """Solved reCAPTCHA v2 token with worker context.
 
@@ -53,12 +53,12 @@ class AntiCaptchaRecaptchaV2Solution(RecaptchaV2Solution):
     __str__ = __repr__
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaRecaptchaV3Solution(RecaptchaV3Solution):
     """Solved reCAPTCHA v3 token."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaHCaptchaSolution(HCaptchaSolution):
     """Solved hCaptcha token with worker context."""
 
@@ -74,22 +74,22 @@ class AntiCaptchaHCaptchaSolution(HCaptchaSolution):
     __str__ = __repr__
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaFunCaptchaSolution(FunCaptchaSolution):
     """Solved Arkose Labs FunCaptcha token."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaGeeTestV3Solution(GeeTestV3Solution):
     """Solved GeeTest v3 three-part answer."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaGeeTestV4Solution(GeeTestV4Solution):
     """Solved GeeTest v4 five-part answer."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AntiCaptchaTurnstileSolution(TurnstileSolution):
     """Solved Cloudflare Turnstile token."""
 

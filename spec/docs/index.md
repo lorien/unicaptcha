@@ -102,6 +102,7 @@ supersede.
 | [0074](ADR/0074-turnstile-kind.md) | Cloudflare Turnstile kind | amends 0002/0070: ninth v1 kind; resolves dangling deferred claim |
 | [0075](ADR/0075-submit-ready-fast-path.md) | Submit-ready fast path | amends 0053/0067, formalizes ParsedTask (0058): SubmitAccepted, ticket-carried `instant_answer` |
 | [0076](ADR/0076-per-provider-challenge-field-surface.md) | Per-provider challenge field surface | amends 0006/0031/0069 scope: concrete field lists in architecture §2 |
+| [0077](ADR/0077-auto-solve.md) | Auto mode: HTML detection + auto solve | new public `detect()` / `auto_solve`; amends goals non-goal |
 | [0078](ADR/0078-docs-site.md) | Static documentation site | supersedes 0023 |
 
 ## Conventions

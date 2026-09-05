@@ -19,47 +19,47 @@ from unicaptcha.solution.text import TextSolution
 from unicaptcha.solution.turnstile import TurnstileSolution
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaImageSolution(ImageSolution):
     """Solved image captcha text."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaTextSolution(TextSolution):
     """Solved question-captcha answer text."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaRecaptchaV2Solution(RecaptchaV2Solution):
     """Solved reCAPTCHA v2 token."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaRecaptchaV3Solution(RecaptchaV3Solution):
     """Solved reCAPTCHA v3 token with score/action when reported."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaHCaptchaSolution(HCaptchaSolution):
     """Solved hCaptcha token."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaFunCaptchaSolution(FunCaptchaSolution):
     """Solved Arkose Labs FunCaptcha token."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaGeeTestV3Solution(GeeTestV3Solution):
     """Solved GeeTest v3 three-part answer."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaGeeTestV4Solution(GeeTestV4Solution):
     """Solved GeeTest v4 five-part answer."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class TwoCaptchaTurnstileSolution(TurnstileSolution):
     """Solved Cloudflare Turnstile token."""
 

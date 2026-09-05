@@ -41,6 +41,7 @@ nav:
   - Getting started: getting-started.md
   - Guides:
       - Universal client: guides/universal-client.md
+      - Auto solve: guides/auto-solve.md
       - Provider facades: guides/facades.md
       - Two-phase batch: guides/two-phase.md
       - Configuration: guides/configuration.md
@@ -52,6 +53,7 @@ nav:
   - API Reference:
       - api/index.md
       - Clients: api/clients.md
+      - Detect: api/detect.md
       - Challenges: api/challenges.md
       - Solutions: api/solutions.md
       - Types: api/types.md

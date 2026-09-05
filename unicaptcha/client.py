@@ -18,12 +18,19 @@ import httpx
 
 from unicaptcha._internal.async_engine import AsyncTaskEngine
 from unicaptcha._internal.engine import TaskEngine
+from unicaptcha._internal.fill import build_fill
 from unicaptcha._internal.handlers import check_sync_handler, emit_async, emit_sync
 from unicaptcha._internal.http import AsyncHttpTransport, HttpTransport
 from unicaptcha._internal.routing import dispatch
 from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
-from unicaptcha.errors import ClientClosedError, ErrorKind, UnsupportedChallengeError
+from unicaptcha.detect import AutoSolveResult, detect
+from unicaptcha.errors import (
+    ClientClosedError,
+    ErrorKind,
+    NoCaptchaDetectedError,
+    UnsupportedChallengeError,
+)
 from unicaptcha.events import (
     AsyncEventHandler,
     SyncEventHandler,
@@ -195,6 +202,43 @@ class Solver:
         adapter, prepared = self._route(challenge, provider, start, handler)
         return self._engine.solve(
             adapter, prepared, time=time, retry=retry, on_event=handler
+        )
+
+    def auto_solve(
+        self,
+        html: str,
+        pageurl: str,
+        provider: str | None = None,
+        *,
+        time: TimeConfig | None = None,
+        retry: RetryConfig | None = None,
+        on_event: SyncEventHandler | None = None,
+    ) -> AutoSolveResult:
+        """Detect and solve the first captcha in ``html`` (ADR-0077).
+
+        Raises ``NoCaptchaDetectedError`` when the page has no supported
+        captcha. Pages with several captchas use ``detect()`` + ``solve()``
+        directly. The returned ``fill`` maps DOM selectors to the solved
+        values; the caller injects them into the live page.
+        """
+        self._check_open()
+        detected = detect(html, pageurl)
+        if not detected:
+            raise NoCaptchaDetectedError(
+                f"no supported captcha detected in page {pageurl!r}"
+            )
+        first = detected[0]
+        result = self.solve(
+            first.challenge,
+            provider=provider,
+            time=time,
+            retry=retry,
+            on_event=on_event,
+        )
+        return AutoSolveResult(
+            detected=first,
+            result=result,
+            fill=build_fill(result.solution),
         )
 
     def submit(
@@ -375,6 +419,43 @@ class AsyncSolver:
         adapter, prepared = await self._route(challenge, provider, start, handler)
         return await self._engine.solve(
             adapter, prepared, time=time, retry=retry, on_event=handler
+        )
+
+    async def auto_solve(
+        self,
+        html: str,
+        pageurl: str,
+        provider: str | None = None,
+        *,
+        time: TimeConfig | None = None,
+        retry: RetryConfig | None = None,
+        on_event: AsyncEventHandler | None = None,
+    ) -> AutoSolveResult:
+        """Detect and solve the first captcha in ``html`` (ADR-0077).
+
+        Raises ``NoCaptchaDetectedError`` when the page has no supported
+        captcha. Pages with several captchas use ``detect()`` + ``solve()``
+        directly. The returned ``fill`` maps DOM selectors to the solved
+        values; the caller injects them into the live page.
+        """
+        self._check_open()
+        detected = detect(html, pageurl)
+        if not detected:
+            raise NoCaptchaDetectedError(
+                f"no supported captcha detected in page {pageurl!r}"
+            )
+        first = detected[0]
+        result = await self.solve(
+            first.challenge,
+            provider=provider,
+            time=time,
+            retry=retry,
+            on_event=on_event,
+        )
+        return AutoSolveResult(
+            detected=first,
+            result=result,
+            fill=build_fill(result.solution),
         )
 
     async def submit(

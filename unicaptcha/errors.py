@@ -34,6 +34,7 @@ class ErrorKind(Enum):
     EMPTY_SOLUTION = "EMPTY_SOLUTION"
     CLIENT_CLOSED = "CLIENT_CLOSED"
     INVALID_CONFIG = "INVALID_CONFIG"
+    NO_CAPTCHA_DETECTED = "NO_CAPTCHA_DETECTED"
     PROVIDER = "PROVIDER"
 
 
@@ -163,6 +164,17 @@ class ClientClosedError(UnicaptchaError):
         )
 
 
+class NoCaptchaDetectedError(UnicaptchaError):
+    """Auto-solve found no supported captcha in the page (ADR-0077)."""
+
+    def __init__(self, message: str, *, raw_response: bytes = b"") -> None:
+        super().__init__(
+            message,
+            kind=ErrorKind.NO_CAPTCHA_DETECTED,
+            raw_response=raw_response,
+        )
+
+
 class ProviderError(UnicaptchaError):
     """Unclassified provider error.
 
@@ -205,6 +217,7 @@ _KIND_CLASS: dict[ErrorKind, Callable[..., UnicaptchaError]] = {
     ErrorKind.EMPTY_SOLUTION: EmptySolutionError,
     ErrorKind.CLIENT_CLOSED: ClientClosedError,
     ErrorKind.INVALID_CONFIG: InvalidConfigError,
+    ErrorKind.NO_CAPTCHA_DETECTED: NoCaptchaDetectedError,
     ErrorKind.PROVIDER: ProviderError,
 }
 
@@ -234,6 +247,7 @@ __all__ = [
     "InvalidChallengeError",
     "InvalidConfigError",
     "NetworkError",
+    "NoCaptchaDetectedError",
     "NoSolutionError",
     "ProviderError",
     "RateLimitError",
