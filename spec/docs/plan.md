@@ -152,19 +152,6 @@ Universal-tier `solve` returns `TaskResult[Any]` statically (runtime fully
 typed). Add the nine-kind overload set if universal precision is wanted;
 facades already type precisely.
 
-## Example demo values: geetest_v3 dynamic challenge; funcaptcha annotation
-
-Status: new
-Priority: -1
-
-Live smoke (2026-08-28): geetest_v3 examples fail with `NoSolutionError`
-— the static demo `challenge` is stale by design (one-time value). Fetch
-a fresh challenge from the 2captcha demo page per run (the vendor SDK
-example's pattern: GET the page, `split(';')[0]`) in sync/async examples.
-FunCaptcha's public demo blob is not worker-solvable; keep those examples
-illustrative with an explicit docstring/README note (`NoSolutionError`
-expected).
-
 ## Report commit-hash traceability
 
 Status: new

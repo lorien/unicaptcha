@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the solved values. `NoCaptchaDetectedError` (new `ErrorKind.
   NO_CAPTCHA_DETECTED`) is raised when nothing is detected. Provider
   solution reprs no longer leak full tokens (ADR-0034).
+- The `geetest_v3` and `funcaptcha` examples are documented as
+  illustrative: the GeeTest v3 demo `challenge` is single-use and
+  Arkose's public demo blob is not worker-solvable, so those solves are
+  expected to end in `NoSolutionError`.
 
 ### Changed
 

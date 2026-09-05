@@ -23,10 +23,15 @@ export UNICAPTCHA_TWOCAPTCHA_API_KEY=your_api_key
 python examples/sync/recaptcha_v2.py
 python examples/async/turnstile.py
 ```
+Without the key a script prints how to set it and exits non-zero —
+nothing is submitted. Demo sitekeys are public 2Captcha demo pages (plus
+official hCaptcha/Arkose test keys), so the scripts run as-is once the
+key is set.
 
-Without the key a script prints how to set it and exits non-zero — nothing
-is submitted. Demo sitekeys are public 2Captcha demo pages (plus official
-hCaptcha/Arkose test keys), so the scripts run as-is once the key is set.
+> **Illustrative examples:** `geetest_v3.py` and `funcaptcha.py` are
+> illustrative — the GeeTest v3 demo `challenge` is single-use and
+> Arkose's public demo blob is not worker-solvable, so those solves are
+> expected to end in `NoSolutionError`.
 
 ## Index
 

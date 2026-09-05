@@ -1,5 +1,8 @@
 """Solve FunCaptcha (Arkose Labs) with the 2Captcha provider.
 
+Illustrative: Arkose's public demo blob is not worker-solvable, so a
+live solve is expected to end in ``NoSolutionError``.
+
 Works identically with Anti-Captcha, CapMonster Cloud, and Capsolver:
 swap TwoCaptchaClient -> AntiCaptchaClient / CapMonsterClient /
 CapsolverClient. Per-provider extras for a given kind are documented in

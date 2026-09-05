@@ -1,5 +1,10 @@
 """Solve GeeTest v3 with the 2Captcha provider (async).
 
+Illustrative: the demo ``challenge`` below is single-use by design, so a
+live solve is expected to end in ``NoSolutionError``. To solve for real,
+obtain a fresh challenge from the target page (GeeTest issues one per
+page load) and pass it here.
+
 Works identically with Anti-Captcha, CapMonster Cloud, and Capsolver:
 swap AsyncTwoCaptchaClient -> AsyncAntiCaptchaClient /
 AsyncCapMonsterClient / AsyncCapsolverClient. Per-provider extras for a
@@ -22,8 +27,9 @@ async def main() -> None:
             "(https://2captcha.com/setting/devcenter)"
         )
 
-    # Public demo values from 2captcha.com/demo/geetest. `challenge` is
-    # dynamic: fetch a fresh one per request (the demo page serves one).
+    # Public demo values from 2captcha.com/demo/geetest. The `challenge`
+    # is single-use: the demo page serves a fresh one per request, so this
+    # static value is illustrative and the solve is expected to fail.
     gt_key = "f3bf6dbdcf7886856696502e1d55e00c"
     challenge = "12345678abc90123d45678ef90123a456b"
     pageurl = "https://2captcha.com/demo/geetest"
