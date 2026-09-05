@@ -165,15 +165,6 @@ FunCaptcha's public demo blob is not worker-solvable; keep those examples
 illustrative with an explicit docstring/README note (`NoSolutionError`
 expected).
 
-## Markdown link checker in CI
-
-Status: new
-Priority: -1
-
-A README/docs link checker job; cheap, but decide scope (README only vs
-spec/docs too) and whether broken-link tolerance is needed for external
-URLs.
-
 ## Report commit-hash traceability
 
 Status: new
