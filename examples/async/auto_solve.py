@@ -10,7 +10,7 @@ import asyncio
 import os
 import sys
 
-from unicaptcha import AsyncSolver
+from unicaptcha import AsyncSolver, detect
 from unicaptcha.provider.twocaptcha import TwoCaptchaAdapter
 
 # Public 2Captcha demo page (reCAPTCHA v2), as static HTML source.
@@ -28,6 +28,9 @@ async def main() -> None:
             "Set UNICAPTCHA_TWOCAPTCHA_API_KEY to your 2Captcha API key "
             "(https://2captcha.com/setting/devcenter)"
         )
+
+    for found in detect(HTML, PAGE_URL):
+        print("detected:", found.kind, found.signals)
 
     async with AsyncSolver(adapters=[TwoCaptchaAdapter(api_key)]) as client:
         auto = await client.auto_solve(HTML, PAGE_URL)
