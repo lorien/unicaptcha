@@ -44,7 +44,10 @@ There is no roll-up file: the set of still-open items is derived from the
 reports themselves, e.g.
 `grep -rn "\[open\]|\[needs-decision\]" spec/report/`.
 
-Traceability: markers carry no commit hashes. The resolution commit of an
-item is found via `git blame` on the marker line, or `git log -S
-"<marker phrase>" -- <report>` (pickaxe) for the commit that changed an
-item's text.
+Traceability: markers never carry commit hashes — a report is committed
+atomically with the work it documents, so it cannot cite its own
+implementation hash. Own-work traceability is via `git blame` on the
+marker line, or `git log -S "<marker phrase>" -- <report>` (pickaxe) for
+the commit that changed an item's text. Reports may cite the commit
+hashes of *already-existing* prior work in prose (e.g. "commit
+`2c31a47`") when referencing another task's implementation.

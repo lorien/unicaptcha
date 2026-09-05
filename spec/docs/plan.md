@@ -152,14 +152,6 @@ Universal-tier `solve` returns `TaskResult[Any]` statically (runtime fully
 typed). Add the nine-kind overload set if universal precision is wanted;
 facades already type precisely.
 
-## Report commit-hash traceability
-
-Status: new
-Priority: -1
-
-Whether session/task reports should cite commit hashes for traceability
-(undecided; currently reports cite task names and dates only).
-
 ## Register project soft_ids for Anti-Captcha and CapMonster Cloud
 
 Status: new
