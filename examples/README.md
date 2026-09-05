@@ -33,6 +33,7 @@ hCaptcha/Arkose test keys), so the scripts run as-is once the key is set.
 | File (sync/ + async/) | Shows |
 |---|---|
 | `universal_client.py` | `Solver`/`AsyncSolver` multi-adapter dispatch |
+| `auto_solve.py` | detect + auto-solve a page's captcha (`AutoSolveResult` / `fill`) |
 | `image.py` | image captcha from `bytes` (uses `images/captcha.png`) |
 | `text.py` | text question captcha |
 | `recaptcha_v2.py` | reCAPTCHA v2 token |

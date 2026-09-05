@@ -78,6 +78,7 @@ def test_sync_async_mirrors_match() -> None:
     assert sync == async_names, "sync/ and async/ examples must mirror 1:1"
     expected = {
         "aux_ops.py",
+        "auto_solve.py",
         "errors.py",
         "events.py",
         "funcaptcha.py",
@@ -108,6 +109,7 @@ SOLUTION = {
     "image.py": {"text": "demo-answer"},
     "text.py": {"text": "demo-answer"},
     "universal_client.py": {"text": "demo-answer"},
+    "auto_solve.py": {"gRecaptchaResponse": "auto-token"},
     "proxy.py": {"text": "demo-answer"},
     "two_phase.py": {"text": "demo-answer"},
     "aux_ops.py": {"text": "demo-answer"},
@@ -133,6 +135,7 @@ EXPECTED_OUTPUT = {
     "image.py": "solved:",
     "text.py": "solved:",
     "universal_client.py": "solved:",
+    "auto_solve.py": "token:",
     "proxy.py": "solved:",
     "two_phase.py": "solved:",
     "aux_ops.py": "reported good",
