@@ -26,6 +26,7 @@ from unicaptcha.challenge.geetest import GeeTestV3Challenge, GeeTestV4Challenge
 from unicaptcha.challenge.hcaptcha import HCaptchaChallenge
 from unicaptcha.challenge.recaptcha_v2 import RecaptchaV2Challenge
 from unicaptcha.challenge.recaptcha_v3 import RecaptchaV3Challenge
+from unicaptcha.challenge.tags import TAG_KINDS
 from unicaptcha.challenge.turnstile import TurnstileChallenge
 from unicaptcha.errors import InvalidChallengeError
 from unicaptcha.solution.base import BaseSolution
@@ -75,8 +76,8 @@ class AutoSolveResult:
 
 def _build_challenge(signal: Signal, pageurl: str) -> BaseChallenge | None:
     fields = signal.fields
-    kind = signal.kind
-    if kind == "recaptcha-v2":
+    base = TAG_KINDS.get(signal.kind)
+    if base is RecaptchaV2Challenge:
         sitekey = fields.get("sitekey")
         if not sitekey:
             return None
@@ -85,7 +86,7 @@ def _build_challenge(signal: Signal, pageurl: str) -> BaseChallenge | None:
             pageurl=pageurl,
             invisible=fields.get("invisible") == "1",
         )
-    if kind == "recaptcha-v3":
+    if base is RecaptchaV3Challenge:
         sitekey = fields.get("sitekey")
         if not sitekey:
             return None
@@ -94,7 +95,7 @@ def _build_challenge(signal: Signal, pageurl: str) -> BaseChallenge | None:
             pageurl=pageurl,
             action=fields.get("action"),
         )
-    if kind == "hcaptcha":
+    if base is HCaptchaChallenge:
         sitekey = fields.get("sitekey")
         if not sitekey:
             return None
@@ -104,7 +105,7 @@ def _build_challenge(signal: Signal, pageurl: str) -> BaseChallenge | None:
             is_invisible=fields.get("is_invisible") == "1",
             rqdata=fields.get("rqdata"),
         )
-    if kind == "turnstile":
+    if base is TurnstileChallenge:
         sitekey = fields.get("sitekey")
         if not sitekey:
             return None
@@ -115,18 +116,18 @@ def _build_challenge(signal: Signal, pageurl: str) -> BaseChallenge | None:
             c_data=fields.get("c_data"),
             chl_page_data=fields.get("chl_page_data"),
         )
-    if kind == "funcaptcha":
+    if base is FunCaptchaChallenge:
         public_key = fields.get("public_key")
         if not public_key:
             return None
         return FunCaptchaChallenge(public_key=public_key, pageurl=pageurl)
-    if kind == "geetest-v3":
+    if base is GeeTestV3Challenge:
         gt_key = fields.get("gt_key")
         challenge = fields.get("challenge")
         if not gt_key or not challenge:
             return None
         return GeeTestV3Challenge(gt_key=gt_key, challenge=challenge, pageurl=pageurl)
-    if kind == "geetest-v4":
+    if base is GeeTestV4Challenge:
         captcha_id = fields.get("captcha_id")
         if not captcha_id:
             return None

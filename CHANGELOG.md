@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   illustrative: the GeeTest v3 demo `challenge` is single-use and
   Arkose's public demo blob is not worker-solvable, so those solves are
   expected to end in `NoSolutionError`.
+- Capability introspection: `Solver`/`AsyncSolver` gain `supports(kind)`,
+  `providers_supporting(kind)`, and `supported_kinds()` so callers can
+  ask which providers cover a challenge kind without probing via
+  `solve()`. Kinds are addressed by kind-base class or the new public
+  tag strings in `KIND_TAGS`/`TAG_KINDS` (the same tags
+  `unicaptcha.detect` reports).
 
 ### Changed
 

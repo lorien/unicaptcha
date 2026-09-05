@@ -76,14 +76,6 @@ Priority: -1
 Fake clients / canned results / failure injection for downstream test
 suites. Defer until the core API survives real usage.
 
-## Capability introspection API
-
-Status: new
-Priority: -1
-
-`client.supports(...)` / `providers_supporting(...)` and challenge-kind
-tags. v1: probe by calling, catch exceptions.
-
 ## Client usage statistics
 
 Status: new

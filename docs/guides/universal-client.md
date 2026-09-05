@@ -44,6 +44,28 @@ async with AsyncSolver(adapters=[...]) as client:
     result = await client.solve(RecaptchaV2Challenge(sitekey="...", pageurl="..."))
 ```
 
+## Capability introspection
+
+Ask what the registered adapters can solve without probing (no network):
+
+```python
+client.supports(HCaptchaChallenge)             # bool
+client.supports("hcaptcha")                    # tag string, as from detect()
+client.providers_supporting(TurnstileChallenge)  # ("twocaptcha", "capmonster", ...)
+client.supported_kinds()                       # ("image", "text", "recaptcha-v2", ...)
+```
+
+- `kind` is a kind-base class (`RecaptchaV2Challenge`) or its tag string
+  (`"recaptcha-v2"`); unknown kinds raise `TypeError`.
+- `supports` returns `False` for a valid-but-unsupported kind (never
+  raises); `providers_supporting` returns `()` then.
+- `supported_kinds()` lists the tags covered by at least one registered
+  adapter, in the canonical order of `KIND_TAGS`.
+- All three are synchronous on both `Solver` and `AsyncSolver` — they
+  only read the adapter registry.
+- `KIND_TAGS` / `TAG_KINDS` (exported from `unicaptcha`) map every kind
+  base to its tag and back.
+
 ## Auxiliary operations
 
 The universal client exposes the same aux operations as the facades:

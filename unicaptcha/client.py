@@ -21,9 +21,10 @@ from unicaptcha._internal.engine import TaskEngine
 from unicaptcha._internal.fill import build_fill
 from unicaptcha._internal.handlers import check_sync_handler, emit_async, emit_sync
 from unicaptcha._internal.http import AsyncHttpTransport, HttpTransport
-from unicaptcha._internal.routing import dispatch
+from unicaptcha._internal.routing import dispatch, supports_kind
 from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
+from unicaptcha.challenge.tags import KIND_TAGS, TAG_KINDS
 from unicaptcha.detect import AutoSolveResult, detect
 from unicaptcha.errors import (
     ClientClosedError,
@@ -184,6 +185,49 @@ class Solver:
         if resolved not in self._registry:
             raise TypeError(f"provider {resolved!r} is not registered")
         return resolved
+
+    def _resolve_kind(self, kind: type[BaseChallenge] | str) -> type[BaseChallenge]:
+        """Resolve a kind-base class or tag string to a kind base."""
+        if isinstance(kind, str):
+            resolved = TAG_KINDS.get(kind)
+            if resolved is None:
+                raise TypeError(f"{kind!r} is not a known challenge-kind tag")
+            return resolved
+        if kind not in KIND_TAGS:
+            raise TypeError(f"{kind!r} is not a challenge-kind base")
+        return kind
+
+    # -- introspection ---------------------------------------------------
+
+    def supports(self, kind: type[BaseChallenge] | str) -> bool:
+        """Whether any registered provider supports the challenge kind.
+
+        ``kind`` is a kind-base class (``RecaptchaV2Challenge``) or a tag
+        string (``"recaptcha-v2"``, as returned by ``unicaptcha.detect``).
+        Never raises for a valid-but-unsupported kind; unknown kinds raise
+        ``TypeError``.
+        """
+        resolved = self._resolve_kind(kind)
+        return any(
+            supports_kind(adapter, resolved) for adapter in self._registry.values()
+        )
+
+    def providers_supporting(self, kind: type[BaseChallenge] | str) -> tuple[str, ...]:
+        """The provider names supporting the kind, in registration order."""
+        resolved = self._resolve_kind(kind)
+        return tuple(
+            adapter.provider
+            for adapter in self._registry.values()
+            if supports_kind(adapter, resolved)
+        )
+
+    def supported_kinds(self) -> tuple[str, ...]:
+        """Tags of the kinds covered by at least one registered provider."""
+        return tuple(
+            KIND_TAGS[kind]
+            for kind in KIND_TAGS
+            if any(supports_kind(adapter, kind) for adapter in self._registry.values())
+        )
 
     # -- operations ------------------------------------------------------
 
@@ -374,6 +418,48 @@ class AsyncSolver:
         if resolved not in self._registry:
             raise TypeError(f"provider {resolved!r} is not registered")
         return resolved
+
+    def _resolve_kind(self, kind: type[BaseChallenge] | str) -> type[BaseChallenge]:
+        """Resolve a kind-base class or tag string to a kind base."""
+        if isinstance(kind, str):
+            resolved = TAG_KINDS.get(kind)
+            if resolved is None:
+                raise TypeError(f"{kind!r} is not a known challenge-kind tag")
+            return resolved
+        if kind not in KIND_TAGS:
+            raise TypeError(f"{kind!r} is not a challenge-kind base")
+        return kind
+
+    # -- introspection ---------------------------------------------------
+
+    def supports(self, kind: type[BaseChallenge] | str) -> bool:
+        """Whether any registered provider supports the challenge kind.
+
+        Synchronous even on ``AsyncSolver``: derived purely from the
+        adapter registry, no I/O. ``kind`` is a kind-base class or a tag
+        string; unknown kinds raise ``TypeError``.
+        """
+        resolved = self._resolve_kind(kind)
+        return any(
+            supports_kind(adapter, resolved) for adapter in self._registry.values()
+        )
+
+    def providers_supporting(self, kind: type[BaseChallenge] | str) -> tuple[str, ...]:
+        """The provider names supporting the kind, in registration order."""
+        resolved = self._resolve_kind(kind)
+        return tuple(
+            adapter.provider
+            for adapter in self._registry.values()
+            if supports_kind(adapter, resolved)
+        )
+
+    def supported_kinds(self) -> tuple[str, ...]:
+        """Tags of the kinds covered by at least one registered provider."""
+        return tuple(
+            KIND_TAGS[kind]
+            for kind in KIND_TAGS
+            if any(supports_kind(adapter, kind) for adapter in self._registry.values())
+        )
 
     async def _route(
         self,

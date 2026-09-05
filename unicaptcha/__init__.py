@@ -7,6 +7,8 @@ from unicaptcha.adapter import (
     Endpoints,
 )
 from unicaptcha.challenge import (
+    KIND_TAGS,
+    TAG_KINDS,
     BaseChallenge,
     FunCaptchaChallenge,
     GeeTestV3Challenge,
@@ -68,6 +70,8 @@ from unicaptcha.types import (
 )
 
 __all__ = [
+    "KIND_TAGS",
+    "TAG_KINDS",
     "AntiCaptchaCompatAdapterBase",
     "AsyncSolver",
     "AuthenticationError",

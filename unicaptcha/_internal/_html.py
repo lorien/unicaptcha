@@ -20,6 +20,9 @@ import re
 from dataclasses import dataclass
 from typing import Final
 
+from unicaptcha.challenge.base import BaseChallenge
+from unicaptcha.challenge.tags import KIND_TAGS, TAG_KINDS
+
 __all__ = ["Signal", "scan"]
 
 
@@ -37,13 +40,13 @@ class Signal:
     evidence: str
 
 
-_RECAPTCHA_V2: Final = "recaptcha-v2"
-_RECAPTCHA_V3: Final = "recaptcha-v3"
-_HCAPTCHA: Final = "hcaptcha"
-_TURNSTILE: Final = "turnstile"
-_FUNCAPTCHA: Final = "funcaptcha"
-_GEETEST_V3: Final = "geetest-v3"
-_GEETEST_V4: Final = "geetest-v4"
+_RECAPTCHA_V2: Final = TAG_KINDS["recaptcha-v2"]
+_RECAPTCHA_V3: Final = TAG_KINDS["recaptcha-v3"]
+_HCAPTCHA: Final = TAG_KINDS["hcaptcha"]
+_TURNSTILE: Final = TAG_KINDS["turnstile"]
+_FUNCAPTCHA: Final = TAG_KINDS["funcaptcha"]
+_GEETEST_V3: Final = TAG_KINDS["geetest-v3"]
+_GEETEST_V4: Final = TAG_KINDS["geetest-v4"]
 
 _DIV_CLASSES: Final = {
     "g-recaptcha": _RECAPTCHA_V2,
@@ -103,6 +106,11 @@ def _js_params(body: str) -> dict[str, str]:
     return out
 
 
+def _tag(kind: type[BaseChallenge]) -> str:
+    """Canonical tag string for a challenge kind base (KIND_TAGS)."""
+    return KIND_TAGS[kind]
+
+
 def _element_signal(tag: str, attrs: str) -> Signal | None:
     fields = _parse_attrs(attrs)
     if tag == "div":
@@ -116,7 +124,7 @@ def _element_signal(tag: str, attrs: str) -> Signal | None:
             if kind == _RECAPTCHA_V2:
                 invisible = fields.get("data-size", "") == "invisible"
                 return Signal(
-                    kind,
+                    _tag(kind),
                     {"sitekey": sitekey, "invisible": "1" if invisible else "0"},
                     f'<div class="{token}" data-sitekey="{sitekey}">',
                 )
@@ -129,7 +137,7 @@ def _element_signal(tag: str, attrs: str) -> Signal | None:
                 if fields.get("data-rqdata"):
                     out["rqdata"] = fields["data-rqdata"]
                 return Signal(
-                    kind, out, f'<div class="{token}" data-sitekey="{sitekey}">'
+                    _tag(kind), out, f'<div class="{token}" data-sitekey="{sitekey}">'
                 )
             # Turnstile.
             out = {"sitekey": sitekey}
@@ -140,12 +148,14 @@ def _element_signal(tag: str, attrs: str) -> Signal | None:
             ):
                 if fields.get(attr):
                     out[key] = fields[attr]
-            return Signal(kind, out, f'<div class="{token}" data-sitekey="{sitekey}">')
+            return Signal(
+                _tag(kind), out, f'<div class="{token}" data-sitekey="{sitekey}">'
+            )
     if tag == "iframe":
         public_key = fields.get("data-pkey")
         if public_key:
             return Signal(
-                _FUNCAPTCHA,
+                _tag(_FUNCAPTCHA),
                 {"public_key": public_key},
                 f'<iframe data-pkey="{public_key}">',
             )
@@ -161,7 +171,7 @@ def _js_signal(call: str, body: str) -> Signal | None:
             return None
         invisible = params.get("size") == "invisible"
         return Signal(
-            _RECAPTCHA_V2,
+            _tag(_RECAPTCHA_V2),
             {"sitekey": sitekey, "invisible": "1" if invisible else "0"},
             f"grecaptcha.render(..., {{sitekey: {sitekey!r}}})",
         )
@@ -179,7 +189,7 @@ def _js_signal(call: str, body: str) -> Signal | None:
         if params.get("action"):
             out["action"] = params["action"]
         return Signal(
-            _RECAPTCHA_V3,
+            _tag(_RECAPTCHA_V3),
             out,
             f"grecaptcha.execute({sitekey!r}, {{action: {out.get('action')!r}}})",
         )
@@ -194,7 +204,9 @@ def _js_signal(call: str, body: str) -> Signal | None:
         }
         if params.get("rqdata"):
             out["rqdata"] = params["rqdata"]
-        return Signal(_HCAPTCHA, out, f"hcaptcha.render(..., {{sitekey: {sitekey!r}}})")
+        return Signal(
+            _tag(_HCAPTCHA), out, f"hcaptcha.render(..., {{sitekey: {sitekey!r}}})"
+        )
     if lower.startswith("turnstile.render"):
         params = _js_params(body)
         sitekey = params.get("sitekey")
@@ -205,7 +217,7 @@ def _js_signal(call: str, body: str) -> Signal | None:
             if params.get(key):
                 out[key] = params[key]
         return Signal(
-            _TURNSTILE, out, f"turnstile.render(..., {{sitekey: {sitekey!r}}})"
+            _tag(_TURNSTILE), out, f"turnstile.render(..., {{sitekey: {sitekey!r}}})"
         )
     if lower.startswith("initgeetest4"):
         params = _js_params(body)
@@ -213,7 +225,7 @@ def _js_signal(call: str, body: str) -> Signal | None:
         if not captcha_id:
             return None
         return Signal(
-            _GEETEST_V4,
+            _tag(_GEETEST_V4),
             {"captcha_id": captcha_id},
             f"initGeetest4({{captcha_id: {captcha_id!r}}})",
         )
@@ -224,7 +236,7 @@ def _js_signal(call: str, body: str) -> Signal | None:
         if not gt or not challenge:
             return None
         return Signal(
-            _GEETEST_V3,
+            _tag(_GEETEST_V3),
             {"gt_key": gt, "challenge": challenge},
             f"initGeetest({{gt: {gt!r}, challenge: {challenge!r}}})",
         )

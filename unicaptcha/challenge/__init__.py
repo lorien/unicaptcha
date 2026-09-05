@@ -7,10 +7,13 @@ from unicaptcha.challenge.hcaptcha import HCaptchaChallenge
 from unicaptcha.challenge.image import ImageChallenge
 from unicaptcha.challenge.recaptcha_v2 import RecaptchaV2Challenge
 from unicaptcha.challenge.recaptcha_v3 import RecaptchaV3Challenge
+from unicaptcha.challenge.tags import KIND_TAGS, TAG_KINDS
 from unicaptcha.challenge.text import TextChallenge
 from unicaptcha.challenge.turnstile import TurnstileChallenge
 
 __all__ = [
+    "KIND_TAGS",
+    "TAG_KINDS",
     "BaseChallenge",
     "FunCaptchaChallenge",
     "GeeTestV3Challenge",
