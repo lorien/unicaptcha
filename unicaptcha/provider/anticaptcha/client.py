@@ -166,6 +166,7 @@ class AntiCaptchaClient:
         *,
         base_url: str | None = None,
         referral: bool | str = True,
+        currency: str | None = None,
         name: str | None = None,
         user_agent: str | None = None,
         proxy: Proxy | None = None,
@@ -177,7 +178,9 @@ class AntiCaptchaClient:
         on_event: SyncEventHandler | None = None,
     ) -> None:
         check_sync_handler(on_event, what="AntiCaptchaClient(on_event)")
-        self._adapter = AntiCaptchaAdapter(api_key, base_url, referral=referral)
+        self._adapter = AntiCaptchaAdapter(
+            api_key, base_url, referral=referral, currency=currency
+        )
         self._default_proxy = proxy
         self._on_event = on_event
         self._closed = False
@@ -620,6 +623,7 @@ class AsyncAntiCaptchaClient:
         *,
         base_url: str | None = None,
         referral: bool | str = True,
+        currency: str | None = None,
         name: str | None = None,
         user_agent: str | None = None,
         proxy: Proxy | None = None,
@@ -630,7 +634,9 @@ class AsyncAntiCaptchaClient:
         network_client: httpx.AsyncClient | None = None,
         on_event: AsyncEventHandler | None = None,
     ) -> None:
-        self._adapter = AntiCaptchaAdapter(api_key, base_url, referral=referral)
+        self._adapter = AntiCaptchaAdapter(
+            api_key, base_url, referral=referral, currency=currency
+        )
         self._default_proxy = proxy
         self._on_event = on_event
         self._closed = False

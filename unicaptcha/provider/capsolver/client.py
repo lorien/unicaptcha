@@ -161,6 +161,7 @@ class CapsolverClient:
         *,
         base_url: str | None = None,
         referral: bool | str = True,
+        currency: str | None = None,
         name: str | None = None,
         user_agent: str | None = None,
         proxy: Proxy | None = None,
@@ -172,7 +173,9 @@ class CapsolverClient:
         on_event: SyncEventHandler | None = None,
     ) -> None:
         check_sync_handler(on_event, what="CapsolverClient(on_event)")
-        self._adapter = CapsolverAdapter(api_key, base_url, referral=referral)
+        self._adapter = CapsolverAdapter(
+            api_key, base_url, referral=referral, currency=currency
+        )
         self._default_proxy = proxy
         self._on_event = on_event
         self._closed = False
@@ -549,6 +552,7 @@ class AsyncCapsolverClient:
         *,
         base_url: str | None = None,
         referral: bool | str = True,
+        currency: str | None = None,
         name: str | None = None,
         user_agent: str | None = None,
         proxy: Proxy | None = None,
@@ -559,7 +563,9 @@ class AsyncCapsolverClient:
         network_client: httpx.AsyncClient | None = None,
         on_event: AsyncEventHandler | None = None,
     ) -> None:
-        self._adapter = CapsolverAdapter(api_key, base_url, referral=referral)
+        self._adapter = CapsolverAdapter(
+            api_key, base_url, referral=referral, currency=currency
+        )
         self._default_proxy = proxy
         self._on_event = on_event
         self._closed = False

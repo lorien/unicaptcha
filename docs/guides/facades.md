@@ -67,7 +67,10 @@ operations shared with the universal client (`get_balance`,
 `get_abandoned_tasks`).
 
 On facades, `get_task_status`/`report_*` take a task id (`int | str`)
-rather than a `TaskRef`; `get_balance` takes no argument.
+rather than a `TaskRef`; `get_balance` takes no argument and returns a
+`Money` in the adapter's currency. Facade constructors forward the
+`base_url`, `referral`, and `currency` adapter kwargs (currency defaults
+to the service host — see the [Universal client](universal-client.md)).
 
 ## Reference
 

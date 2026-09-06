@@ -143,7 +143,7 @@ Each provider package exports `<Provider>Client` and `Async<Provider>Client`
 (`TwoCaptchaClient`, `AntiCaptchaClient`, `CapMonsterClient`,
 `CapsolverClient`, and their async counterparts). Facade constructors take
 `api_key` positionally and otherwise mirror `Solver` minus `adapters`
-(`base_url`, `referral`, `proxy`, `time`, `retry`, `network`, `on_event`).
+(`base_url`, `referral`, `currency`, `proxy`, `time`, `retry`, `network`, `on_event`).
 
 ### Two-phase batch
 

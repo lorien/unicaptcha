@@ -1,5 +1,10 @@
 """Auxiliary operations: balance, task status, good/bad reports.
 
+Money values carry their currency: `get_balance()` returns a `Money`,
+and the facade forwards a `currency=` override (the default follows the
+`base_url` host — `api.rucaptcha.com` bills in RUB, everything else
+USD).
+
 Works identically with Anti-Captcha, CapMonster Cloud, and Capsolver:
 swap TwoCaptchaClient -> AntiCaptchaClient / CapMonsterClient /
 CapsolverClient. Per-provider extras for a given kind are documented in
@@ -23,7 +28,9 @@ if __name__ == "__main__":
     image = Path(__file__).resolve().parent.parent / "images" / "captcha.png"
 
     with TwoCaptchaClient(api_key) as client:
-        print("balance:", client.get_balance())
+        balance = client.get_balance()
+        print("balance:", balance)
+        print("balance amount:", balance.amount, "currency:", balance.currency)
 
         ticket = client.submit(TwoCaptchaImageChallenge(image))
         status = client.get_task_status(ticket.task_ref)
@@ -31,6 +38,7 @@ if __name__ == "__main__":
 
         result = client.wait(ticket)
         print("solved:", result.solution.text)
+        print("cost:", result.cost)
 
         if client.report_good_result(result.task_ref):
             print("reported good")

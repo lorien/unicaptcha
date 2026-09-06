@@ -85,6 +85,8 @@ with Solver(
 
 stats = collector.snapshot()
 print(stats.solved, stats.failed, stats.per_provider)
+print(stats.cost_totals)  # {"USD": Decimal("0.00025"), ...} — per currency
+print(stats.per_provider["twocaptcha"].cost, stats.per_provider["twocaptcha"].currency)
 ```
 
 - `snapshot()` returns an immutable `UsageStats` (`solved`, `failed`,
