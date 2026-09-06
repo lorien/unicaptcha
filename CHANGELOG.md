@@ -27,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `solve()`. Kinds are addressed by kind-base class or the new public
   tag strings in `KIND_TAGS`/`TAG_KINDS` (the same tags
   `unicaptcha.detect` reports).
+- `StatsCollector`: a synchronous `on_event` handler that tallies
+  cumulative solved/failed tasks and elapsed time per provider into an
+  immutable `UsageStats` snapshot (`solved`, `failed`, `elapsed`,
+  `per_provider`). Cost totals are deferred until currency handling is
+  decided.
 
 ### Changed
 

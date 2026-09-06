@@ -53,6 +53,7 @@ from unicaptcha.solution import (
     TextSolution,
     TurnstileSolution,
 )
+from unicaptcha.stats import ProviderUsage, StatsCollector, UsageStats
 from unicaptcha.types import (
     NetworkConfig,
     ParsedTask,
@@ -103,6 +104,7 @@ __all__ = [
     "NoSolutionError",
     "ParsedTask",
     "ProviderError",
+    "ProviderUsage",
     "Proxy",
     "ProxyKind",
     "RateLimitError",
@@ -114,6 +116,7 @@ __all__ = [
     "SecretStr",
     "ServiceBusyError",
     "Solver",
+    "StatsCollector",
     "SubmitAccepted",
     "TaskEvent",
     "TaskEventKind",
@@ -130,6 +133,7 @@ __all__ = [
     "TurnstileSolution",
     "UnicaptchaError",
     "UnsupportedChallengeError",
+    "UsageStats",
     "__version__",
     "detect",
 ]

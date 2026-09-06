@@ -59,5 +59,6 @@ nav:
       - Types: api/types.md
       - Errors: api/errors.md
       - Events: api/events.md
+      - Statistics: api/stats.md
       - Adapter SDK: api/adapter.md
       - Providers: api/providers.md

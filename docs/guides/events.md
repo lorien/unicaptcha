@@ -66,3 +66,35 @@ assert "RESULT_RECEIVED" in seen
 ## Reference
 
 - [`TaskEvent`, `TaskEventKind`](../api/events.md)
+
+## Usage statistics
+
+A `StatsCollector` turns the same `on_event` stream into cumulative
+solve/failure counters and elapsed time, per provider — no client state:
+
+```python
+from unicaptcha import Solver, StatsCollector
+from unicaptcha.provider.twocaptcha import TwoCaptchaAdapter
+
+collector = StatsCollector()
+with Solver(
+    adapters=[TwoCaptchaAdapter("YOUR_API_KEY")],
+    on_event=collector.on_event,
+) as client:
+    client.solve_image(b"captcha.png")
+
+stats = collector.snapshot()
+print(stats.solved, stats.failed, stats.per_provider)
+```
+
+- `snapshot()` returns an immutable `UsageStats` (`solved`, `failed`,
+  `elapsed`, and a `per_provider` breakdown); `reset()` zeroes it.
+- The collector is synchronous, so the same handler works with
+  `AsyncSolver` / `Async…Client`.
+- Classification follows the terminal events: `RESULT_RECEIVED` counts
+  as solved; `PRE_FLIGHT_FAILED` / `SUBMIT_FAILED` / `RESULT_FAILED`
+  count as failed.
+- Cost totals are intentionally **not** included (currency handling is
+  undecided); this collector counts solves, failures, and time.
+
+See [`StatsCollector`, `UsageStats`](../api/stats.md).
