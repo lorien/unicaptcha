@@ -1,5 +1,9 @@
 """Solve an image captcha with the universal multi-provider client.
 
+Also shows capability introspection: `supports`, `providers_supporting`,
+and `supported_kinds` ask which registered adapters cover a challenge
+kind without probing via `solve()`.
+
 Works identically with Anti-Captcha, CapMonster Cloud, and Capsolver:
 swap TwoCaptchaAdapter -> AntiCaptchaAdapter / CapMonsterAdapter /
 CapsolverAdapter. Per-provider extras for a given kind are documented in
@@ -22,6 +26,12 @@ if __name__ == "__main__":
         )
 
     client = Solver(adapters=[TwoCaptchaAdapter(api_key)])
+
+    # Capability introspection: registry-only, no network.
+    print("supports image:", client.supports(ImageChallenge))
+    print("supports hcaptcha:", client.supports("hcaptcha"))
+    print("providers for image:", client.providers_supporting(ImageChallenge))
+    print("all supported kinds:", client.supported_kinds())
 
     # Any path or bytes works; the value is normalized to bytes at construction.
     image = Path(__file__).resolve().parent.parent / "images" / "captcha.png"

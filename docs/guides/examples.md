@@ -36,7 +36,7 @@ key is set.
 
 | File (sync/ + async/) | Shows |
 |---|---|
-| `universal_client.py` | `Solver`/`AsyncSolver` multi-adapter dispatch |
+| `universal_client.py` | `Solver`/`AsyncSolver` multi-adapter dispatch + capability introspection |
 | `auto_solve.py` | detect + auto-solve a page's captcha (`AutoSolveResult` / `fill`) |
 | `image.py` | image captcha from `bytes` (uses `images/captcha.png`) |
 | `text.py` | text question captcha |

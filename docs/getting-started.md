@@ -75,6 +75,7 @@ tokens, `challenge/validate/seccode` for GeeTest v3, and so on.
 ## Next steps
 
 - [Universal client](guides/universal-client.md)
+- [Auto solve](guides/auto-solve.md)
 - [Provider facades](guides/facades.md)
 - [Configuration](guides/configuration.md)
 - [Errors](guides/errors.md)

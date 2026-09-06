@@ -76,6 +76,44 @@ every provider shares; the concrete provider classes
 - Image bodies accept `bytes` or a `Path`; the value is normalized to bytes
   at construction.
 
+### Capability introspection
+
+Ask which registered adapters cover a challenge kind — no probing, no
+network:
+
+```python
+client.supports(HCaptchaChallenge)              # bool
+client.providers_supporting(TurnstileChallenge) # ("twocaptcha", ...)
+client.supported_kinds()                        # ("image", "text", ...)
+```
+
+`kind` is a kind-base class (`RecaptchaV2Challenge`) or its tag string
+(`"recaptcha-v2"`); `KIND_TAGS` / `TAG_KINDS` map between them. These
+methods are synchronous on both `Solver` and `AsyncSolver`.
+
+### Auto solve
+
+Point the library at a page's HTML and it detects and solves the captcha
+for you:
+
+```python
+from unicaptcha import Solver, detect
+from unicaptcha.provider.twocaptcha import TwoCaptchaAdapter
+
+html = open("signup.html").read()
+
+for found in detect(html, "https://example.com/signup"):
+    print(found.kind, found.signals)          # what the page uses
+
+with Solver([TwoCaptchaAdapter("YOUR_API_KEY")]) as client:
+    auto = client.auto_solve(html, "https://example.com/signup")
+    token = auto.fill["#g-recaptcha-response"]   # inject into the live page
+```
+
+`auto_solve` solves the first detected captcha and returns an
+`AutoSolveResult` whose `fill` maps DOM selectors to the solved values.
+See the [auto-solve guide](https://lorien.github.io/unicaptcha/guides/auto-solve/).
+
 ### Provider facades
 
 For a single provider, a facade client offers one convenience method per
@@ -149,8 +187,8 @@ Pass `on_event=` at construction or per call to observe the task lifecycle
 ## Examples
 
 Runnable scripts, one per use case in `examples/sync/` and `examples/async/`:
-every captcha kind, two-phase batch, aux ops, events, errors, proxy.
-See [examples/README.md](examples/README.md).
+every captcha kind, two-phase batch, aux ops, events, errors, proxy,
+auto-solve. See [examples/README.md](examples/README.md).
 
 ## Custom providers
 
