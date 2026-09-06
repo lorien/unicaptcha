@@ -16,6 +16,7 @@ from unicaptcha import (
     AsyncSolver,
     ClientClosedError,
     ImageChallenge,
+    Money,
     Proxy,
     RecaptchaV2Challenge,
     RetryConfig,
@@ -85,7 +86,7 @@ class EchoAdapter(BaseAdapter):
             instant = ParsedTask(
                 state=TaskStatus.READY,
                 solution=FakeSolution(),
-                cost=Decimal("0.001"),
+                cost=Money(Decimal("0.001"), "USD"),
                 raw=raw,
             )
         return SubmitAccepted(task_id=data["taskId"], instant_answer=instant)
@@ -97,7 +98,7 @@ class EchoAdapter(BaseAdapter):
             return ParsedTask(
                 state=TaskStatus.READY,
                 solution=FakeSolution(),
-                cost=Decimal("0.001"),
+                cost=Money(Decimal("0.001"), "USD"),
                 raw=raw,
             )
         if status == "unsolvable":

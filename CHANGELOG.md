@@ -35,6 +35,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking (currency-aware costs, ADR-0040):** money now carries its
+  currency. New public `Money(amount, currency)` type; `get_balance()`
+  and `result.cost` return `Money` instead of a bare `Decimal`. The
+  adapter resolves a per-service default from its `base_url` host
+  (2Captcha / Anti-Captcha / CapMonster / Capsolver → USD; the RuCaptcha
+  mirror `api.rucaptcha.com` → RUB), overridable with `currency=`. The
+  provider wire returns bare numbers — the library never parses currency
+  or converts. `StatsCollector` now totals cost per provider and per
+  currency (`UsageStats.cost_totals`), never mixing currencies.
 - 2Captcha/RuCaptcha solves now embed the project's registered `soft_id`
   (5859) by default (ADR-0072): the provider pays the project a small
   commission per solve. Pass `referral=False` to disable it, or

@@ -70,8 +70,15 @@ client.supported_kinds()                       # ("image", "text", "recaptcha-v2
 
 The universal client exposes the same aux operations as the facades:
 
-- `get_balance(provider)` → `Decimal` balance in USD. `provider` may be
-  a string, adapter instance, or adapter class.
+- `get_balance(provider)` → `Money` balance in the provider's currency.
+  `provider` may be a string, adapter instance, or adapter class.
+
+Money (`result.cost`, `get_balance()`) carries its currency: the adapter
+resolves a per-service default from its `base_url` host (2Captcha and
+Anti-Captcha/CapMonster/Capsolver → USD; the RuCaptcha mirror
+`api.rucaptcha.com` → RUB), overridable with `currency=` on the adapter
+constructor. The provider wire returns bare numbers; the library never
+parses currency or converts between them.
 - `get_task_status(ref)` → one-shot status for a `TaskRef`.
 - `report_bad_result(ref)` / `report_good_result(ref)` → `bool`
   (coverage varies by provider).

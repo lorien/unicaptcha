@@ -86,7 +86,7 @@ from unicaptcha.provider.twocaptcha import (
     TwoCaptchaTextChallenge,
     TwoCaptchaTurnstileChallenge,
 )
-from unicaptcha.types import Proxy, TaskRef, TaskStatus
+from unicaptcha.types import Money, Proxy, TaskRef, TaskStatus
 
 
 def _j(**data: object) -> bytes:
@@ -1037,7 +1037,7 @@ def test_solve_submit_then_poll_wire_round_trip(fast_time, fast_retry) -> None:
     assert result.task_id == 99
     assert result.provider == "twocaptcha"
     assert result.solution.text == "hello"
-    assert result.cost == Decimal("0.00025")
+    assert result.cost == Money(Decimal("0.00025"), "USD")
 
 
 def test_instant_answer_fast_path_no_poll(fast_time, fast_retry) -> None:
@@ -1172,7 +1172,7 @@ def test_get_balance_wire() -> None:
         request = route.calls.last.request
         assert str(request.url) == "https://api.2captcha.com/getBalance"
         assert _body(request) == {"clientKey": "test-key"}
-    assert balance == Decimal("7.5")
+    assert balance == Money(Decimal("7.5"), "USD")
 
 
 def test_report_bad_good_wire_round_trip() -> None:

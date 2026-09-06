@@ -56,7 +56,7 @@ backoff, total-time budgets, error normalization, and events.
 
 2Captcha-protocol mirrors such as RuCaptcha work by overriding the base
 URL (RuCaptcha's JSON API v2 is verified complete):
-`TwoCaptchaClient(api_key=..., base_url="https://rucaptcha.com")`.
+`TwoCaptchaClient(api_key=..., base_url="https://api.rucaptcha.com")`.
 
 ## Supported CAPTCHA kinds
 

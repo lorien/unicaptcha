@@ -7,6 +7,7 @@ and that it never touches ``unicaptcha._internal``.
 
 import ast
 import json
+from decimal import Decimal
 from pathlib import Path
 
 import httpx
@@ -21,7 +22,7 @@ from _myservice import (
 
 from unicaptcha import AsyncSolver, Solver
 from unicaptcha.errors import AuthenticationError
-from unicaptcha.types import TaskRef, TaskStatus
+from unicaptcha.types import Money, TaskRef, TaskStatus
 
 BASE = "https://myservice.example"
 CREATE = f"{BASE}/createTask"
@@ -205,7 +206,7 @@ def test_aux_ops_balance_status_reports(fast_time, fast_retry) -> None:
         retry=fast_retry,
     ) as solver:
         balance = solver.get_balance("myservice")
-        assert balance == 7.5 or str(balance) == "7.5"
+        assert balance == Money(Decimal("7.5"), "USD")
         status = solver.get_task_status(TaskRef("myservice", 5))
         assert status.status is TaskStatus.READY
         assert solver.report_bad_result(TaskRef("myservice", 5)) is True

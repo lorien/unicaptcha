@@ -16,6 +16,7 @@ from unicaptcha import (
     ClientClosedError,
     ErrorKind,
     InvalidChallengeError,
+    Money,
     NoCaptchaDetectedError,
     Solver,
 )
@@ -128,7 +129,7 @@ class TestSyncAutoSolve:
         assert isinstance(auto.result.solution, TwoCaptchaRecaptchaV2Solution)
         assert auto.fill == {"#g-recaptcha-response": "03AGdBq7solved-token"}
         assert auto.result.task_ref == TaskRef("twocaptcha", 99)
-        assert auto.result.cost == Decimal("0.00025")
+        assert auto.result.cost == Money(Decimal("0.00025"), "USD")
 
     def test_no_detection_raises(self) -> None:
         with (

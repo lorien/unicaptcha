@@ -1,6 +1,6 @@
 # ADR-0040: Lenient parsing and USD-pinned balance
 
-**Status:** Accepted (currency verification note added 2026-08-23; `EmptySolutionError` amendment added 2026-08-23; required-fields amendment added 2026-08-23)
+**Status:** Accepted (currency verification note added 2026-08-23; `EmptySolutionError` amendment added 2026-08-23; required-fields amendment added 2026-08-23; currency-aware costs amendment added 2026-09-06)
 **Date:** 2026-08-23
 
 ## Context
@@ -46,6 +46,20 @@ all three services bill in USD.
   document that provider's actual currency, and revisit the pin
   (candidate shapes: per-provider documented currency, or
   `tuple[Decimal, str]`).
+- **Currency-aware costs amendment (2026-09-06)**: the verification note
+  is resolved. The provider wire returns bare numbers only (no currency
+  code), so currency is never parsed — it is declared. Money surfaces
+  (`get_balance()`, `TaskResult.cost`, `TaskEvent.cost`,
+  `TaskStatusResult.cost`) use the public `Money(amount, currency)`
+  value type; adapters resolve a per-service default from their
+  `base_url` host (2Captcha / Anti-Captcha / CapMonster / Capsolver →
+  USD; the RuCaptcha mirror `api.rucaptcha.com` → RUB), overridable with
+  a `currency=` adapter kwarg. No conversion, no exchange rates. The
+  usage-statistics collector totals cost per provider (one currency per
+  adapter instance) and per currency (`UsageStats.cost_totals`) — never
+  a blind cross-currency sum. The parse layer (`parse_balance`,
+  `_decimal`) stays `Decimal`; `Money` is assembled where the currency is
+  known.
 
 ## Rationale
 

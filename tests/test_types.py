@@ -5,7 +5,7 @@ from decimal import Decimal
 import pytest
 from _fake import FakeSolution
 
-from unicaptcha import TaskRef, TaskResult, TaskStatus, TaskStatusResult
+from unicaptcha import Money, TaskRef, TaskResult, TaskStatus, TaskStatusResult
 from unicaptcha.types import ParsedTask, SubmitAccepted, TaskTicket
 
 
@@ -13,7 +13,7 @@ def _result(*, raw: bytes = b'{"status":"ready"}') -> TaskResult[FakeSolution]:
     return TaskResult(
         solution=FakeSolution(),
         task_id=12345,
-        cost=Decimal("0.00095"),
+        cost=Money(Decimal("0.00095"), "USD"),
         raw=raw,
         provider="twocaptcha",
         created_at=datetime(2026, 8, 26, 12, 0, 0, tzinfo=UTC),
@@ -39,7 +39,7 @@ class TestTaskResult:
         r = _result()
         assert r.solution == FakeSolution()
         assert r.task_id == 12345
-        assert r.cost == Decimal("0.00095")
+        assert r.cost == Money(Decimal("0.00095"), "USD")
         assert r.raw == b'{"status":"ready"}'
         assert r.provider == "twocaptcha"
         assert r.created_at.tzinfo is not None
@@ -73,7 +73,7 @@ class TestTaskStatusResult:
             provider="twocaptcha",
             status=TaskStatus.READY,
             solution=FakeSolution(),
-            cost=Decimal("0.001"),
+            cost=Money(Decimal("0.001"), "USD"),
             raw=b'{"status":"ready"}',
         )
         assert isinstance(s.solution, FakeSolution)
@@ -114,7 +114,7 @@ class TestTaskTicket:
         parsed = ParsedTask(
             state=TaskStatus.READY,
             solution=FakeSolution(),
-            cost=Decimal("0.001"),
+            cost=Money(Decimal("0.001"), "USD"),
             raw=b'{"status":"ready"}',
         )
         t = TaskTicket(
@@ -145,7 +145,7 @@ class TestParsedTaskAndSubmitAccepted:
         p = ParsedTask(
             state=TaskStatus.READY,
             solution=FakeSolution(),
-            cost=Decimal("0.001"),
+            cost=Money(Decimal("0.001"), "USD"),
             raw=b"body",
         )
         s = SubmitAccepted(task_id=42, instant_answer=p)

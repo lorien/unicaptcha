@@ -11,7 +11,7 @@ from unicaptcha.adapter import BaseAdapter
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import ErrorKind, error_from_kind
 from unicaptcha.solution.base import BaseSolution
-from unicaptcha.types import ParsedTask, SubmitAccepted, TaskRef, TaskStatus
+from unicaptcha.types import Money, ParsedTask, SubmitAccepted, TaskRef, TaskStatus
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,7 +93,7 @@ class StubAdapter(BaseAdapter):
             instant = ParsedTask(
                 state=TaskStatus.READY,
                 solution=FakeSolution("tok1234"),
-                cost=Decimal("0.001"),
+                cost=Money(Decimal("0.001"), "USD"),
                 raw=raw,
             )
         return SubmitAccepted(task_id=data["taskId"], instant_answer=instant)
@@ -105,7 +105,7 @@ class StubAdapter(BaseAdapter):
             return ParsedTask(
                 state=TaskStatus.READY,
                 solution=FakeSolution("tok1234"),
-                cost=Decimal("0.001"),
+                cost=Money(Decimal("0.001"), "USD"),
                 raw=raw,
             )
         if status == "unsolvable":

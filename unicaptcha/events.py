@@ -15,6 +15,7 @@ from datetime import timedelta
 from enum import Enum
 
 from unicaptcha.errors import ErrorKind
+from unicaptcha.types import Money
 
 
 class TaskEventKind(Enum):
@@ -36,7 +37,9 @@ class TaskEvent:
     ``error_kind`` is set only on the terminal failure kinds (see the
     per-kind matrix in ADR-0018); it is ``None`` on in-progress and success
     kinds, and ``None`` on ``PRE_FLIGHT_FAILED`` caused by a wrong-provider
-    ``TypeError``. ``detail`` never carries credentials.
+    ``TypeError``. ``cost`` is set only on ``RESULT_RECEIVED`` (the solved
+    task's price in the adapter's currency); it is ``None`` elsewhere.
+    ``detail`` never carries credentials.
     """
 
     kind: TaskEventKind
@@ -46,6 +49,7 @@ class TaskEvent:
     task_id: int | str | None = None
     detail: str | None = None
     error_kind: ErrorKind | None = None
+    cost: Money | None = None
 
 
 SyncEventHandler = Callable[[TaskEvent], None]

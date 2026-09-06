@@ -9,7 +9,6 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
-from decimal import Decimal
 from typing import Any, Generic, TypeVar, cast
 
 from unicaptcha._internal.backoff import backoff_sleep
@@ -41,6 +40,7 @@ from unicaptcha.errors import (
 from unicaptcha.events import AsyncEventHandler, TaskEvent, TaskEventKind
 from unicaptcha.solution.base import BaseSolution
 from unicaptcha.types import (
+    Money,
     ParsedTask,
     RetryConfig,
     TaskRef,
@@ -111,6 +111,7 @@ class AsyncTaskEngine(Generic[_T]):
         attempt: int = 1,
         detail: str | None = None,
         error_kind: ErrorKind | None = None,
+        cost: Money | None = None,
     ) -> TaskEvent:
         return TaskEvent(
             kind=kind,
@@ -120,6 +121,7 @@ class AsyncTaskEngine(Generic[_T]):
             task_id=task_id,
             detail=detail,
             error_kind=error_kind,
+            cost=cost,
         )
 
     # -- submit ---------------------------------------------------------
@@ -310,6 +312,7 @@ class AsyncTaskEngine(Generic[_T]):
                     adapter.provider,
                     start,
                     task_id=ticket.task_ref.task_id,
+                    cost=ticket.instant_answer.cost,
                 ),
             )
             return result
@@ -385,6 +388,7 @@ class AsyncTaskEngine(Generic[_T]):
                         start,
                         task_id=ticket.task_ref.task_id,
                         attempt=attempt,
+                        cost=parsed.cost,
                     ),
                 )
                 return result
@@ -492,14 +496,15 @@ class AsyncTaskEngine(Generic[_T]):
             self._registry.remove(ref)
         return self._status_result(ref, parsed)
 
-    async def get_balance(self, adapter: BaseAdapter) -> Decimal:
+    async def get_balance(self, adapter: BaseAdapter) -> Money:
         self._check_open()
         retry_cfg = resolve_retry(self._client_retry, None)
         url = join_url(adapter.base_url, adapter.endpoints.get_balance)
         payload = adapter.build_balance()
-        return await self._post_retried(
+        amount = await self._post_retried(
             adapter, url, payload, retry_cfg, None, 0.0, adapter.parse_balance
         )
+        return Money(amount=amount, currency=adapter.currency)
 
     async def report_bad_result(self, adapter: BaseAdapter, ref: TaskRef) -> bool:
         self._check_open()

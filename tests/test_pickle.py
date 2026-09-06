@@ -5,6 +5,7 @@ from decimal import Decimal
 from _fake import FakeSolution
 
 from unicaptcha import (
+    Money,
     TaskRef,
     TaskResult,
     TaskStatus,
@@ -31,7 +32,7 @@ class TestPickleRoundTrips:
         r = TaskResult(
             solution=FakeSolution(),
             task_id=1,
-            cost=Decimal("0.001"),
+            cost=Money(Decimal("0.001"), "USD"),
             raw=b"body",
             provider="twocaptcha",
             created_at=datetime(2026, 8, 26, 12, 0, 0, tzinfo=UTC),

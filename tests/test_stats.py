@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import timedelta
+from decimal import Decimal
 
 import httpx
 import respx
@@ -12,6 +13,7 @@ import respx
 from unicaptcha import (
     AsyncSolver,
     ImageChallenge,
+    Money,
     ProviderUsage,
     Solver,
     StatsCollector,
@@ -92,6 +94,59 @@ def test_reset() -> None:
     collector.on_event(_event(TaskEventKind.RESULT_RECEIVED))
     collector.reset()
     assert collector.snapshot() == UsageStats(0, 0, timedelta(), {})
+
+
+class TestCostTotals:
+    def test_per_provider_and_per_currency(self) -> None:
+        collector = StatsCollector()
+        collector.on_event(_event(TaskEventKind.RESULT_RECEIVED, provider="twocaptcha"))
+        collector.on_event(
+            TaskEvent(
+                kind=TaskEventKind.RESULT_RECEIVED,
+                provider="twocaptcha",
+                elapsed=timedelta(seconds=0.1),
+                attempt=1,
+                cost=Money(Decimal("0.00025"), "USD"),
+            )
+        )
+        collector.on_event(
+            TaskEvent(
+                kind=TaskEventKind.RESULT_RECEIVED,
+                provider="rucaptcha",
+                elapsed=timedelta(seconds=0.1),
+                attempt=1,
+                cost=Money(Decimal("0.50"), "RUB"),
+            )
+        )
+        stats = collector.snapshot()
+        assert stats.cost_totals == {"USD": Decimal("0.00025"), "RUB": Decimal("0.50")}
+        assert stats.per_provider["twocaptcha"].cost == Decimal("0.00025")
+        assert stats.per_provider["twocaptcha"].currency == "USD"
+        assert stats.per_provider["rucaptcha"].cost == Decimal("0.50")
+        assert stats.per_provider["rucaptcha"].currency == "RUB"
+
+    def test_failures_add_no_cost(self) -> None:
+        collector = StatsCollector()
+        collector.on_event(_event(TaskEventKind.SUBMIT_FAILED))
+        stats = collector.snapshot()
+        assert stats.failed == 1
+        assert stats.cost_totals == {}
+
+    def test_reset_clears_costs(self) -> None:
+        collector = StatsCollector()
+        collector.on_event(
+            TaskEvent(
+                kind=TaskEventKind.RESULT_RECEIVED,
+                provider="p",
+                elapsed=timedelta(),
+                attempt=1,
+                cost=Money(Decimal("1"), "USD"),
+            )
+        )
+        collector.reset()
+        stats = collector.snapshot()
+        assert stats.cost_totals == {}
+        assert stats.per_provider == {}
 
 
 class TestEndToEnd:

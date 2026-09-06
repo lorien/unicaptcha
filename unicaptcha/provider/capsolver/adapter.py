@@ -294,7 +294,7 @@ class CapsolverAdapter(AntiCaptchaCompatAdapterBase):
             return ParsedTask(
                 state=TaskStatus.READY,
                 solution=self._solution_from(solution),
-                cost=self._decimal(data.get("cost")),
+                cost=self._money(self._decimal(data.get("cost"))),
                 raw=raw,
             )
         if status == "failed":

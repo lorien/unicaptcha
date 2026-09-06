@@ -15,7 +15,6 @@ import time as _time_module
 from collections.abc import Callable, Mapping
 from dataclasses import fields
 from datetime import timedelta
-from decimal import Decimal
 from pathlib import Path
 from typing import TypeVar, cast
 
@@ -66,6 +65,7 @@ from unicaptcha.provider.anticaptcha.solution import (
 )
 from unicaptcha.solution.base import BaseSolution
 from unicaptcha.types import (
+    Money,
     NetworkConfig,
     Proxy,
     RetryConfig,
@@ -589,7 +589,7 @@ class AntiCaptchaClient:
         self._checked_open()
         return self._engine.get_task_status(self._adapter, _ref_of(task))
 
-    def get_balance(self) -> Decimal:
+    def get_balance(self) -> Money:
         self._checked_open()
         return self._engine.get_balance(self._adapter)
 
@@ -1038,7 +1038,7 @@ class AsyncAntiCaptchaClient:
         self._checked_open()
         return await self._engine.get_task_status(self._adapter, _ref_of(task))
 
-    async def get_balance(self) -> Decimal:
+    async def get_balance(self) -> Money:
         self._checked_open()
         return await self._engine.get_balance(self._adapter)
 

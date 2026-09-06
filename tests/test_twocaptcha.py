@@ -39,7 +39,7 @@ from unicaptcha.provider.twocaptcha import (
     TwoCaptchaTextChallenge,
     TwoCaptchaTurnstileChallenge,
 )
-from unicaptcha.types import Proxy, TaskRef, TaskStatus, TaskTicket
+from unicaptcha.types import Money, Proxy, TaskRef, TaskStatus, TaskTicket
 
 BASE = "https://api.2captcha.com"
 CREATE = f"{BASE}/createTask"
@@ -292,7 +292,7 @@ def test_submit_ready_inline_instant_answer() -> None:
     instant = accepted.instant_answer
     assert instant.state is TaskStatus.READY
     assert isinstance(instant.solution, TwoCaptchaImageSolution)
-    assert instant.cost == Decimal("0.002")
+    assert instant.cost == Money(Decimal("0.002"), "USD")
 
 
 def test_submit_error_maps_to_authentication_error() -> None:
@@ -442,7 +442,7 @@ def test_sync_facade_solve_happy_path(fast_time, fast_retry) -> None:
     assert isinstance(result.solution, TwoCaptchaImageSolution)
     assert result.solution.text == "hello world"
     assert result.task_id == 99
-    assert result.cost == Decimal("0.00025")
+    assert result.cost == Money(Decimal("0.00025"), "USD")
     assert result.task_ref == TaskRef("twocaptcha", 99)
     assert "SUBMIT_ACCEPTED" in events
     assert "RESULT_RECEIVED" in events
@@ -462,7 +462,7 @@ def test_sync_facade_aux_ops(fast_time, fast_retry) -> None:
         return_value=httpx.Response(200, content=_j(errorId=0, status="success"))
     )
     with TwoCaptchaClient("test-key", time=fast_time, retry=fast_retry) as client:
-        assert client.get_balance() == Decimal("7.5")
+        assert client.get_balance() == Money(Decimal("7.5"), "USD")
         status = client.get_task_status(55)
         assert status.task_id == 55
         assert status.status is TaskStatus.PENDING or status.status is not None

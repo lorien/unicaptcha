@@ -17,7 +17,7 @@ Documentation: https://lorien.github.io/unicaptcha/
 
 2Captcha-protocol mirrors such as RuCaptcha work by overriding the base URL
 (RuCaptcha's JSON API v2 is verified complete): `TwoCaptchaClient(api_key=...,
-base_url="https://rucaptcha.com")`. Smaller mirrors need per-service
+base_url="https://api.rucaptcha.com")`. Smaller mirrors need per-service
 verification of their JSON API.
 
 ## Supported CAPTCHA kinds (v1)
@@ -163,7 +163,7 @@ status = client.wait_ref(TaskRef("twocaptcha", 12345), timeout=120)  # from a pe
 
 The universal client and the facades share the same aux names:
 
-- `get_balance(provider)` → `Decimal` balance in USD (facades take no argument)
+- `get_balance(provider)` → `Money` balance in the provider's currency (facades take no argument)
 - `get_task_status(task)` → one-shot status (`TaskRef`, or `int` on facades)
 - `report_bad_result(task)` / `report_good_result(task)` → `bool`
   (coverage varies by provider)

@@ -33,7 +33,7 @@ from unicaptcha.provider.anticaptcha import (
     AntiCaptchaTurnstileChallenge,
     AsyncAntiCaptchaClient,
 )
-from unicaptcha.types import Proxy, TaskRef, TaskStatus
+from unicaptcha.types import Money, Proxy, TaskRef, TaskStatus
 
 BASE = "https://api.anti-captcha.com"
 CREATE = f"{BASE}/createTask"
@@ -311,7 +311,7 @@ def test_sync_facade_solve_happy_path(fast_time, fast_retry) -> None:
         result = client.solve_image(b"png", language_pool="en")
     assert result.task_id == 99
     assert result.solution.text == "hello world"
-    assert result.cost == Decimal("0.00025")
+    assert result.cost == Money(Decimal("0.00025"), "USD")
 
 
 @respx.mock

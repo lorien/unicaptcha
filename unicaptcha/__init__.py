@@ -55,6 +55,7 @@ from unicaptcha.solution import (
 )
 from unicaptcha.stats import ProviderUsage, StatsCollector, UsageStats
 from unicaptcha.types import (
+    Money,
     NetworkConfig,
     ParsedTask,
     Proxy,
@@ -98,6 +99,7 @@ __all__ = [
     "InsufficientBalanceError",
     "InvalidChallengeError",
     "InvalidConfigError",
+    "Money",
     "NetworkConfig",
     "NetworkError",
     "NoCaptchaDetectedError",

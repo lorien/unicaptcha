@@ -33,6 +33,7 @@ from unicaptcha.solution.base import BaseSolution
 from unicaptcha.solution.image import ImageSolution
 from unicaptcha.solution.recaptcha_v2 import RecaptchaV2Solution
 from unicaptcha.types import (
+    Money,
     ParsedTask,
     SubmitAccepted,
     TaskRef,
@@ -126,7 +127,7 @@ class MyServiceAdapter(BaseAdapter):
                 instant_answer=ParsedTask(
                     state=TaskStatus.READY,
                     solution=MyServiceImageSolution("instant"),
-                    cost=Decimal(str(data.get("cost") or "0.0001")),
+                    cost=Money(Decimal(str(data.get("cost") or "0.0001")), "USD"),
                     raw=raw,
                 ),
             )
@@ -156,7 +157,7 @@ class MyServiceAdapter(BaseAdapter):
             return ParsedTask(
                 state=TaskStatus.READY,
                 solution=solution,
-                cost=Decimal(str(data.get("cost") or "0.0001")),
+                cost=Money(Decimal(str(data.get("cost") or "0.0001")), "USD"),
                 raw=raw,
             )
         if status == "unsolvable":

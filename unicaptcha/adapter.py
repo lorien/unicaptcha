@@ -14,6 +14,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Any, ClassVar, cast
+from urllib.parse import urlparse
 
 from unicaptcha.challenge.base import BaseChallenge
 from unicaptcha.errors import (
@@ -26,6 +27,7 @@ from unicaptcha.errors import (
     error_from_kind,
 )
 from unicaptcha.types import (
+    Money,
     ParsedTask,
     Proxy,
     SecretStr,
@@ -70,6 +72,11 @@ class BaseAdapter(ABC):
     provider: ClassVar[str]
     challenges: ClassVar[frozenset[type[BaseChallenge]]]
     default_base_url: ClassVar[str]
+    #: Default billing currency for this provider's service (ADR-0040).
+    default_currency: ClassVar[str] = "USD"
+    #: Canonical API host -> currency overrides (exact host match, no
+    #: normalization). The twocaptcha adapter maps its RuCaptcha mirror.
+    _host_currency: ClassVar[Mapping[str, str]] = {}
     endpoints: ClassVar[Endpoints] = Endpoints(
         submit="/createTask",
         get_task_status="/getTaskResult",
@@ -81,7 +88,7 @@ class BaseAdapter(ABC):
         None
     )
 
-    __slots__ = ("_api_key", "_referral", "base_url")
+    __slots__ = ("_api_key", "_referral", "base_url", "currency")
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -98,12 +105,16 @@ class BaseAdapter(ABC):
         base_url: str | None = None,
         *,
         referral: bool | str = True,
+        currency: str | None = None,
     ) -> None:
         self._api_key = (
             api_key if isinstance(api_key, SecretStr) else SecretStr(api_key)
         )
         self.base_url = base_url or self.default_base_url
         self._referral = referral
+        hostname = urlparse(self.base_url).hostname
+        host_currency = self._host_currency.get(hostname) if hostname else None
+        self.currency = currency or host_currency or type(self).default_currency
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(api_key=***)"
@@ -128,7 +139,8 @@ class BaseAdapter(ABC):
 
     @abstractmethod
     def parse_balance(self, raw: bytes) -> Decimal:
-        """Parse a balance response into an exact ``Decimal`` (USD)."""
+        """Parse a balance response into an exact ``Decimal`` (the amount
+        is in the adapter's declared ``currency``, ADR-0040)."""
         ...
 
     def build_task_status(self, task_id: int | str) -> dict[str, Any]:
@@ -245,6 +257,12 @@ class AntiCaptchaCompatAdapterBase(BaseAdapter):
         except (InvalidOperation, ValueError) as exc:
             raise ProviderError(f"invalid balance/cost value {value!r}") from exc
 
+    def _money(self, value: Decimal | None) -> Money | None:
+        """Wrap a parsed cost into the adapter's declared currency."""
+        if value is None:
+            return None
+        return Money(amount=value, currency=self.currency)
+
     def _cookies(self, cookies: Any) -> str | None:
         """Worker cookies serialize header-style: ``k1=v1; k2=v2``."""
         if not cookies:
@@ -343,7 +361,7 @@ class AntiCaptchaCompatAdapterBase(BaseAdapter):
             instant = ParsedTask(
                 state=TaskStatus.READY,
                 solution=self._solution_from(solution),
-                cost=self._decimal(data.get("cost")),
+                cost=self._money(self._decimal(data.get("cost"))),
                 raw=raw,
             )
             return SubmitAccepted(task_id=task_id, instant_answer=instant)
@@ -379,7 +397,7 @@ class AntiCaptchaCompatAdapterBase(BaseAdapter):
             return ParsedTask(
                 state=TaskStatus.READY,
                 solution=self._solution_from(solution),
-                cost=self._decimal(data.get("cost")),
+                cost=self._money(self._decimal(data.get("cost"))),
                 raw=raw,
             )
         return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)

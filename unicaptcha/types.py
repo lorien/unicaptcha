@@ -19,6 +19,26 @@ from unicaptcha.solution.base import BaseSolution
 T = TypeVar("T", bound=BaseSolution)
 
 
+@dataclass(frozen=True, slots=True)
+class Money:
+    """An amount in a named currency (currency-aware costs, ADR-0040).
+
+    ``currency`` is an ISO-4217-style code. The currency is declared per
+    service/adapter (never parsed from the provider wire, which returns
+    bare numbers); defaults are USD, with RUB for the RuCaptcha mirror
+    (``api.rucaptcha.com``). Plain value type: no arithmetic operators,
+    so amounts in different currencies cannot be mixed accidentally.
+    """
+
+    amount: Decimal
+    currency: str
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.amount}, {self.currency!r})"
+
+    __str__ = __repr__
+
+
 class TaskStatus(Enum):
     """Provider-side task outcomes, as answered by status queries."""
 
@@ -53,7 +73,7 @@ class TaskResult(Generic[T]):
 
     solution: T
     task_id: int | str
-    cost: Decimal | None
+    cost: Money | None
     raw: bytes
     provider: str
     created_at: datetime
@@ -87,7 +107,7 @@ class TaskStatusResult:
     provider: str
     status: TaskStatus
     solution: BaseSolution | None
-    cost: Decimal | None
+    cost: Money | None
     raw: bytes
 
     def __repr__(self) -> str:
@@ -137,7 +157,7 @@ class ParsedTask:
 
     state: TaskStatus
     solution: BaseSolution | None
-    cost: Decimal | None
+    cost: Money | None
     raw: bytes
     detail: str | None = None
 
@@ -307,6 +327,7 @@ class RetryConfig:
 
 
 __all__ = [
+    "Money",
     "NetworkConfig",
     "ParsedTask",
     "Proxy",

@@ -21,6 +21,7 @@ from _fake import FakeAsyncSleep, FakeClock, FakeSolution
 
 from unicaptcha import (
     ClientClosedError,
+    Money,
     NetworkError,
     NoSolutionError,
     ProviderError,
@@ -76,7 +77,7 @@ class TimingAdapter(BaseAdapter):
             instant = ParsedTask(
                 state=TaskStatus.READY,
                 solution=FakeSolution("tok1234"),
-                cost=Decimal("0.001"),
+                cost=Money(Decimal("0.001"), "USD"),
                 raw=raw,
             )
         return SubmitAccepted(task_id=data["taskId"], instant_answer=instant)
@@ -88,7 +89,7 @@ class TimingAdapter(BaseAdapter):
             return ParsedTask(
                 state=TaskStatus.READY,
                 solution=FakeSolution("tok1234"),
-                cost=Decimal("0.001"),
+                cost=Money(Decimal("0.001"), "USD"),
                 raw=raw,
             )
         if status == "unsolvable":

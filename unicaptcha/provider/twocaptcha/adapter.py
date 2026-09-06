@@ -50,6 +50,9 @@ class TwoCaptchaAdapter(AntiCaptchaCompatAdapterBase):
     json_provider: ClassVar[str] = "2captcha"
     #: ADR-0072 project affiliate id (2Captcha/RuCaptcha catalog).
     project_soft_id: ClassVar[int | None] = 5859
+    #: The RuCaptcha mirror (same protocol) bills in rubles; 2Captcha's
+    #: canonical host falls through to the ``USD`` class default.
+    _host_currency: ClassVar[Mapping[str, str]] = {"api.rucaptcha.com": "RUB"}
     error_kinds: ClassVar[Mapping[str, ErrorKind]] = {
         "ERROR_KEY_DOES_NOT_EXIST": ErrorKind.AUTHENTICATION,
         "ERROR_WRONG_USER_KEY": ErrorKind.AUTHENTICATION,

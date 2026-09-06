@@ -20,6 +20,7 @@ from unicaptcha import (
     AuthenticationError,
     ClientClosedError,
     ImageChallenge,
+    Money,
     NetworkError,
     NoSolutionError,
     ProviderError,
@@ -106,7 +107,7 @@ class TestSyncCore:
             result = engine.solve(adapter, challenge, on_event=events.append)
         assert result.task_id == 777
         assert result.provider == "myservice"
-        assert result.cost == Decimal("0.001")
+        assert result.cost == Money(Decimal("0.001"), "USD")
         assert result.solution == FakeSolution("tok1234")
         assert result.created_at.tzinfo is not None
         assert status.call_count == 2
@@ -343,7 +344,7 @@ class TestSyncAux:
             respx.post(f"{BASE}/getBalance").mock(
                 return_value=httpx.Response(200, content=b'{"balance": 1.23}')
             )
-            assert make_engine().get_balance(adapter) == Decimal("1.23")
+            assert make_engine().get_balance(adapter) == Money(Decimal("1.23"), "USD")
 
     def test_report_bad_result(self, adapter: StubAdapter) -> None:
         ref = TaskRef("myservice", 25)
@@ -599,7 +600,9 @@ class TestAsyncCore:
             respx.post(f"{BASE}/getBalance").mock(
                 return_value=httpx.Response(200, content=b'{"balance": 2.5}')
             )
-            assert await make_async_engine().get_balance(adapter) == Decimal("2.5")
+            assert await make_async_engine().get_balance(adapter) == Money(
+                Decimal("2.5"), "USD"
+            )
 
     @pytest.mark.asyncio
     async def test_external_cancellation_passes_through(

@@ -32,7 +32,7 @@ from unicaptcha.provider.capmonster import (
     CapMonsterRecaptchaV3Challenge,
     CapMonsterTurnstileChallenge,
 )
-from unicaptcha.types import TaskRef, TaskStatus
+from unicaptcha.types import Money, TaskRef, TaskStatus
 
 BASE = "https://api.capmonster.cloud"
 CREATE = f"{BASE}/createTask"
@@ -309,7 +309,7 @@ def test_sync_facade_solve_happy_path(fast_time, fast_retry) -> None:
         result = client.solve_image(b"png", module_name="google")
     assert result.task_id == 99
     assert result.solution.text == "hello world"
-    assert result.cost == Decimal("0.00025")
+    assert result.cost == Money(Decimal("0.00025"), "USD")
 
 
 @respx.mock

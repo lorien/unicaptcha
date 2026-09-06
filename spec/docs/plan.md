@@ -166,24 +166,3 @@ machinery — one-line code change each.
 References: ADR-0072, report-1788542943 (soft_id 5859),
 var/vendor/anticaptcha-python-analysis.md,
 var/vendor/capmonster-python-captcha-solver-analysis.md.
-
-## Currency-aware costs
-
-Status: new
-Priority: -1
-
-ADR-0040 pins balance — and, by inheritance, `TaskResult.cost` — to USD
-("no currency field, no conversion"), but its implementation-time
-verification note was never acted on: provider cost/balance currencies
-are unverified, and accounts can be currency-scoped by registration
-(2Captcha/RuCaptcha report RUB for RUB-scoped accounts), so summing
-costs across providers silently mixes currencies.
-
-Resolve the contract (ADR-0040 candidate shapes: per-provider documented
-currency, or `tuple[Decimal, str]`), then extend the client usage
-statistics to count cost: add `cost` to `TaskEvent` (set only on
-`RESULT_RECEIVED`; the engine already holds `parsed.cost` at the emit
-site) and total costs per provider and cumulatively in `UsageStats`.
-
-References: ADR-0040 (verification note), report-1788684317
-(client usage statistics).

@@ -11,7 +11,6 @@ import threading
 import time as _time
 from collections.abc import Iterable
 from datetime import timedelta
-from decimal import Decimal
 from typing import Any
 
 import httpx
@@ -39,6 +38,7 @@ from unicaptcha.events import (
     TaskEventKind,
 )
 from unicaptcha.types import (
+    Money,
     NetworkConfig,
     Proxy,
     RetryConfig,
@@ -314,7 +314,7 @@ class Solver:
         self._check_open()
         return self._engine.get_task_status(self._adapter_for_ref(ref), ref)
 
-    def get_balance(self, provider: BaseAdapter | type[BaseAdapter] | str) -> Decimal:
+    def get_balance(self, provider: BaseAdapter | type[BaseAdapter] | str) -> Money:
         self._check_open()
         name = self._resolve_provider(provider)
         return self._engine.get_balance(self._registry[name])
@@ -581,7 +581,7 @@ class AsyncSolver:
 
     async def get_balance(
         self, provider: BaseAdapter | type[BaseAdapter] | str
-    ) -> Decimal:
+    ) -> Money:
         self._check_open()
         name = self._resolve_provider(provider)
         return await self._engine.get_balance(self._registry[name])

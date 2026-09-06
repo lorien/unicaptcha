@@ -88,13 +88,16 @@ print(stats.solved, stats.failed, stats.per_provider)
 ```
 
 - `snapshot()` returns an immutable `UsageStats` (`solved`, `failed`,
-  `elapsed`, and a `per_provider` breakdown); `reset()` zeroes it.
+  `elapsed`, per-provider breakdown, and `cost_totals` keyed by currency);
+  `reset()` zeroes it.
 - The collector is synchronous, so the same handler works with
   `AsyncSolver` / `Async…Client`.
 - Classification follows the terminal events: `RESULT_RECEIVED` counts
-  as solved; `PRE_FLIGHT_FAILED` / `SUBMIT_FAILED` / `RESULT_FAILED`
-  count as failed.
-- Cost totals are intentionally **not** included (currency handling is
-  undecided); this collector counts solves, failures, and time.
+  as solved (and adds its `cost`); `PRE_FLIGHT_FAILED` / `SUBMIT_FAILED`
+  / `RESULT_FAILED` count as failed.
+- Cost totals are currency-safe: each provider instance has one currency
+  (per-service default, e.g. `api.rucaptcha.com` → RUB, others USD), so
+  `per_provider.cost` sums one currency, and `cost_totals` groups by
+  currency code — never a blind cross-currency sum.
 
 See [`StatsCollector`, `UsageStats`](../api/stats.md).
