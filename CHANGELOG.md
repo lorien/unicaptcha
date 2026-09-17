@@ -49,6 +49,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   commission per solve. Pass `referral=False` to disable it, or
   `referral="<your-id>"` to credit your own software registration. Other
   providers have no registered id yet.
+- Adapter SDK (ADR-0079): `parse_submit_response` / `parse_task_status`
+  and the compat base's `_solution_from` accept an optional keyword-only
+  `challenge_type`. The engine supplies the submitted challenge's class so
+  adapters can disambiguate wire shapes that collide across kinds; direct
+  calls keep the shape-dispatch fallback. `TaskTicket` gains
+  `challenge_type` (the class only — never the challenge instance).
+
+### Fixed
+
+- 2Captcha/RuCaptcha reCAPTCHA v2 solutions are no longer mis-typed as
+  v3. The provider returns the same `gRecaptchaResponse` + `token` shape
+  for both kinds, so shape-only dispatch mis-typed any v2 answer that
+  carried `token` — notably v2 invisible (e.g. the Semrush login
+  sitekey), which returned a `TwoCaptchaRecaptchaV3Solution`. The
+  submitted kind now decides the solution type, on `solve()` and on the
+  two-phase `submit()`/`wait()` path alike (ADR-0079).
 
 ## [0.1.0] - 2026-09-04
 

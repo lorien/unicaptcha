@@ -116,7 +116,12 @@ class MyServiceAdapter(BaseAdapter):
             payload["softId"] = int(self._referral)
         return payload
 
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
+    def parse_submit_response(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> SubmitAccepted:
         data = json.loads(raw)
         if data.get("errorId"):
             self._raise_mapped(raw)
@@ -135,7 +140,12 @@ class MyServiceAdapter(BaseAdapter):
 
     # -- status / balance / errors -----------------------------------------
 
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         data = json.loads(raw)
         if data.get("errorId"):
             if data.get("errorCode") == "ERROR_CAPTCHA_UNSOLVABLE":

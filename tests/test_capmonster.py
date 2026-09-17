@@ -30,6 +30,7 @@ from unicaptcha.provider.capmonster import (
     CapMonsterRecaptchaV2Challenge,
     CapMonsterRecaptchaV2Solution,
     CapMonsterRecaptchaV3Challenge,
+    CapMonsterRecaptchaV3Solution,
     CapMonsterTurnstileChallenge,
 )
 from unicaptcha.types import Money, TaskRef, TaskStatus
@@ -254,6 +255,17 @@ def test_solution_shape_dispatch() -> None:
         }
     )
     assert isinstance(gv4, CapMonsterGeeTestV4Solution)
+    # Kind context resolves the colliding reCAPTCHA v2/v3 shapes.
+    v2_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g", "token": "t"},
+        challenge_type=CapMonsterRecaptchaV2Challenge,
+    )
+    assert isinstance(v2_ctx, CapMonsterRecaptchaV2Solution)
+    v3_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g"},
+        challenge_type=CapMonsterRecaptchaV3Challenge,
+    )
+    assert isinstance(v3_ctx, CapMonsterRecaptchaV3Solution)
     with pytest.raises(EmptySolutionError):
         a._solution_from({"bogus": 1})
 

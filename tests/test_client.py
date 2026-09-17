@@ -79,7 +79,12 @@ class EchoAdapter(BaseAdapter):
             payload["ref"] = str(task_id)
         return payload
 
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
+    def parse_submit_response(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> SubmitAccepted:
         data = json.loads(raw)
         instant = None
         if data.get("status") == "ready":
@@ -91,7 +96,12 @@ class EchoAdapter(BaseAdapter):
             )
         return SubmitAccepted(task_id=data["taskId"], instant_answer=instant)
 
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         data = json.loads(raw)
         status = data["status"]
         if status == "ready":

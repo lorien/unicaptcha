@@ -67,7 +67,12 @@ class TimingAdapter(BaseAdapter):
     def build_payload(self, challenge: BaseChallenge) -> dict[str, object]:
         return {"clientKey": "test-key", "task": "data"}
 
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
+    def parse_submit_response(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> SubmitAccepted:
         data = json.loads(raw)
         if data.get("errorId"):
             kind, message = self.map_provider_error(raw)
@@ -82,7 +87,12 @@ class TimingAdapter(BaseAdapter):
             )
         return SubmitAccepted(task_id=data["taskId"], instant_answer=instant)
 
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         data = json.loads(raw)
         status = data["status"]
         if status == "ready":

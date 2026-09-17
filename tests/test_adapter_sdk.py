@@ -30,10 +30,20 @@ class MinimalAdapter(BaseAdapter):
     def build_payload(self, challenge: BaseChallenge) -> dict[str, Any]:
         return {}
 
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
+    def parse_submit_response(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> SubmitAccepted:
         return SubmitAccepted(task_id=1)
 
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)
 
     def parse_balance(self, raw: bytes) -> Decimal:

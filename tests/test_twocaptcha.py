@@ -361,6 +361,19 @@ def test_solution_shape_dispatch() -> None:
     # v2 carries gRecaptchaResponse only.
     v2 = a._solution_from({"gRecaptchaResponse": "g"})
     assert isinstance(v2, TwoCaptchaRecaptchaV2Solution)
+    # 2Captcha documents the *same* v2 and v3 solution shape
+    # (`gRecaptchaResponse` + `token`), so the submitted challenge kind is
+    # authoritative when the engine supplies it (ADR-0079).
+    v2_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g", "token": "t"},
+        challenge_type=TwoCaptchaRecaptchaV2Challenge,
+    )
+    assert isinstance(v2_ctx, TwoCaptchaRecaptchaV2Solution)
+    v3_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g"},
+        challenge_type=TwoCaptchaRecaptchaV3Challenge,
+    )
+    assert isinstance(v3_ctx, TwoCaptchaRecaptchaV3Solution)
     with pytest.raises(EmptySolutionError):
         a._solution_from({"bogus": 1})
 
@@ -446,6 +459,113 @@ def test_sync_facade_solve_happy_path(fast_time, fast_retry) -> None:
     assert result.task_ref == TaskRef("twocaptcha", 99)
     assert "SUBMIT_ACCEPTED" in events
     assert "RESULT_RECEIVED" in events
+
+
+@respx.mock
+def test_solve_recaptcha_v2_invisible_solution_is_v2(fast_time, fast_retry) -> None:
+    """Regression (ADR-0079): 2Captcha/RuCaptcha answers reCAPTCHA v2
+    (including invisible) with the same ``gRecaptchaResponse`` + ``token``
+    shape it uses for v3; the submitted kind must decide the type."""
+    respx.post(CREATE).mock(
+        return_value=httpx.Response(200, content=_j(errorId=0, taskId=7))
+    )
+    respx.post(POLL).mock(
+        return_value=httpx.Response(
+            200,
+            content=_j(
+                errorId=0,
+                status="ready",
+                cost="0.001",
+                solution={"gRecaptchaResponse": "g-token", "token": "g-token"},
+            ),
+        )
+    )
+    with TwoCaptchaClient("test-key", time=fast_time, retry=fast_retry) as client:
+        result = client.solve_recaptcha_v2(
+            sitekey="sitekey",
+            pageurl="https://www.semrush.com/login/",
+            invisible=True,
+        )
+    assert isinstance(result.solution, TwoCaptchaRecaptchaV2Solution)
+    assert not isinstance(result.solution, TwoCaptchaRecaptchaV3Solution)
+    assert result.solution.token == "g-token"
+
+
+@respx.mock
+def test_solve_recaptcha_v3_answer_stays_v3(fast_time, fast_retry) -> None:
+    respx.post(CREATE).mock(
+        return_value=httpx.Response(200, content=_j(errorId=0, taskId=8))
+    )
+    respx.post(POLL).mock(
+        return_value=httpx.Response(
+            200,
+            content=_j(
+                errorId=0,
+                status="ready",
+                solution={"gRecaptchaResponse": "g-token", "token": "g-token"},
+            ),
+        )
+    )
+    with TwoCaptchaClient("test-key", time=fast_time, retry=fast_retry) as client:
+        result = client.solve_recaptcha_v3(
+            sitekey="sitekey", pageurl="https://example.com/"
+        )
+    assert isinstance(result.solution, TwoCaptchaRecaptchaV3Solution)
+
+
+@respx.mock
+def test_submit_wait_carries_challenge_kind(fast_time, fast_retry) -> None:
+    """The two-phase path gets the same kind context as ``solve``."""
+    respx.post(CREATE).mock(
+        return_value=httpx.Response(200, content=_j(errorId=0, taskId=9))
+    )
+    respx.post(POLL).mock(
+        return_value=httpx.Response(
+            200,
+            content=_j(
+                errorId=0,
+                status="ready",
+                solution={"gRecaptchaResponse": "g", "token": "g"},
+            ),
+        )
+    )
+    with TwoCaptchaClient("test-key", time=fast_time, retry=fast_retry) as client:
+        ticket = client.submit(
+            TwoCaptchaRecaptchaV2Challenge(
+                sitekey="sitekey", pageurl="https://example.com/", invisible=True
+            )
+        )
+        assert ticket.challenge_type is TwoCaptchaRecaptchaV2Challenge
+        assert "challenge_type=TwoCaptchaRecaptchaV2Challenge" in repr(ticket)
+        result = client.wait(ticket)
+    assert isinstance(result.solution, TwoCaptchaRecaptchaV2Solution)
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_solve_recaptcha_v2_invisible_solution_is_v2(
+    fast_time, fast_retry
+) -> None:
+    respx.post(CREATE).mock(
+        return_value=httpx.Response(200, content=_j(errorId=0, taskId=10))
+    )
+    respx.post(POLL).mock(
+        return_value=httpx.Response(
+            200,
+            content=_j(
+                errorId=0,
+                status="ready",
+                solution={"gRecaptchaResponse": "g", "token": "g"},
+            ),
+        )
+    )
+    async with AsyncTwoCaptchaClient(
+        "test-key", time=fast_time, retry=fast_retry
+    ) as client:
+        result = await client.solve_recaptcha_v2(
+            sitekey="sitekey", pageurl="https://example.com/", invisible=True
+        )
+    assert isinstance(result.solution, TwoCaptchaRecaptchaV2Solution)
 
 
 @respx.mock

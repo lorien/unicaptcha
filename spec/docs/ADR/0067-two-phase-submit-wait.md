@@ -1,6 +1,6 @@
 # ADR-0067: Two-phase submit/wait with TaskTicket
 
-**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains an `instant_answer` field, wait fast-path for inline-answered submits; renamed 2026-08-24: `Result[T]` → `SolveResult[T]` → `TaskResult[T]`, `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status` — task-centric vocabulary; amended 2026-08-24: `submit` takes `on_event=`, no `time=` — retry-bounded, not budget-bounded)
+**Status:** Accepted (amends ADR-0010, ADR-0018, ADR-0038, ADR-0045, ADR-0051; closes deferred item 10; notes deferred item 7; wait's poll-delay skip per the ADR-0030 amendment; amended by ADR-0075: TaskTicket gains an `instant_answer` field, wait fast-path for inline-answered submits; renamed 2026-08-24: `Result[T]` → `SolveResult[T]` → `TaskResult[T]`, `TaskStatus` → `TaskStatusResult`, `get_task_result` → `get_task_status` — task-centric vocabulary; amended 2026-08-24: `submit` takes `on_event=`, no `time=` — retry-bounded, not budget-bounded; amended by ADR-0079: TaskTicket gains `challenge_type` for kind-aware status parsing)
 **Date:** 2026-08-23, amendment 2026-08-24
 
 ## Context

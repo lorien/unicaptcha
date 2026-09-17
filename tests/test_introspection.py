@@ -38,10 +38,20 @@ class _IntroAdapter(BaseAdapter):
     def build_payload(self, challenge: BaseChallenge) -> dict[str, Any]:
         raise NotImplementedError
 
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
+    def parse_submit_response(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> SubmitAccepted:
         raise NotImplementedError
 
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         raise NotImplementedError
 
     def parse_balance(self, raw: bytes) -> Decimal:

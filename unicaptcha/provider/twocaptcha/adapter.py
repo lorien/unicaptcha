@@ -15,6 +15,8 @@ from typing import Any, ClassVar, cast
 
 from unicaptcha.adapter import AntiCaptchaCompatAdapterBase
 from unicaptcha.challenge.base import BaseChallenge
+from unicaptcha.challenge.recaptcha_v2 import RecaptchaV2Challenge
+from unicaptcha.challenge.recaptcha_v3 import RecaptchaV3Challenge
 from unicaptcha.errors import (
     EmptySolutionError,
     ErrorKind,
@@ -299,7 +301,12 @@ class TwoCaptchaAdapter(AntiCaptchaCompatAdapterBase):
             raise error_from_kind(kind, message, raw)
         return data.get("status") == "success"
 
-    def _solution_from(self, solution: dict[str, Any]) -> Any:
+    def _solution_from(
+        self,
+        solution: dict[str, Any],
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> Any:
         g_response = solution.get("gRecaptchaResponse")
         token = solution.get("token")
         if "captcha_output" in solution and "lot_number" in solution:
@@ -316,7 +323,23 @@ class TwoCaptchaAdapter(AntiCaptchaCompatAdapterBase):
                 validate=str(solution["validate"]),
                 seccode=str(solution["seccode"]),
             )
-        if "score" in solution:
+        wants_v2 = challenge_type is not None and issubclass(
+            challenge_type, RecaptchaV2Challenge
+        )
+        wants_v3 = challenge_type is not None and issubclass(
+            challenge_type, RecaptchaV3Challenge
+        )
+        if wants_v2:
+            # The submitted kind is authoritative: 2Captcha's documented
+            # reCAPTCHA v2 and v3 solution shapes are identical
+            # (`gRecaptchaResponse` + `token`), so keys cannot tell them
+            # apart (ADR-0079).
+            return TwoCaptchaRecaptchaV2Solution(str(g_response or token or ""))
+        if wants_v3 or "score" in solution or (g_response and token):
+            # Live-verified (fidelity pass 2026-08-28): the v3 solution
+            # shape is gRecaptchaResponse + token WITHOUT a score field;
+            # only the challenge kind (or a score, when reported) tells it
+            # apart from a v2 answer.
             score = solution.get("score")
             return TwoCaptchaRecaptchaV3Solution(
                 token=str(g_response or token or ""),
@@ -326,13 +349,6 @@ class TwoCaptchaAdapter(AntiCaptchaCompatAdapterBase):
                     if solution.get("action") is not None
                     else None
                 ),
-            )
-        if g_response and token:
-            # Live-verified (fidelity pass 2026-08-28): the v3 solution
-            # shape is gRecaptchaResponse + token WITHOUT a score field;
-            # v2 responses carry gRecaptchaResponse only.
-            return TwoCaptchaRecaptchaV3Solution(
-                token=str(g_response), score=None, action=None
             )
         if g_response:
             return TwoCaptchaRecaptchaV2Solution(str(g_response))

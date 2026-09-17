@@ -30,6 +30,7 @@ from unicaptcha.provider.capsolver import (
     CapsolverRecaptchaV2Challenge,
     CapsolverRecaptchaV2Solution,
     CapsolverRecaptchaV3Challenge,
+    CapsolverRecaptchaV3Solution,
     CapsolverTurnstileChallenge,
     CapsolverTurnstileSolution,
 )
@@ -248,6 +249,17 @@ def test_solution_dispatch_with_type_disambiguation() -> None:
         }
     )
     assert isinstance(gv4, CapsolverGeeTestV4Solution)
+    # Kind context resolves the colliding reCAPTCHA v2/v3 shapes.
+    v2_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g", "token": "t"},
+        challenge_type=CapsolverRecaptchaV2Challenge,
+    )
+    assert isinstance(v2_ctx, CapsolverRecaptchaV2Solution)
+    v3_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g"},
+        challenge_type=CapsolverRecaptchaV3Challenge,
+    )
+    assert isinstance(v3_ctx, CapsolverRecaptchaV3Solution)
     with pytest.raises(EmptySolutionError):
         a._solution_from({"bogus": 1})
 

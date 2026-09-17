@@ -10,11 +10,14 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from typing import Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from unicaptcha._internal.repr import stub_bytes
 from unicaptcha.errors import InvalidConfigError
 from unicaptcha.solution.base import BaseSolution
+
+if TYPE_CHECKING:
+    from unicaptcha.challenge.base import BaseChallenge
 
 T = TypeVar("T", bound=BaseSolution)
 
@@ -132,19 +135,30 @@ class TaskTicket(Generic[T]):
     answered the submit itself (instant tasks); ``wait()`` fast-paths on it.
     ``time`` is the resolved solve-timeline config carried from submit
     (ADR-0030); ``wait()`` derives its default budget and poll cadence from
-    it.
+    it. ``challenge_type`` is the submitted challenge's concrete class,
+    carried so ``wait()`` can give the adapter kind context for ambiguous
+    solution shapes (ADR-0079).
     """
 
     task_ref: TaskRef
     submitted_at: datetime
     instant_answer: ParsedTask | None = None
     time: TimeConfig | None = None
+    #: The submitted challenge's concrete class, carried so ``wait()`` can
+    #: give the adapter kind context when parsing an ambiguous solution
+    #: shape (2Captcha v2 and v3 answers are identical, ADR-0079). ``None``
+    #: for user-constructed tickets (shape dispatch applies).
+    challenge_type: type[BaseChallenge] | None = None
 
     def __repr__(self) -> str:
+        challenge = (
+            self.challenge_type.__name__ if self.challenge_type is not None else None
+        )
         return (
             f"{type(self).__name__}(task_ref={self.task_ref!r}, "
             f"submitted_at={self.submitted_at!r}, "
-            f"instant_answer={self.instant_answer!r}, time={self.time!r})"
+            f"instant_answer={self.instant_answer!r}, time={self.time!r}, "
+            f"challenge_type={challenge})"
         )
 
     __str__ = __repr__

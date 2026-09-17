@@ -29,6 +29,7 @@ from unicaptcha.provider.anticaptcha import (
     AntiCaptchaRecaptchaV2Challenge,
     AntiCaptchaRecaptchaV2Solution,
     AntiCaptchaRecaptchaV3Challenge,
+    AntiCaptchaRecaptchaV3Solution,
     AntiCaptchaTextChallenge,
     AntiCaptchaTurnstileChallenge,
     AsyncAntiCaptchaClient,
@@ -260,6 +261,17 @@ def test_solution_shape_dispatch() -> None:
         }
     )
     assert isinstance(gv4, AntiCaptchaGeeTestV4Solution)
+    # Kind context resolves the colliding reCAPTCHA v2/v3 shapes.
+    v2_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g", "token": "t"},
+        challenge_type=AntiCaptchaRecaptchaV2Challenge,
+    )
+    assert isinstance(v2_ctx, AntiCaptchaRecaptchaV2Solution)
+    v3_ctx = a._solution_from(
+        {"gRecaptchaResponse": "g"},
+        challenge_type=AntiCaptchaRecaptchaV3Challenge,
+    )
+    assert isinstance(v3_ctx, AntiCaptchaRecaptchaV3Solution)
     with pytest.raises(EmptySolutionError):
         a._solution_from({"bogus": 1})
 

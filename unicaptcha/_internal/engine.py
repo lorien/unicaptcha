@@ -7,6 +7,7 @@ from __future__ import annotations
 import threading
 from collections.abc import Callable
 from datetime import timedelta
+from functools import partial
 from typing import Any, Generic, TypeVar, cast
 
 from unicaptcha._internal.backoff import backoff_sleep
@@ -152,7 +153,7 @@ class TaskEngine(Generic[_T]):
             retry_cfg,
             handler,
             start,
-            adapter.parse_submit_response,
+            partial(adapter.parse_submit_response, challenge_type=type(challenge)),
         )
         emit_sync(
             handler,
@@ -171,6 +172,7 @@ class TaskEngine(Generic[_T]):
             submitted_at=self._clock.wallclock(),
             instant_answer=accepted.instant_answer,
             time=timing.to_config(),
+            challenge_type=type(challenge),
         )
 
     def _post_retried(
@@ -368,7 +370,9 @@ class TaskEngine(Generic[_T]):
                     )
                 )
                 continue
-            parsed = adapter.parse_task_status(response.body)
+            parsed = adapter.parse_task_status(
+                response.body, challenge_type=ticket.challenge_type
+            )
             if parsed.state is TaskStatus.READY:
                 result = self._build_result(adapter, ticket, parsed, start)
                 self._registry.remove(ticket.task_ref)

@@ -24,6 +24,8 @@ from typing import Any, ClassVar, cast
 
 from unicaptcha.adapter import AntiCaptchaCompatAdapterBase
 from unicaptcha.challenge.base import BaseChallenge
+from unicaptcha.challenge.recaptcha_v2 import RecaptchaV2Challenge
+from unicaptcha.challenge.recaptcha_v3 import RecaptchaV3Challenge
 from unicaptcha.errors import (
     EmptySolutionError,
     ErrorKind,
@@ -267,7 +269,12 @@ class CapsolverAdapter(AntiCaptchaCompatAdapterBase):
 
     # -- response parsing --------------------------------------------------
 
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         data = self._decode(raw)
         if data.get("errorId"):
             code = self._provider_code(data)
@@ -293,7 +300,7 @@ class CapsolverAdapter(AntiCaptchaCompatAdapterBase):
             solution = self._solution_dict(data)
             return ParsedTask(
                 state=TaskStatus.READY,
-                solution=self._solution_from(solution),
+                solution=self._solution_from(solution, challenge_type=challenge_type),
                 cost=self._money(self._decimal(data.get("cost"))),
                 raw=raw,
             )
@@ -303,7 +310,12 @@ class CapsolverAdapter(AntiCaptchaCompatAdapterBase):
             )
         return ParsedTask(state=TaskStatus.PENDING, solution=None, cost=None, raw=raw)
 
-    def _solution_from(self, solution: dict[str, Any]) -> Any:
+    def _solution_from(
+        self,
+        solution: dict[str, Any],
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> Any:
         g_response = solution.get("gRecaptchaResponse")
         token = solution.get("token")
         kind = str(solution.get("type") or "").lower()
@@ -321,7 +333,16 @@ class CapsolverAdapter(AntiCaptchaCompatAdapterBase):
                 validate=str(solution["validate"]),
                 seccode=str(solution["seccode"]),
             )
-        if "score" in solution:
+        wants_v2 = challenge_type is not None and issubclass(
+            challenge_type, RecaptchaV2Challenge
+        )
+        wants_v3 = challenge_type is not None and issubclass(
+            challenge_type, RecaptchaV3Challenge
+        )
+        if wants_v2:
+            # The submitted kind wins over the (collision-prone) shape.
+            return CapsolverRecaptchaV2Solution(str(g_response or token or ""))
+        if wants_v3 or "score" in solution:
             score = solution.get("score")
             return CapsolverRecaptchaV3Solution(
                 token=str(g_response or token or ""),

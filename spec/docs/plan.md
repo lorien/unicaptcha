@@ -166,3 +166,19 @@ machinery — one-line code change each.
 References: ADR-0072, report-1788542943 (soft_id 5859),
 var/vendor/anticaptcha-python-analysis.md,
 var/vendor/capmonster-python-captcha-solver-analysis.md.
+## Kind context for bare-`TaskRef` status queries
+
+Status: new
+Priority: -1
+
+ADR-0079 threads the submitted challenge kind through the engine's
+`solve()` / `submit()` / `wait()` paths; `wait_ref()` and
+`get_task_status()` still shape-dispatch because a `TaskRef` carries only
+provider + id. On providers whose kinds share a wire shape (2Captcha
+reCAPTCHA v2/v3; token-only hCaptcha/Turnstile/FunCaptcha), a status
+query can label the right token with the wrong solution class. Option:
+persist the challenge class with the registry entry (which already stores
+abandoned refs) so status queries can pass it too. Only worth doing if
+callers report relying on the type label from bare-ref queries.
+
+References: ADR-0079, report-1789667248.

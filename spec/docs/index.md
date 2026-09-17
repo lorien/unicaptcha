@@ -104,6 +104,7 @@ supersede.
 | [0076](ADR/0076-per-provider-challenge-field-surface.md) | Per-provider challenge field surface | amends 0006/0031/0069 scope: concrete field lists in architecture §2 |
 | [0077](ADR/0077-auto-solve.md) | Auto mode: HTML detection + auto solve | new public `detect()` / `auto_solve`; amends goals non-goal |
 | [0078](ADR/0078-docs-site.md) | Static documentation site | supersedes 0023 |
+| [0079](ADR/0079-challenge-kind-context-in-parsing.md) | Challenge-kind context in parsing | amends 0041/0053/0058/0067: engine-supplied `challenge_type` for colliding v2/v3 shapes |
 
 ## Conventions
 

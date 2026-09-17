@@ -127,14 +127,32 @@ class BaseAdapter(ABC):
         ...
 
     @abstractmethod
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
-        """Parse a ``createTask`` response (ADR-0075)."""
+    def parse_submit_response(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> SubmitAccepted:
+        """Parse a ``createTask`` response (ADR-0075).
+
+        ``challenge_type`` is the concrete class of the challenge that
+        produced the task (engine-provided context, ADR-0079); adapters
+        use it to disambiguate solution shapes that collide across kinds
+        (e.g. 2Captcha's identical reCAPTCHA v2/v3 answers). ``None``
+        falls back to shape dispatch.
+        """
         ...
 
     @abstractmethod
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         """Parse a ``getTaskResult`` response into a four-state
-        ``ParsedTask`` (ADR-0058)."""
+        ``ParsedTask`` (ADR-0058); ``challenge_type`` per
+        :meth:`parse_submit_response`."""
         ...
 
     @abstractmethod
@@ -227,8 +245,14 @@ class AntiCaptchaCompatAdapterBase(BaseAdapter):
         """Provider-specific challenge -> task mapping."""
 
     @abstractmethod
-    def _solution_from(self, solution: dict[str, Any]) -> Any:
-        """Provider-specific solution-shape dispatch."""
+    def _solution_from(
+        self,
+        solution: dict[str, Any],
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> Any:
+        """Provider-specific solution dispatch, shape-keyed with optional
+        challenge-kind context (ADR-0079)."""
 
     # -- shared field helpers ----------------------------------------------
 
@@ -350,7 +374,12 @@ class AntiCaptchaCompatAdapterBase(BaseAdapter):
         """Provider-specific envelope-level fields (default: none)."""
         return {}
 
-    def parse_submit_response(self, raw: bytes) -> SubmitAccepted:
+    def parse_submit_response(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> SubmitAccepted:
         data = self._decode(raw)
         if data.get("errorId"):
             kind, message = self.map_provider_error(raw)
@@ -360,14 +389,19 @@ class AntiCaptchaCompatAdapterBase(BaseAdapter):
             solution = self._solution_dict(data)
             instant = ParsedTask(
                 state=TaskStatus.READY,
-                solution=self._solution_from(solution),
+                solution=self._solution_from(solution, challenge_type=challenge_type),
                 cost=self._money(self._decimal(data.get("cost"))),
                 raw=raw,
             )
             return SubmitAccepted(task_id=task_id, instant_answer=instant)
         return SubmitAccepted(task_id=task_id)
 
-    def parse_task_status(self, raw: bytes) -> ParsedTask:
+    def parse_task_status(
+        self,
+        raw: bytes,
+        *,
+        challenge_type: type[BaseChallenge] | None = None,
+    ) -> ParsedTask:
         data = self._decode(raw)
         if data.get("errorId"):
             code = self._provider_code(data)
@@ -396,7 +430,7 @@ class AntiCaptchaCompatAdapterBase(BaseAdapter):
             solution = self._solution_dict(data)
             return ParsedTask(
                 state=TaskStatus.READY,
-                solution=self._solution_from(solution),
+                solution=self._solution_from(solution, challenge_type=challenge_type),
                 cost=self._money(self._decimal(data.get("cost"))),
                 raw=raw,
             )
