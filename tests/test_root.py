@@ -63,4 +63,4 @@ class TestRootExports:
             assert hasattr(unicaptcha, name), name
 
     def test_version(self) -> None:
-        assert unicaptcha.__version__ == "0.1.0"
+        assert unicaptcha.__version__ == "0.2.0"
