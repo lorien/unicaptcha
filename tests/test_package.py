@@ -21,8 +21,8 @@ SUBPACKAGES = [
 ]
 
 
-def test_version() -> None:
-    assert unicaptcha.__version__ == "0.2.0"
+def test_version(released_version: str) -> None:
+    assert unicaptcha.__version__ == released_version
 
 
 @pytest.mark.parametrize("name", SUBPACKAGES)

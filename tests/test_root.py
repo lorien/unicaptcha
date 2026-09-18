@@ -62,5 +62,5 @@ class TestRootExports:
         for name in expected:
             assert hasattr(unicaptcha, name), name
 
-    def test_version(self) -> None:
-        assert unicaptcha.__version__ == "0.2.0"
+    def test_version(self, released_version: str) -> None:
+        assert unicaptcha.__version__ == released_version
